@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="vi" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookNest - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #8b5a3c;
+            --color-secondary: #d4a574;
+            --color-bg: #f8f6f1;
+            --color-surface: #ffffff;
+            --color-text: #1a1410;
+            --color-border: #e5e0d8;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-error: #ef4444;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%);
+        }
+
+        .sidebar-item {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-card {
+            transition: all 0.3s ease;
+            border: 1px solid var(--color-border);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-row {
+            border-bottom: 1px solid var(--color-border);
+            transition: background-color 0.2s;
+        }
+
+        .table-row:hover {
+            background-color: rgba(139, 90, 60, 0.05);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(139, 90, 60, 0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--color-surface);
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            animation: slideIn 0.3s ease;
+            z-index: 100;
+        }
+
+        .toast.success {
+            background-color: var(--color-success);
+        }
+
+        .toast.error {
+            background-color: var(--color-error);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background-color: #d1fae5;
+            color: var(--color-success);
+        }
+
+        .badge-warning {
+            background-color: #fef3c7;
+            color: var(--color-warning);
+        }
+
+        .badge-error {
+            background-color: #fee2e2;
+            color: var(--color-error);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(139, 90, 60, 0.2);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="h-full overflow-auto" style="background-color: var(--color-bg);">
+    <div class="flex min-h-full w-full">
+        <!-- Sidebar -->
+        <aside class="sidebar w-64 text-white flex flex-col fixed left-0 top-0 h-full">
+            <div class="p-6 border-b border-white/20">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 id="store-name" class="font-bold text-lg">BookNest</h1>
+                        <p class="text-xs opacity-75">Quản lý</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+                <button
+                    class="sidebar-item active w-full text-left px-4 py-3 rounded-lg font-medium flex items-center gap-3"
+                    data-view="dashboard">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-3m0 0l7-4 7 4M5 9v7a1 1 0 001 1h12a1 1 0 001-1V9m-9 16l-7-4m0 0V5m7 4l7-4" />
+                    </svg>
+                    <span>Dashboard</span>
+                </button>
+                <button class="sidebar-item w-full text-left px-4 py-3 rounded-lg font-medium flex items-center gap-3"
+                    data-view="books">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <span>Quản lý sách</span>
+                </button>
+                <button class="sidebar-item w-full text-left px-4 py-3 rounded-lg font-medium flex items-center gap-3"
+                    data-view="categories">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                    <span>Danh mục</span>
+                </button>
+                <button class="sidebar-item w-full text-left px-4 py-3 rounded-lg font-medium flex items-center gap-3"
+                    data-view="analytics">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span>Thống kê</span>
+                </button>
+            </nav>
+            <div class="p-4 border-t border-white/20">
+                <div class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10 cursor-pointer">
+                    <div class="w-10 h-10 rounded-full bg-white/20"></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium truncate">Admin</p>
+                        <p class="text-xs opacity-75">booknest@store</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64">
+            <!-- Header -->
+            <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+                <div class="px-8 py-4 flex items-center justify-between">
+                    <div>
+                        <h2 id="view-title" class="text-2xl font-bold" style="color: var(--color-text);">Dashboard</h2>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button class="p-2 rounded-lg hover:bg-gray-100 relative">
+                            <svg class="w-6 h-6" style="color: var(--color-text);" fill="none" stroke="currentColor"
+                                viewbox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 1115 15.5v1.5m0 0h-1.5m1.5 0V11m0 0a9 9 0 10-18 0 9 9 0 0018 0z" />
+                            </svg>
+                            <span
+                                class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">3</span>
+                        </button>
+                        <button class="p-2 rounded-lg hover:bg-gray-100">
+                            <svg class="w-6 h-6" style="color: var(--color-text);" fill="none" stroke="currentColor"
+                                viewbox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view-content p-8 space-y-8">
+                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="stat-card bg-white p-6 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-600 font-medium">Tổng sách</h3>
+                            <div class="w-12 h-12 rounded-lg flex items-center justify-center"
+                                style="background: linear-gradient(135deg, rgba(139, 90, 60, 0.1), rgba(212, 165, 116, 0.1));">
+                                <svg class="w-6 h-6" style="color: var(--color-primary);" fill="none"
+                                    stroke="currentColor" viewbox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold" style="color: var(--color-text);" id="stat-total-books">0</p>
+                        <p class="text-sm text-gray-500 mt-2">Đầu sách trong kho</p>
+                    </div>
+                    <div class="stat-card bg-white p-6 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-600 font-medium">Doanh thu</h3>
+                            <div class="w-12 h-12 rounded-lg flex items-center justify-center"
+                                style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));">
+                                <svg class="w-6 h-6" style="color: var(--color-success);" fill="none"
+                                    stroke="currentColor" viewbox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold" style="color: var(--color-text);" id="stat-revenue">0đ</p>
+                        <p class="text-sm text-gray-500 mt-2">Tháng này</p>
+                    </div>
+                    <div class="stat-card bg-white p-6 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-600 font-medium">Tồn kho</h3>
+                            <div class="w-12 h-12 rounded-lg flex items-center justify-center"
+                                style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));">
+                                <svg class="w-6 h-6" style="color: var(--color-warning);" fill="none"
+                                    stroke="currentColor" viewbox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M20 7l-8-4-8 4m0 0l8 4m-8-4v10l8 4m0-10l8 4m-8-4v10M8 13v2m0-6V7m8 6v2m0-6V7" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold" style="color: var(--color-text);" id="stat-stock">0</p>
+                        <p class="text-sm text-gray-500 mt-2">Tổng số lượng</p>
+                    </div>
+                    <div class="stat-card bg-white p-6 rounded-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-600 font-medium">Đánh giá</h3>
+                            <div class="w-12 h-12 rounded-lg flex items-center justify-center"
+                                style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));">
+                                <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewbox="0 0 24 24">
+                                    <path
+                                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold" style="color: var(--color-text);" id="stat-rating">0</p>
+                        <p class="text-sm text-gray-500 mt-2">Trung bình</p>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-lg">
+                        <h3 class="text-lg font-bold mb-4" style="color: var(--color-text);">Bán hàng tháng này</h3>
+                        <div class="h-64 flex items-center justify-center text-gray-400">
+                            <p>Biểu đồ (Tương tác với dữ liệu sách)</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg">
+                        <h3 class="text-lg font-bold mb-4" style="color: var(--color-text);">Danh mục</h3>
+                        <div class="space-y-3 max-h-64 overflow-y-auto" id="category-list">
+                            <div class="flex items-center gap-2 pb-3 border-b">
+                                <div class="w-3 h-3 rounded-full" style="background: var(--color-primary);"></div>
+                                <span class="flex-1 text-sm">Văn học</span>
+                                <span class="text-sm font-bold" id="cat-literature">0</span>
+                            </div>
+                            <div class="flex items-center gap-2 pb-3 border-b">
+                                <div class="w-3 h-3 rounded-full" style="background: var(--color-secondary);"></div>
+                                <span class="flex-1 text-sm">Kinh doanh</span>
+                                <span class="text-sm font-bold" id="cat-business">0</span>
+                            </div>
+                            <div class="flex items-center gap-2 pb-3 border-b">
+                                <div class="w-3 h-3 rounded-full" style="background: #10b981;"></div>
+                                <span class="flex-1 text-sm">Tâm lý</span>
+                                <span class="text-sm font-bold" id="cat-psychology">0</span>
+                            </div>
+                            <div class="flex items-center gap-2 pb-3 border-b">
+                                <div class="w-3 h-3 rounded-full" style="background: #805ad5;"></div>
+                                <span class="flex-1 text-sm">Khoa học</span>
+                                <span class="text-sm font-bold" id="cat-science">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Books Management View -->
+            <div id="books-view" class="view-content hidden p-8 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold" style="color: var(--color-text);">Quản lý sách</h3>
+                    <button id="btn-add-book"
+                        class="btn-primary text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>Thêm sách</span>
+                    </button>
+                </div>
+                <div class="bg-white rounded-lg overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b bg-gray-50">
+                                <th class="px-6 py-4 text-left text-sm font-semibold" style="color: var(--color-text);">
+                                    Tên sách</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold" style="color: var(--color-text);">
+                                    Tác giả</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold" style="color: var(--color-text);">
+                                    Danh mục</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold" style="color: var(--color-text);">
+                                    Giá</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold" style="color: var(--color-text);">
+                                    Tồn kho</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold" style="color: var(--color-text);">
+                                    Trạng thái</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold" style="color: var(--color-text);">
+                                    Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="books-table-body">
+                            <tr class="table-row">
+                                <td colspan="7" class="px-6 py-8 text-center text-gray-400">
+                                    <p>Chưa có sách. Hãy thêm sách đầu tiên!</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Categories View -->
+            <div id="categories-view" class="view-content hidden p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg border" style="border-color: var(--color-border);">
+                        <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
+                            style="background: linear-gradient(135deg, rgba(139, 90, 60, 0.1), rgba(212, 165, 116, 0.1));">
+                            <svg class="w-6 h-6" style="color: var(--color-primary);" fill="none" stroke="currentColor"
+                                viewbox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2" style="color: var(--color-text);">Văn học</h4>
+                        <p class="text-sm text-gray-600 mb-4"><span id="cat-detail-literature">0</span> đầu sách</p>
+                        <button class="text-sm font-medium" style="color: var(--color-primary);">Xem chi tiết →</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border" style="border-color: var(--color-border);">
+                        <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
+                            style="background: linear-gradient(135deg, rgba(139, 90, 60, 0.1), rgba(212, 165, 116, 0.1));">
+                            <svg class="w-6 h-6" style="color: var(--color-primary);" fill="none" stroke="currentColor"
+                                viewbox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2" style="color: var(--color-text);">Kinh doanh</h4>
+                        <p class="text-sm text-gray-600 mb-4"><span id="cat-detail-business">0</span> đầu sách</p>
+                        <button class="text-sm font-medium" style="color: var(--color-primary);">Xem chi tiết →</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border" style="border-color: var(--color-border);">
+                        <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
+                            style="background: linear-gradient(135deg, rgba(139, 90, 60, 0.1), rgba(212, 165, 116, 0.1));">
+                            <svg class="w-6 h-6" style="color: var(--color-primary);" fill="none" stroke="currentColor"
+                                viewbox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2" style="color: var(--color-text);">Tâm lý</h4>
+                        <p class="text-sm text-gray-600 mb-4"><span id="cat-detail-psychology">0</span> đầu sách</p>
+                        <button class="text-sm font-medium" style="color: var(--color-primary);">Xem chi tiết →</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border" style="border-color: var(--color-border);">
+                        <div class="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
+                            style="background: linear-gradient(135deg, rgba(139, 90, 60, 0.1), rgba(212, 165, 116, 0.1));">
+                            <svg class="w-6 h-6" style="color: var(--color-primary);" fill="none" stroke="currentColor"
+                                viewbox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2" style="color: var(--color-text);">Khoa học</h4>
+                        <p class="text-sm text-gray-600 mb-4"><span id="cat-detail-science">0</span> đầu sách</p>
+                        <button class="text-sm font-medium" style="color: var(--color-primary);">Xem chi tiết →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics View -->
+            <div id="analytics-view" class="view-content hidden p-8 space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg">
+                        <h3 class="text-lg font-bold mb-4" style="color: var(--color-text);">Sách bán chạy nhất</h3>
+                        <div class="space-y-4" id="bestseller-list">
+                            <div class="flex items-center gap-4 pb-4 border-b">
+                                <div class="w-12 h-12 rounded-lg flex items-center justify-center"
+                                    style="background: linear-gradient(135deg, rgba(139, 90, 60, 0.1), rgba(212, 165, 116, 0.1));">
+                                    <span class="font-bold" style="color: var(--color-primary);">1</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold">Nhà Giả Kim</p>
+                                    <p class="text-sm text-gray-500">Paulo Coelho</p>
+                                </div>
+                                <span class="font-bold" style="color: var(--color-success);">2.4k đơn</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg">
+                        <h3 class="text-lg font-bold mb-4" style="color: var(--color-text);">Hiệu suất</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-sm font-medium">Tỷ lệ tồn kho</span>
+                                    <span class="text-sm font-bold">65%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full" style="background: #e5e0d8;">
+                                    <div class="h-2 rounded-full" style="background: var(--color-primary); width: 65%;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-sm font-medium">Tỷ lệ hàng bán chạy</span>
+                                    <span class="text-sm font-bold">45%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full" style="background: #e5e0d8;">
+                                    <div class="h-2 rounded-full"
+                                        style="background: var(--color-secondary); width: 45%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Add Book -->
+    <div id="modal-add-book" class="modal">
+        <div class="modal-content p-8 space-y-6">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold" style="color: var(--color-text);">Thêm sách mới</h3>
+                <button class="modal-close text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="form-add-book" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Tên sách</label>
+                    <input type="text" id="input-title" required
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                        style="border-color: var(--color-border); --tw-ring-color: var(--color-primary);">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Tác giả</label>
+                    <input type="text" id="input-author" required
+                        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                        style="border-color: var(--color-border); --tw-ring-color: var(--color-primary);">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Danh mục</label>
+                        <select id="input-category" required
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                            style="border-color: var(--color-border); --tw-ring-color: var(--color-primary);">
+                            <option>Văn học</option>
+                            <option>Kinh doanh</option>
+                            <option>Tâm lý</option>
+                            <option>Khoa học</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Giá</label>
+                        <input type="number" id="input-price" required min="0"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                            style="border-color: var(--color-border); --tw-ring-color: var(--color-primary);">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Tồn kho</label>
+                        <input type="number" id="input-stock" required min="0"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                            style="border-color: var(--color-border); --tw-ring-color: var(--color-primary);">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Giảm giá
+                            (%)</label>
+                        <input type="number" id="input-discount" min="0" max="100" value="0"
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2"
+                            style="border-color: var(--color-border); --tw-ring-color: var(--color-primary);">
+                    </div>
+                </div>
+                <div class="flex gap-4 pt-4">
+                    <button type="submit" class="btn-primary flex-1 text-white px-4 py-2 rounded-lg font-medium">
+                        <span class="inline-flex items-center gap-2">
+                            <span>Thêm sách</span>
+                            <span id="btn-submit-loading" class="hidden loading-spinner"></span>
+                        </span>
+                    </button>
+                    <button type="button" class="modal-close flex-1 px-4 py-2 rounded-lg font-medium border"
+                        style="border-color: var(--color-border); color: var(--color-text);">Hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let allBooks = [];
+
+        // Navigation
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const view = this.dataset.view;
+
+                document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+
+                document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+                document.getElementById(`${view}-view`).classList.remove('hidden');
+
+                const titles = {
+                    dashboard: 'Dashboard',
+                    books: 'Quản lý sách',
+                    categories: 'Danh mục',
+                    analytics: 'Thống kê'
+                };
+                document.getElementById('view-title').textContent = titles[view];
+            });
+        });
+
+        // Modal
+        const modal = document.getElementById('modal-add-book');
+        document.getElementById('btn-add-book').addEventListener('click', () => modal.classList.add('active'));
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', () => modal.classList.remove('active'));
+        });
+
+        // Toast
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Stats
+        function updateStats() {
+            const totalBooks = allBooks.length;
+            const totalStock = allBooks.reduce((sum, b) => sum + (b.stock || 0), 0);
+            const avgRating = allBooks.length > 0 ? (allBooks.reduce((sum, b) => sum + (b.rating || 0), 0) / allBooks.length).toFixed(1) : 0;
+
+            document.getElementById('stat-total-books').textContent = totalBooks;
+            document.getElementById('stat-stock').textContent = totalStock;
+            document.getElementById('stat-rating').textContent = avgRating;
+
+            // Update categories
+            const categories = {
+                'Văn học': 0,
+                'Kinh doanh': 0,
+                'Tâm lý': 0,
+                'Khoa học': 0
+            };
+
+            allBooks.forEach(book => {
+                if (categories[book.category] !== undefined) {
+                    categories[book.category]++;
+                }
+            });
+
+            document.getElementById('cat-literature').textContent = categories['Văn học'];
+            document.getElementById('cat-business').textContent = categories['Kinh doanh'];
+            document.getElementById('cat-psychology').textContent = categories['Tâm lý'];
+            document.getElementById('cat-science').textContent = categories['Khoa học'];
+
+            document.getElementById('cat-detail-literature').textContent = categories['Văn học'];
+            document.getElementById('cat-detail-business').textContent = categories['Kinh doanh'];
+            document.getElementById('cat-detail-psychology').textContent = categories['Tâm lý'];
+            document.getElementById('cat-detail-science').textContent = categories['Khoa học'];
+        }
+
+        // Books table
+        function renderBooksTable() {
+            const tbody = document.getElementById('books-table-body');
+
+            if (allBooks.length === 0) {
+                tbody.innerHTML = '<tr class="table-row"><td colspan="7" class="px-6 py-8 text-center text-gray-400">Chưa có sách. Hãy thêm sách đầu tiên!</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = allBooks.map((book, index) => `
+        <tr class="table-row">
+          <td class="px-6 py-4 text-sm font-medium" style="color: var(--color-text);">${book.title}</td>
+          <td class="px-6 py-4 text-sm text-gray-600">${book.author}</td>
+          <td class="px-6 py-4 text-sm text-gray-600">${book.category}</td>
+          <td class="px-6 py-4 text-sm font-bold" style="color: var(--color-primary);">${book.price.toLocaleString()}đ</td>
+          <td class="px-6 py-4 text-sm"><span class="badge ${book.stock > 5 ? 'badge-success' : 'badge-warning'}">${book.stock}</span></td>
+          <td class="px-6 py-4 text-sm"><span class="badge badge-success">Có sẵn</span></td>
+          <td class="px-6 py-4 text-sm">
+            <button class="text-blue-500 hover:underline" onclick="editBook(${index})">Sửa</button>
+            <button class="text-red-500 hover:underline ml-3" onclick="deleteBook(${index})">Xóa</button>
+          </td>
+        </tr>
+      `).join('');
+        }
+
+        // Form submit
+        document.getElementById('form-add-book').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const loading = document.getElementById('btn-submit-loading');
+            loading.classList.remove('hidden');
+
+            const newBook = {
+                title: document.getElementById('input-title').value,
+                author: document.getElementById('input-author').value,
+                category: document.getElementById('input-category').value,
+                price: parseInt(document.getElementById('input-price').value),
+                stock: parseInt(document.getElementById('input-stock').value),
+                discount: parseInt(document.getElementById('input-discount').value) || 0,
+                rating: 4.5,
+                reviews: 0,
+                status: 'active',
+                createdAt: new Date().toISOString()
+            };
+
+            setTimeout(() => {
+                allBooks.push(newBook);
+                updateStats();
+                renderBooksTable();
+
+                loading.classList.add('hidden');
+                showToast('✓ Thêm sách thành công!');
+                document.getElementById('form-add-book').reset();
+                modal.classList.remove('active');
+            }, 500);
+        });
+
+        function deleteBook(index) {
+            const book = allBooks[index];
+            if (!confirm(`Bạn chắc chắn muốn xóa "${book.title}"?`)) return;
+
+            allBooks.splice(index, 1);
+            updateStats();
+            renderBooksTable();
+            showToast('✓ Xóa sách thành công!');
+        }
+
+        function editBook(index) {
+            showToast('Tính năng sửa đang phát triển', 'error');
+        }
+
+        // Initial render
+        updateStats();
+        renderBooksTable();
+    </script>
+</body>
+
+</html>
