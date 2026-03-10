@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Books</title>
+</head>
+<body>
+
+<h1>Book List</h1>
+
+<form method="get" th:action="@{/books}">
+    <input type="text" name="q" placeholder="Search title or author" th:value="${q}">
+    <input type="number" name="categoryId" placeholder="Category ID" min="1" th:value="${categoryId}">
+    <input type="number" name="minPrice" placeholder="Min price" min="0" step="0.01" th:value="${minPrice}">
+    <input type="number" name="maxPrice" placeholder="Max price" min="0" step="0.01" th:value="${maxPrice}">
+    <select name="sort">
+        <option value="title_asc" th:selected="${sort == 'title_asc'}">Title (A-Z)</option>
+        <option value="price_asc" th:selected="${sort == 'price_asc'}">Price (Low to High)</option>
+        <option value="price_desc" th:selected="${sort == 'price_desc'}">Price (High to Low)</option>
+        <option value="newest" th:selected="${sort == 'newest'}">Newest</option>
+    </select>
+    <button type="submit">Apply</button>
+    <a th:href="@{/books}">Reset</a>
+</form>
+
+<p th:if="${#lists.isEmpty(books)}">No books found.</p>
+
+<div th:each="book : ${books}">
+    <h3 th:text="${book.title}"></h3>
+    <p th:text="${book.author}"></p>
+    <p th:text="${book.price}"></p>
+
+    <a th:href="@{/books/{id}(id=${book.bookID})}">View Detail</a>
+
+    <hr>
+</div>
+
+</body>
+</html>
