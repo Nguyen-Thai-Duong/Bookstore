@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Đơn Hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Bookstore</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2>Chi Tiết Đơn Hàng #<span th:text="${order.id}"></span></h2>
+
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5>Thông Tin Đơn Hàng</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>ID Đơn Hàng:</strong> <span th:text="${order.id}"></span></p>
+                        <p><strong>Khách Hàng:</strong> <span th:text="${order.user?.fullName}"></span></p>
+                        <p><strong>Số Điện Thoại:</strong> <span th:text="${order.phoneNumber}"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Ngày Đặt:</strong> <span
+                                th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></span></p>
+                        <p><strong>Trạng Thái:</strong>
+                            <span class="badge" th:classappend="${order.status == 'DELIVERED' ? 'bg-success' : 
+                                                   order.status == 'CANCELLED' ? 'bg-danger' : 'bg-warning'}"
+                                th:text="${order.status}"></span>
+                        </p>
+                        <p><strong>Địa Chỉ Giao Hàng:</strong> <span th:text="${order.shippingAddress}"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header bg-success text-white">
+                <h5>Chi Tiết Sản Phẩm</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered"
+                    th:if="${order.orderDetails != null and !order.orderDetails.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>Tên Sách</th>
+                            <th>Đơn Giá</th>
+                            <th>Số Lượng</th>
+                            <th>Thành Tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="detail : ${order.orderDetails}">
+                            <td th:text="${detail.book?.title}"></td>
+                            <td th:text="${detail.price} + ' VNĐ'"></td>
+                            <td th:text="${detail.quantity}"></td>
+                            <td th:text="${detail.subtotal} + ' VNĐ'"></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Tổng Cộng:</strong></td>
+                            <td><strong th:text="${order.totalAmount} + ' VNĐ'" class="text-danger"></strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <p th:if="${order.orderDetails == null or order.orderDetails.isEmpty()}">Không có sản phẩm nào trong đơn
+                    hàng này.</p>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a th:href="@{/orders/delete/{id}(id=${order.id})}" class="btn btn-danger"
+                onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa Đơn Hàng</a>
+            <a href="/orders" class="btn btn-secondary">Quay Lại</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

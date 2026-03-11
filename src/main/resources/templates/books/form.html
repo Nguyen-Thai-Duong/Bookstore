@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Sách</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Bookstore</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 th:text="${book.id != null ? 'Chỉnh Sửa Sách' : 'Thêm Sách Mới'}">Form Sách</h2>
+
+        <form th:action="@{/books}" th:object="${book}" method="post">
+            <input type="hidden" th:field="*{id}">
+
+            <div class="mb-3">
+                <label for="title" class="form-label">Tên Sách *</label>
+                <input type="text" class="form-control" id="title" th:field="*{title}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="author" class="form-label">Tác Giả</label>
+                <input type="text" class="form-control" id="author" th:field="*{author}">
+            </div>
+
+            <div class="mb-3">
+                <label for="isbn" class="form-label">ISBN</label>
+                <input type="text" class="form-control" id="isbn" th:field="*{isbn}">
+            </div>
+
+            <div class="mb-3">
+                <label for="price" class="form-label">Giá *</label>
+                <input type="number" step="0.01" class="form-control" id="price" th:field="*{price}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="stock" class="form-label">Tồn Kho *</label>
+                <input type="number" class="form-control" id="stock" th:field="*{stock}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="publisher" class="form-label">Nhà Xuất Bản</label>
+                <input type="text" class="form-control" id="publisher" th:field="*{publisher}">
+            </div>
+
+            <div class="mb-3">
+                <label for="publishDate" class="form-label">Ngày Xuất Bản</label>
+                <input type="date" class="form-control" id="publishDate" th:field="*{publishDate}">
+            </div>
+
+            <div class="mb-3">
+                <label for="category" class="form-label">Danh Mục</label>
+                <select class="form-select" id="category" th:field="*{category.id}">
+                    <option value="">-- Chọn Danh Mục --</option>
+                    <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Mô Tả</label>
+                <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="imageUrl" class="form-label">URL Hình Ảnh</label>
+                <input type="text" class="form-control" id="imageUrl" th:field="*{imageUrl}">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Lưu</button>
+            <a href="/books" class="btn btn-secondary">Hủy</a>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
