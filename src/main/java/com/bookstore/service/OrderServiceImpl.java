@@ -6,9 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -50,5 +54,122 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void deleteOrder(Long id) {
         orderRepository.deleteById(id);
+    }
+
+    @Override
+    public Map<String, Object> getRevenueStatistics(String period, LocalDateTime startDate, LocalDateTime endDate) {
+        String normalizedPeriod = normalizePeriod(period);
+        LocalDateTime safeStart = alignStartForPeriod(startDate, normalizedPeriod);
+        LocalDateTime safeEnd = endDate != null ? endDate : LocalDateTime.now();
+
+        if (safeEnd.isBefore(safeStart)) {
+            LocalDateTime temp = safeStart;
+            safeStart = safeEnd;
+            safeEnd = temp;
+        }
+
+        LinkedHashMap<String, BigDecimal> revenueByPeriod = new LinkedHashMap<>();
+        LinkedHashMap<String, Integer> booksSoldByPeriod = new LinkedHashMap<>();
+
+        LocalDateTime cursor = safeStart;
+        while (!cursor.isAfter(safeEnd)) {
+            String label = formatLabel(cursor, normalizedPeriod);
+            revenueByPeriod.putIfAbsent(label, BigDecimal.ZERO);
+            booksSoldByPeriod.putIfAbsent(label, 0);
+            cursor = incrementPeriod(cursor, normalizedPeriod);
+        }
+
+        List<Order> orders = orderRepository.findByOrderDateBetween(safeStart, safeEnd);
+        for (Order order : orders) {
+            LocalDateTime orderDate = order.getOrderDate();
+            if (orderDate == null) {
+                continue;
+            }
+
+            String label = formatLabel(orderDate, normalizedPeriod);
+            if (!revenueByPeriod.containsKey(label)) {
+                continue;
+            }
+
+            BigDecimal currentRevenue = revenueByPeriod.get(label);
+            BigDecimal orderRevenue = order.getTotalAmount() != null ? order.getTotalAmount() : BigDecimal.ZERO;
+            revenueByPeriod.put(label, currentRevenue.add(orderRevenue));
+
+            int currentBooksSold = booksSoldByPeriod.get(label);
+            int booksFromOrder = order.getOrderDetails() == null
+                    ? 0
+                    : order.getOrderDetails().stream()
+                            .mapToInt(detail -> detail.getQuantity() != null ? detail.getQuantity() : 0)
+                            .sum();
+            booksSoldByPeriod.put(label, currentBooksSold + booksFromOrder);
+        }
+
+        List<String> labels = new ArrayList<>(revenueByPeriod.keySet());
+        List<Double> revenues = revenueByPeriod.values().stream()
+                .map(value -> value.setScale(2, RoundingMode.HALF_UP).doubleValue())
+                .toList();
+        List<Integer> booksSold = labels.stream()
+                .map(label -> booksSoldByPeriod.getOrDefault(label, 0))
+                .toList();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("labels", labels);
+        result.put("revenue", revenues);
+        result.put("booksSold", booksSold);
+        return result;
+    }
+
+    private String normalizePeriod(String period) {
+        if (period == null) {
+            return "day";
+        }
+        String normalized = period.toLowerCase(Locale.ROOT).trim();
+        if (!normalized.equals("day") && !normalized.equals("month") && !normalized.equals("year")) {
+            return "day";
+        }
+        return normalized;
+    }
+
+    private LocalDateTime alignStartForPeriod(LocalDateTime input, String period) {
+        LocalDateTime source = input != null ? input : LocalDateTime.now();
+        switch (period) {
+            case "month":
+                YearMonth ym = YearMonth.of(source.getYear(), source.getMonth());
+                return ym.atDay(1).atStartOfDay();
+            case "year":
+                return LocalDate.of(source.getYear(), 1, 1).atStartOfDay();
+            case "day":
+            default:
+                return source.toLocalDate().atStartOfDay();
+        }
+    }
+
+    private LocalDateTime incrementPeriod(LocalDateTime input, String period) {
+        switch (period) {
+            case "month":
+                return input.plusMonths(1);
+            case "year":
+                return input.plusYears(1);
+            case "day":
+            default:
+                return input.plusDays(1);
+        }
+    }
+
+    private String formatLabel(LocalDateTime input, String period) {
+        DateTimeFormatter formatter;
+        switch (period) {
+            case "month":
+                formatter = DateTimeFormatter.ofPattern("MM/yyyy");
+                break;
+            case "year":
+                formatter = DateTimeFormatter.ofPattern("yyyy");
+                break;
+            case "day":
+            default:
+                formatter = DateTimeFormatter.ofPattern("dd/MM");
+                break;
+        }
+        return input.format(formatter);
     }
 }
