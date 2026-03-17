@@ -1,0 +1,119 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài khoản - BookNest</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #f8f6f1;
+            --color-surface: #ffffff;
+            --color-text: #1a1410;
+            --color-primary: #8b5a3c;
+            --color-secondary: #d4a574;
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 90, 60, 0.2);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(139, 90, 60, 0.5);
+        }
+        .hero-pattern {
+            background: linear-gradient(135deg, rgba(139, 90, 60, 0.03) 0%, rgba(212, 165, 116, 0.03) 100%);
+        }
+    </style>
+</head>
+<body class="h-full overflow-auto">
+<div class="min-h-full w-full">
+    <header class="sticky top-0 z-50 backdrop-blur-md" style="background-color: rgba(250, 247, 242, 0.95);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <a class="flex items-center gap-3" th:href="@{/}">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                        style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <span class="font-display text-xl sm:text-2xl font-bold">BookNest</span>
+                </a>
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <a th:href="@{/books}" class="px-4 py-2 rounded-full font-medium border-2"
+                       style="border-color: var(--color-primary); color: var(--color-primary);">Sách</a>
+                    <a th:href="@{/account}" class="btn-primary px-4 py-2 rounded-full text-white font-semibold">Tài khoản</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero-pattern py-10 sm:py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-3xl shadow-xl p-6 sm:p-8">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h1 class="font-display text-2xl sm:text-3xl font-bold mb-2">Thông tin tài khoản</h1>
+                        <p class="text-sm" style="color: #6b6560;">Thông tin cơ bản của bạn</p>
+                    </div>
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center"
+                         style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
+                        <span class="text-white font-semibold text-lg"
+                              th:text="${#strings.substring(user.fullName,0,1)}">U</span>
+                    </div>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-2xl border-2" style="border-color: #eee7dd;">
+                        <p class="text-xs uppercase tracking-wider mb-1" style="color: #9b8f86;">Họ và tên</p>
+                        <p class="font-semibold" th:text="${user.fullName}">User Name</p>
+                    </div>
+                    <div class="p-4 rounded-2xl border-2" style="border-color: #eee7dd;">
+                        <p class="text-xs uppercase tracking-wider mb-1" style="color: #9b8f86;">Email</p>
+                        <p class="font-semibold" th:text="${user.email}">user@example.com</p>
+                    </div>
+                    <div class="p-4 rounded-2xl border-2" style="border-color: #eee7dd;">
+                        <p class="text-xs uppercase tracking-wider mb-1" style="color: #9b8f86;">Số điện thoại</p>
+                        <p class="font-semibold" th:text="${user.phone}">-</p>
+                    </div>
+                    <div class="p-4 rounded-2xl border-2" style="border-color: #eee7dd;">
+                        <p class="text-xs uppercase tracking-wider mb-1" style="color: #9b8f86;">Địa chỉ</p>
+                        <p class="font-semibold" th:text="${user.address}">-</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                    <a th:href="@{/books}" class="px-5 py-3 rounded-xl font-semibold border-2 text-center"
+                       style="border-color: var(--color-primary); color: var(--color-primary);">Xem sách</a>
+                    <form method="post" th:action="@{/logout}">
+                        <button type="submit" class="btn-primary px-5 py-3 rounded-xl text-white font-semibold w-full">
+                            Đăng xuất
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>
