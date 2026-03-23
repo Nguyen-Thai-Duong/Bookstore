@@ -29,6 +29,11 @@ public class BookService {
         Integer category = (categoryId != null && categoryId > 0) ? categoryId : null;
         Double min = (minPrice != null && minPrice >= 0) ? minPrice : null;
         Double max = (maxPrice != null && maxPrice >= 0) ? maxPrice : null;
+        if (min != null && max != null && min > max) {
+            double temp = min;
+            min = max;
+            max = temp;
+        }
 
         Sort sortOption = switch (sort == null ? "" : sort) {
             case "price_asc" -> Sort.by("price").ascending();

@@ -66,4 +66,38 @@ public class AuthService {
 
         return user;
     }
+
+    public User updateProfile(int userId, String fullName, String phone, String address) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return null;
+        }
+        User user = userOpt.get();
+        user.setFullName(fullName);
+        user.setPhone(phone);
+        user.setAddress(address);
+        return userRepository.save(user);
+    }
+
+    public boolean changePassword(int userId, String currentPassword, String newPassword) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+        User user = userOpt.get();
+        String stored = user.getPassword() == null ? "" : user.getPassword();
+
+        boolean matches;
+        if (stored.startsWith("$2a$") || stored.startsWith("$2b$") || stored.startsWith("$2y$")) {
+            matches = passwordEncoder.matches(currentPassword, stored);
+        } else {
+            matches = stored.equals(currentPassword);
+        }
+        if (!matches) {
+            return false;
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true;
+    }
 }
