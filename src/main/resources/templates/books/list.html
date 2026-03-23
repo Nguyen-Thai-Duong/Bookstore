@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sách Sách</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Bookstore</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Trang Chủ</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/books">Sách</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/categories">Danh Mục</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/users">Người Dùng</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/orders">Đơn Hàng</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Danh Sách Sách</h2>
+            <a href="/books/new" class="btn btn-primary">Thêm Sách Mới</a>
+        </div>
+
+        <form action="/books/search" method="get" class="row g-3 mb-4">
+            <div class="col-md-5">
+                <input type="text" class="form-control" name="title" placeholder="Tìm theo tên sách">
+            </div>
+            <div class="col-md-5">
+                <input type="text" class="form-control" name="author" placeholder="Tìm theo tác giả">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success w-100">Tìm Kiếm</button>
+            </div>
+        </form>
+
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Tên Sách</th>
+                    <th>Tác Giả</th>
+                    <th>ISBN</th>
+                    <th>Giá</th>
+                    <th>Tồn Kho</th>
+                    <th>Danh Mục</th>
+                    <th>Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="book : ${books}">
+                    <td th:text="${book.id}"></td>
+                    <td th:text="${book.title}"></td>
+                    <td th:text="${book.author}"></td>
+                    <td th:text="${book.isbn}"></td>
+                    <td th:text="${book.price} + ' VNĐ'"></td>
+                    <td th:text="${book.stock}"></td>
+                    <td th:text="${book.category?.name}"></td>
+                    <td>
+                        <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-info btn-sm">Xem</a>
+                        <a th:href="@{/books/edit/{id}(id=${book.id})}" class="btn btn-warning btn-sm">Sửa</a>
+                        <a th:href="@{/books/delete/{id}(id=${book.id})}" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
