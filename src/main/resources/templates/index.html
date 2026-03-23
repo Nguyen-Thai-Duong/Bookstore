@@ -120,15 +120,70 @@
     </section>
 
     <section class="py-12 sm:py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h3 class="font-display text-2xl sm:text-3xl font-bold mb-4">Đăng ký nhận tin</h3>
-            <p class="mb-8" style="color: #6b6560;">Nhận thông báo về sách mới và ưu đãi độc quyền</p>
-            <form class="flex flex-col sm:flex-row gap-4 justify-center">
-                <input type="email" placeholder="Email của bạn" required
-                       class="px-6 py-4 rounded-full border-2 focus:outline-none flex-1 max-w-md"
-                       style="background-color: var(--color-surface); border-color: #e5e0d8; color: var(--color-text);">
-                <button type="submit" class="btn-primary px-8 py-4 rounded-full text-white font-semibold">Đăng ký</button>
-            </form>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
+                <div>
+                    <h3 class="font-display text-2xl sm:text-3xl font-bold">Sách nổi bật</h3>
+                    <p class="text-sm" style="color: #6b6560;">Những cuốn sách được yêu thích nhất tuần này</p>
+                </div>
+                <a th:href="@{/books}" class="text-sm font-semibold underline underline-offset-4"
+                   style="color: var(--color-primary);">Xem tất cả</a>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="bg-white rounded-3xl shadow-lg p-5 flex flex-col gap-3">
+                    <div>
+                        <h4 class="font-display text-lg font-semibold">Đắc Nhân Tâm</h4>
+                        <p class="text-sm" style="color: #6b6560;">Dale Carnegie</p>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="font-semibold">120.000</span>
+                        <span class="text-xs uppercase tracking-wider" style="color: #9b8f86;">VNĐ</span>
+                    </div>
+                    <a th:href="@{/books}" class="btn-primary px-4 py-2 rounded-xl text-white font-semibold text-center">
+                        Xem chi tiết
+                    </a>
+                </div>
+                <div class="bg-white rounded-3xl shadow-lg p-5 flex flex-col gap-3">
+                    <div>
+                        <h4 class="font-display text-lg font-semibold">Nhà Giả Kim</h4>
+                        <p class="text-sm" style="color: #6b6560;">Paulo Coelho</p>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="font-semibold">90.000</span>
+                        <span class="text-xs uppercase tracking-wider" style="color: #9b8f86;">VNĐ</span>
+                    </div>
+                    <a th:href="@{/books}" class="btn-primary px-4 py-2 rounded-xl text-white font-semibold text-center">
+                        Xem chi tiết
+                    </a>
+                </div>
+                <div class="bg-white rounded-3xl shadow-lg p-5 flex flex-col gap-3">
+                    <div>
+                        <h4 class="font-display text-lg font-semibold">Atomic Habits</h4>
+                        <p class="text-sm" style="color: #6b6560;">James Clear</p>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="font-semibold">150.000</span>
+                        <span class="text-xs uppercase tracking-wider" style="color: #9b8f86;">VNĐ</span>
+                    </div>
+                    <a th:href="@{/books}" class="btn-primary px-4 py-2 rounded-xl text-white font-semibold text-center">
+                        Xem chi tiết
+                    </a>
+                </div>
+                <div class="bg-white rounded-3xl shadow-lg p-5 flex flex-col gap-3">
+                    <div>
+                        <h4 class="font-display text-lg font-semibold">Java Programming</h4>
+                        <p class="text-sm" style="color: #6b6560;">James Gosling</p>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="font-semibold">150.000</span>
+                        <span class="text-xs uppercase tracking-wider" style="color: #9b8f86;">VNĐ</span>
+                    </div>
+                    <a th:href="@{/books}" class="btn-primary px-4 py-2 rounded-xl text-white font-semibold text-center">
+                        Xem chi tiết
+                    </a>
+                </div>
+            </div>
         </div>
     </section>
 
