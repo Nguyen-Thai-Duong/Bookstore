@@ -298,8 +298,12 @@
                                 style="background-color: var(--color-surface);">
                                 <div class="aspect-[3/4] flex items-center justify-center p-4"
                                     style="background: linear-gradient(180deg, #f0e6d3 0%, #e8dcc8 100%);">
-                                    <div class="w-full h-full rounded-lg shadow-lg flex flex-col p-4 text-white"
-                                        style="background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);">
+                                    <img th:if="${book.imageUrl != null and !book.imageUrl.isEmpty()}"
+                                        th:src="${book.imageUrl}" th:alt="${book.title}"
+                                        class="w-full h-full rounded-lg shadow-lg object-cover"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div th:style="${book.imageUrl != null and !book.imageUrl.isEmpty()} ? 'display:none; background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);' : 'display:flex; background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);'"
+                                        class="w-full h-full rounded-lg shadow-lg flex-col p-4 text-white">
                                         <div class="flex-1 flex flex-col justify-between">
                                             <div>
                                                 <div class="text-[10px] uppercase tracking-wider opacity-60 mb-1"

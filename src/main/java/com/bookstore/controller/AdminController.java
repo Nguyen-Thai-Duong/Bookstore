@@ -15,11 +15,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/admin")
@@ -94,9 +102,74 @@ public class AdminController {
     }
 
     @PostMapping("/books/save")
-    public String saveBook(@ModelAttribute Book book) {
+    public String saveBook(@ModelAttribute Book book,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+        if (book.getId() != null) {
+            bookService.getBookById(book.getId()).ifPresent(existingBook -> {
+                if (book.getCreatedAt() == null) {
+                    book.setCreatedAt(existingBook.getCreatedAt());
+                }
+                if (book.getImageUrl() == null || book.getImageUrl().isBlank()) {
+                    book.setImageUrl(existingBook.getImageUrl());
+                }
+            });
+        }
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                String uploadedImageUrl = storeBookImage(imageFile, book.getImageUrl());
+                book.setImageUrl(uploadedImageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException("Khong the luu anh sach", e);
+            }
+        }
+
         bookService.saveBook(book);
         return "redirect:/admin/books";
+    }
+
+    private String storeBookImage(MultipartFile imageFile, String oldImageUrl) throws IOException {
+        Path uploadDir = Paths.get("images", "books").toAbsolutePath().normalize();
+        Files.createDirectories(uploadDir);
+
+        String originalName = imageFile.getOriginalFilename() != null ? imageFile.getOriginalFilename() : "book-image";
+        String extension = extractExtension(originalName);
+        String fileName = UUID.randomUUID() + extension;
+
+        Path targetPath = uploadDir.resolve(fileName).normalize();
+        Files.copy(imageFile.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+        deleteOldBookImageIfLocal(oldImageUrl);
+        return "/images/books/" + fileName;
+    }
+
+    private void deleteOldBookImageIfLocal(String oldImageUrl) {
+        if (oldImageUrl == null || !oldImageUrl.startsWith("/images/books/")) {
+            return;
+        }
+
+        String oldFileName = oldImageUrl.substring("/images/books/".length());
+        Path oldPath = Paths.get("images", "books", oldFileName).toAbsolutePath().normalize();
+        try {
+            Files.deleteIfExists(oldPath);
+        } catch (IOException ignored) {
+            // Keep update flow stable even if old image cleanup fails.
+        }
+    }
+
+    private String extractExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex < 0 || dotIndex == fileName.length() - 1) {
+            return ".jpg";
+        }
+
+        String extension = fileName.substring(dotIndex).toLowerCase(Locale.ROOT);
+        if (extension.equals(".png") || extension.equals(".jpg") || extension.equals(".jpeg")
+                || extension.equals(".gif") || extension.equals(".webp")) {
+            return extension;
+        }
+
+        return ".jpg";
     }
 
     @GetMapping("/books/delete/{id}")
