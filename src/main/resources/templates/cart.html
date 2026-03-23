@@ -1,0 +1,78 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ hàng - BookNest</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+</head>
+<body class="bg-[#f8f6f1] text-[#1a1410]">
+<div class="max-w-5xl mx-auto px-6 py-10">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold">Giỏ hàng của bạn</h1>
+        <a th:href="@{/books}"
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all hover:-translate-y-0.5 hover:shadow-lg"
+           style="border-color: #8b5a3c; color: #8b5a3c;">
+            Tiếp tục mua sắm
+        </a>
+    </div>
+
+    <div th:if="${cartError}" class="mb-4 rounded-xl px-4 py-3 text-sm"
+         style="background-color: rgba(220, 38, 38, 0.1); color: #b91c1c;" th:text="${cartError}"></div>
+    <div th:if="${cartSuccess}" class="mb-4 rounded-xl px-4 py-3 text-sm"
+         style="background-color: rgba(22, 163, 74, 0.12); color: #166534;" th:text="${cartSuccess}"></div>
+    <div th:if="${voucherError}" class="mb-4 rounded-xl px-4 py-3 text-sm"
+         style="background-color: rgba(220, 38, 38, 0.1); color: #b91c1c;" th:text="${voucherError}"></div>
+    <div th:if="${voucherSuccess}" class="mb-4 rounded-xl px-4 py-3 text-sm"
+         style="background-color: rgba(22, 163, 74, 0.12); color: #166534;" th:text="${voucherSuccess}"></div>
+
+    <div th:if="${#lists.isEmpty(cart)}" class="bg-white rounded-2xl p-6">
+        <p>Giỏ hàng đang trống.</p>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(cart)}" class="space-y-4">
+        <div th:each="item : ${cart}" class="bg-white rounded-2xl p-4 flex items-center justify-between gap-4">
+            <div>
+                <div class="font-semibold" th:text="${item.book.title}">Tên sách</div>
+                <div class="text-sm text-gray-600" th:text="${item.book.author}">Tác giả</div>
+                <div class="text-sm" th:text="${item.book.price}">0</div>
+            </div>
+            <form method="post" th:action="@{/cart/update}" class="flex items-center gap-2">
+                <input type="hidden" name="bookId" th:value="${item.book.bookID}">
+                <input type="number" name="quantity" min="0" th:value="${item.quantity}"
+                       class="w-20 px-2 py-1 border rounded">
+                <button type="submit" class="px-3 py-1 border rounded">Cập nhật</button>
+            </form>
+            <form method="post" th:action="@{/cart/remove}">
+                <input type="hidden" name="bookId" th:value="${item.book.bookID}">
+                <button type="submit" class="text-red-600">Xóa</button>
+            </form>
+        </div>
+
+        <div class="bg-white rounded-2xl p-4">
+            <div class="flex justify-between text-sm">
+                <span>Tạm tính</span>
+                <span th:text="${subtotal}">0</span>
+            </div>
+            <div class="flex justify-between text-sm">
+                <span>Giảm giá</span>
+                <span th:text="${discount}">0</span>
+            </div>
+            <div class="flex justify-between font-semibold">
+                <span>Tổng cộng</span>
+                <span th:text="${total}">0</span>
+            </div>
+
+            <form method="post" th:action="@{/cart/voucher}" class="mt-4 flex gap-2">
+                <input type="text" name="code" placeholder="DISCOUNT10"
+                       th:value="${voucher != null ? voucher.code : ''}"
+                       class="flex-1 px-3 py-2 border rounded">
+                <button type="submit" class="px-4 py-2 border rounded">Áp dụng</button>
+            </form>
+
+            <a th:href="@{/checkout}" class="mt-4 inline-block px-4 py-2 rounded bg-[#8b5a3c] text-white">Thanh toán</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

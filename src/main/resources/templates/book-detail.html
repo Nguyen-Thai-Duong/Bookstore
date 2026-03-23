@@ -1,0 +1,121 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết sách - BookNest</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <style>
+        .star-input input { display: none; }
+        .star-input label {
+            color: #e5e0d8;
+            cursor: pointer;
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+        .star-input input:checked ~ label,
+        .star-input label:hover,
+        .star-input label:hover ~ label {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body class="bg-[#f8f6f1] text-[#1a1410]">
+<div class="max-w-5xl mx-auto px-6 py-10">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold">Chi tiết sách</h1>
+        <a th:href="@{/books}" class="text-sm underline">Quay lại danh sách</a>
+    </div>
+
+    <div class="bg-white rounded-2xl p-6">
+        <h2 class="text-xl font-semibold" th:text="${book.title}">Tên sách</h2>
+        <p class="text-sm text-gray-600" th:text="${book.author}">Tác giả</p>
+        <p class="mt-2 text-sm" th:text="${book.description}">Mô tả</p>
+        <div class="mt-2 text-sm">Giá: <span th:text="${book.price}">0</span></div>
+        <div class="text-sm">Tồn kho: <span th:text="${book.stockQuantity}">0</span></div>
+
+        <form method="post" th:action="@{/cart/add}" class="mt-4 flex items-center gap-2">
+            <input type="hidden" name="bookId" th:value="${book.bookID}">
+            <input type="number" name="quantity" min="1" value="1" class="w-20 px-2 py-1 border rounded">
+            <button type="submit" class="px-4 py-2 rounded bg-[#8b5a3c] text-white">Thêm vào giỏ</button>
+        </form>
+    </div>
+
+    <div class="mt-8">
+        <h3 class="text-lg font-semibold mb-2">Đánh giá</h3>
+        <div th:if="${reviewError}" class="mb-3 rounded-xl px-4 py-3 text-sm"
+             style="background-color: rgba(220, 38, 38, 0.1); color: #b91c1c;" th:text="${reviewError}"></div>
+        <div th:if="${reviewSuccess}" class="mb-3 rounded-xl px-4 py-3 text-sm"
+             style="background-color: rgba(22, 163, 74, 0.12); color: #166534;" th:text="${reviewSuccess}"></div>
+
+        <div th:if="${#lists.isEmpty(reviews)}" class="bg-white rounded-2xl p-4">
+            <p>Chưa có đánh giá.</p>
+        </div>
+
+        <div th:if="${!#lists.isEmpty(reviews)}" class="space-y-3">
+            <div th:each="review : ${reviews}" class="bg-white rounded-2xl p-4">
+                <div class="flex justify-between text-sm">
+                    <span th:text="${review.user.fullName}">Người dùng</span>
+                    <span th:text="${review.rating}">5</span>
+                </div>
+                <p class="mt-2 text-sm" th:text="${review.comment}">Content</p>
+
+                <div th:if="${myReview != null and myReview.reviewID == review.reviewID}" class="mt-3 space-y-2">
+                    <form method="post" th:action="@{/reviews/update}" class="space-y-2">
+                        <input type="hidden" name="reviewId" th:value="${review.reviewID}">
+                        <input type="hidden" name="bookId" th:value="${book.bookID}">
+                        <div class="flex items-center gap-3">
+                            <label class="text-sm">Đánh giá</label>
+                            <div class="star-input flex flex-row-reverse justify-end gap-1">
+                                <input type="radio" id="edit-star-5" name="rating" value="5" th:checked="${review.rating == 5}">
+                                <label for="edit-star-5">★</label>
+                                <input type="radio" id="edit-star-4" name="rating" value="4" th:checked="${review.rating == 4}">
+                                <label for="edit-star-4">★</label>
+                                <input type="radio" id="edit-star-3" name="rating" value="3" th:checked="${review.rating == 3}">
+                                <label for="edit-star-3">★</label>
+                                <input type="radio" id="edit-star-2" name="rating" value="2" th:checked="${review.rating == 2}">
+                                <label for="edit-star-2">★</label>
+                                <input type="radio" id="edit-star-1" name="rating" value="1" th:checked="${review.rating == 1}">
+                                <label for="edit-star-1">★</label>
+                            </div>
+                        </div>
+                        <textarea name="content" rows="3" class="w-full px-3 py-2 border rounded"
+                                  th:text="${review.comment}"></textarea>
+                        <button type="submit" class="px-3 py-1 border rounded">Cập nhật</button>
+                    </form>
+                    <form method="post" th:action="@{/reviews/delete}">
+                        <input type="hidden" name="reviewId" th:value="${review.reviewID}">
+                        <input type="hidden" name="bookId" th:value="${book.bookID}">
+                        <button type="submit" class="px-3 py-1 border rounded">Xóa</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${myReview == null}" class="mt-4 bg-white rounded-2xl p-4">
+            <form method="post" th:action="@{/reviews/add}" class="space-y-2">
+                <input type="hidden" name="bookId" th:value="${book.bookID}">
+                <div class="flex items-center gap-2">
+                    <label class="text-sm">Đánh giá</label>
+                    <div class="star-input flex flex-row-reverse justify-end gap-1">
+                        <input type="radio" id="add-star-5" name="rating" value="5" checked>
+                        <label for="add-star-5">★</label>
+                        <input type="radio" id="add-star-4" name="rating" value="4">
+                        <label for="add-star-4">★</label>
+                        <input type="radio" id="add-star-3" name="rating" value="3">
+                        <label for="add-star-3">★</label>
+                        <input type="radio" id="add-star-2" name="rating" value="2">
+                        <label for="add-star-2">★</label>
+                        <input type="radio" id="add-star-1" name="rating" value="1">
+                        <label for="add-star-1">★</label>
+                    </div>
+                </div>
+                <textarea name="content" rows="3" class="w-full px-3 py-2 border rounded"
+                          placeholder="Nhập đánh giá..."></textarea>
+                <button type="submit" class="px-4 py-2 rounded bg-[#8b5a3c] text-white">Gửi đánh giá</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

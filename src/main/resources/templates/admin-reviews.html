@@ -1,0 +1,35 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý đánh giá - BookNest</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+</head>
+<body class="bg-[#f8f6f1] text-[#1a1410]">
+<div class="max-w-5xl mx-auto px-6 py-10">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold">Quản lý đánh giá</h1>
+        <a th:href="@{/}" class="text-sm underline">Trang chủ</a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(reviews)}" class="bg-white rounded-2xl p-6">
+        <p>Chưa có đánh giá.</p>
+    </div>
+
+    <div th:if="${!#lists.isEmpty(reviews)}" class="space-y-4">
+        <div th:each="review : ${reviews}" class="bg-white rounded-2xl p-4">
+            <div class="flex justify-between">
+                <div>
+                    <div class="font-semibold" th:text="${review.user.fullName}">User</div>
+                    <div class="text-sm text-gray-600" th:text="${review.rating}">5</div>
+                </div>
+                <div class="text-sm" th:text="${review.createdAt}">Time</div>
+            </div>
+            <div class="mt-2 text-sm text-gray-600" th:text="${review.book.title}">Book</div>
+            <p class="mt-2 text-sm" th:text="${review.comment}">Review content</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

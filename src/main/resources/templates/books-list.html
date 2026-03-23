@@ -1,0 +1,144 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách sách - BookNest</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap"
+          rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #f8f6f1;
+            --color-surface: #ffffff;
+            --color-text: #1a1410;
+            --color-primary: #8b5a3c;
+            --color-secondary: #d4a574;
+        }
+        html, body { height: 100%; margin: 0; }
+        body { font-family: 'Source Sans 3', sans-serif; background-color: var(--color-bg); color: var(--color-text); }
+        .font-display { font-family: 'Playfair Display', serif; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 90, 60, 0.2);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px -10px rgba(139, 90, 60, 0.5); }
+        .hero-pattern { background: linear-gradient(135deg, rgba(139, 90, 60, 0.03) 0%, rgba(212, 165, 116, 0.03) 100%); }
+    </style>
+</head>
+<body class="h-full overflow-auto">
+<div class="min-h-full w-full">
+    <header class="sticky top-0 z-50 backdrop-blur-md" style="background-color: rgba(250, 247, 242, 0.95);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <a class="flex items-center gap-3" th:href="@{/}">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                         style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <span class="font-display text-xl sm:text-2xl font-bold">BookNest</span>
+                </a>
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <a th:href="@{/cart}" class="px-4 py-2 rounded-full font-medium border-2"
+                       style="border-color: var(--color-primary); color: var(--color-primary);">Giỏ hàng</a>
+                    <a th:href="@{/account}" class="btn-primary px-4 py-2 rounded-full text-white font-semibold"
+                       th:text="${session.loggedInUser != null ? session.loggedInUser.fullName : 'Tài khoản'}">Tài khoản</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero-pattern py-8 sm:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col gap-6">
+                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+                    <div>
+                        <h1 class="font-display text-2xl sm:text-3xl font-bold">Danh sách sách</h1>
+                        <p class="text-sm" style="color: #6b6560;">Tìm kiếm và lọc theo nhu cầu của bạn</p>
+                    </div>
+                    <a th:href="@{/books}" class="text-sm font-semibold underline underline-offset-4"
+                       style="color: var(--color-primary);">Làm mới bộ lọc</a>
+                </div>
+
+                <form method="get" th:action="@{/books}" class="bg-white rounded-3xl shadow-xl p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                    <div class="lg:col-span-2">
+                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Từ khóa</label>
+                        <input type="text" name="q" placeholder="Tìm theo tên hoặc tác giả" th:value="${q}"
+                               class="w-full px-4 py-3 rounded-xl border-2 focus:outline-none"
+                               style="border-color: #e5e0d8; background-color: var(--color-surface);">
+                    </div>
+                    <div>
+                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Danh mục</label>
+                        <input type="number" name="categoryId" placeholder="ID" min="1" th:value="${categoryId}"
+                               class="w-full px-4 py-3 rounded-xl border-2 focus:outline-none"
+                               style="border-color: #e5e0d8; background-color: var(--color-surface);">
+                    </div>
+                    <div>
+                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Giá tối thiểu</label>
+                        <input type="number" name="minPrice" placeholder="0" min="0" step="0.01" th:value="${minPrice}"
+                               class="w-full px-4 py-3 rounded-xl border-2 focus:outline-none"
+                               style="border-color: #e5e0d8; background-color: var(--color-surface);">
+                    </div>
+                    <div>
+                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Giá tối đa</label>
+                        <input type="number" name="maxPrice" placeholder="0" min="0" step="0.01" th:value="${maxPrice}"
+                               class="w-full px-4 py-3 rounded-xl border-2 focus:outline-none"
+                               style="border-color: #e5e0d8; background-color: var(--color-surface);">
+                    </div>
+                    <div>
+                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Sắp xếp</label>
+                        <select name="sort" class="w-full px-4 py-3 rounded-xl border-2 focus:outline-none"
+                                style="border-color: #e5e0d8; background-color: var(--color-surface);">
+                            <option value="title_asc" th:selected="${sort == 'title_asc'}">Tên (A-Z)</option>
+                            <option value="price_asc" th:selected="${sort == 'price_asc'}">Giá tăng dần</option>
+                            <option value="price_desc" th:selected="${sort == 'price_desc'}">Giá giảm dần</option>
+                            <option value="newest" th:selected="${sort == 'newest'}">Mới nhất</option>
+                        </select>
+                    </div>
+                    <div class="lg:col-span-6 flex flex-col sm:flex-row gap-3">
+                        <button type="submit" class="btn-primary px-5 py-3 rounded-xl text-white font-semibold w-full sm:w-auto">
+                            Áp dụng bộ lọc
+                        </button>
+                        <a th:href="@{/books}" class="px-5 py-3 rounded-xl font-semibold border-2 text-center w-full sm:w-auto"
+                           style="border-color: var(--color-primary); color: var(--color-primary);">
+                            Xóa lọc
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-8 sm:py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p th:if="${#lists.isEmpty(books)}" class="bg-white rounded-3xl shadow-xl p-6 text-sm">
+                Không tìm thấy sách phù hợp.
+            </p>
+
+            <div th:if="${!#lists.isEmpty(books)}" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div th:each="book : ${books}" class="bg-white rounded-3xl shadow-lg p-5 flex flex-col gap-3">
+                    <div>
+                        <h3 class="font-display text-lg font-semibold" th:text="${book.title}">Tên sách</h3>
+                        <p class="text-sm" style="color: #6b6560;" th:text="${book.author}">Tác giả</p>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="font-semibold" th:text="${book.price}">0</span>
+                        <span class="text-xs uppercase tracking-wider" style="color: #9b8f86;">VNĐ</span>
+                    </div>
+                    <a th:href="@{/books/{id}(id=${book.bookID})}"
+                       class="btn-primary px-4 py-2 rounded-xl text-white font-semibold text-center">
+                        Xem chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+</html>

@@ -4,487 +4,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest - Hiệu Sách Online</title>
-    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>BookNest</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Gộp font đẹp -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+
     <style>
-        :root {
-            --color-bg: #f8f6f1;
-            --color-surface: #ffffff;
-            --color-text: #1a1410;
-            --color-primary: #8b5a3c;
-            --color-secondary: #d4a574;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
         body {
-            height: 100%;
-            margin: 0;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--color-bg);
+            font-family: 'Source Sans 3', sans-serif;
+            background-color: #f8f6f1;
         }
 
         .font-display {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .book-card {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .book-card:hover {
-            transform: translateY(-8px);
-        }
-
-        .book-card:hover .book-shadow {
-            box-shadow: 0 25px 50px -12px rgba(139, 90, 60, 0.25);
+            font-family: 'Playfair Display', serif;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%);
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px -10px rgba(139, 90, 60, 0.5);
-        }
-
-        .category-chip {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .category-chip:hover {
-            background: var(--color-primary);
+            background: #8b5a3c;
             color: white;
-        }
-
-        .category-chip.active {
-            background: var(--color-primary);
-            color: white;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
-        .animate-delay-1 {
-            animation-delay: 0.1s;
-            opacity: 0;
-        }
-
-        .animate-delay-2 {
-            animation-delay: 0.2s;
-            opacity: 0;
-        }
-
-        .animate-delay-3 {
-            animation-delay: 0.3s;
-            opacity: 0;
-        }
-
-        .animate-delay-4 {
-            animation-delay: 0.4s;
-            opacity: 0;
-        }
-
-        .hero-pattern {
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238b5a3c' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-
-        .cart-badge {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.1);
-            }
+            padding: 10px 20px;
+            border-radius: 20px;
         }
     </style>
 </head>
 
-<body class="h-full overflow-auto">
-    <div class="min-h-full w-full">
-        <!-- Header -->
-        <header class="sticky top-0 z-50 backdrop-blur-md" style="background-color: rgba(248, 246, 241, 0.95);">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16 sm:h-20">
-                    <!-- Logo -->
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center"
-                            style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
-                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
-                        </div>
-                        <a href="/" class="font-display text-xl sm:text-2xl font-bold"
-                            style="color: var(--color-text);">BookNest</a>
-                    </div>
-                    <!-- Search Bar (Desktop) -->
-                    <div class="hidden md:flex flex-1 max-w-xl mx-8">
-                        <div class="relative w-full">
-                            <form action="/books/search" method="get">
-                                <input type="text" name="title" placeholder="Tìm kiếm sách..."
-                                    class="w-full pl-12 pr-4 py-3 rounded-full border-2 focus:outline-none transition-all"
-                                    style="background-color: var(--color-surface); border-color: #e5e0d8; color: var(--color-text);"
-                                    onfocus="this.style.borderColor='var(--color-primary)'"
-                                    onblur="this.style.borderColor='#e5e0d8'">
-                                <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5"
-                                    style="color: var(--color-secondary);" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </form>
-                        </div>
-                    </div>
-                    <!-- Nav Actions -->
-                    <div class="flex items-center gap-2 sm:gap-4">
-                        <a href="/admin"
-                            class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-colors hover:bg-white/50"
-                            style="background-color: var(--color-surface); color: var(--color-text);">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
-                            <span>Admin</span>
-                        </a>
-                    </div>
-                </div>
+<body class="h-full">
+
+<div class="min-h-full">
+
+    <!-- HEADER -->
+    <header class="bg-white shadow px-6 py-4 flex justify-between items-center">
+        <h1 class="font-display text-2xl font-bold">📚 BookNest</h1>
+
+        <div class="flex gap-4 items-center">
+            <a th:href="@{/cart}">🛒</a>
+
+            <!-- Nếu đã login -->
+            <div th:if="${session.loggedInUser != null}">
+                <span th:text="${session.loggedInUser.fullName}">User</span>
+                <form method="post" th:action="@{/logout}" class="inline">
+                    <button>Đăng xuất</button>
+                </form>
             </div>
-        </header>
 
-        <!-- Hero Section -->
-        <section class="hero-pattern relative overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
-                <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-                    <!-- Hero Content -->
-                    <div class="text-center lg:text-left">
-                        <span
-                            class="animate-fade-in animate-delay-1 inline-block px-4 py-2 rounded-full text-sm font-medium mb-6"
-                            style="background-color: var(--color-secondary); color: white;">
-                            ✨ Chào mừng đến với BookNest
-                        </span>
-                        <h1 class="animate-fade-in animate-delay-2 font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6"
-                            style="color: var(--color-text);">
-                            Khám phá thế giới<br><span style="color: var(--color-primary);">qua từng trang sách</span>
-                        </h1>
-                        <p class="animate-fade-in animate-delay-3 text-lg sm:text-xl mb-8 max-w-lg mx-auto lg:mx-0"
-                            style="color: #6b6560;">
-                            <span th:text="${books.size()}">50,000</span>+ đầu sách từ văn học, khoa học đến kinh doanh.
-                            Giao hàng nhanh chóng, đổi trả dễ dàng.
-                        </p>
-                        <div
-                            class="animate-fade-in animate-delay-4 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                            <a href="/books"
-                                class="btn-primary px-8 py-4 rounded-full text-white font-semibold text-lg text-center">
-                                Khám phá ngay
-                            </a>
-                            <a href="/categories"
-                                class="px-8 py-4 rounded-full font-semibold text-lg border-2 transition-all hover:bg-white text-center"
-                                style="border-color: var(--color-primary); color: var(--color-primary);">
-                                Danh mục sách
-                            </a>
-                        </div>
-                    </div>
-                    <!-- Hero Stats -->
-                    <div class="grid grid-cols-2 gap-4 lg:gap-6">
-                        <div class="bg-white rounded-2xl p-6 shadow-lg">
-                            <div class="text-3xl font-bold mb-2" style="color: var(--color-primary);"
-                                th:text="${books.size()}">0</div>
-                            <div class="text-sm" style="color: #6b6560;">Đầu sách</div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-6 shadow-lg">
-                            <div class="text-3xl font-bold mb-2" style="color: var(--color-primary);"
-                                th:text="${categories.size()}">0</div>
-                            <div class="text-sm" style="color: #6b6560;">Danh mục</div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-6 shadow-lg col-span-2">
-                            <div class="flex items-center justify-center gap-4">
-                                <a href="/books"
-                                    class="flex-1 text-center py-3 px-4 rounded-lg transition-colors hover:bg-gray-50"
-                                    style="border: 1px solid #e5e0d8;">
-                                    📚 Quản lý Sách
-                                </a>
-                                <a href="/categories"
-                                    class="flex-1 text-center py-3 px-4 rounded-lg transition-colors hover:bg-gray-50"
-                                    style="border: 1px solid #e5e0d8;">
-                                    📂 Danh mục
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Nếu chưa login -->
+            <div th:if="${session.loggedInUser == null}">
+                <a th:href="@{/login}">Đăng nhập</a>
+                <a th:href="@{/register}" class="btn-primary">Đăng ký</a>
             </div>
-        </section>
+        </div>
+    </header>
 
-        <!-- Categories -->
-        <section class="py-8 sm:py-12" style="background-color: var(--color-surface);">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="font-display text-2xl sm:text-3xl font-bold mb-6 text-center"
-                    style="color: var(--color-text);">Danh Mục Sách</h2>
-                <div class="flex flex-wrap gap-3 justify-center">
-                    <a href="/books" class="category-chip active px-5 py-2.5 rounded-full font-medium border-2"
-                        style="border-color: var(--color-primary);">
-                        📚 Tất cả
-                    </a>
-                    <a th:each="category : ${categories}" th:href="@{/books(categoryId=${category.id})}"
-                        class="category-chip px-5 py-2.5 rounded-full font-medium border-2"
-                        style="border-color: #e5e0d8; color: var(--color-text);">
-                        <span th:text="${category.name}">Danh mục</span>
-                    </a>
-                </div>
+    <!-- HERO -->
+    <section class="text-center py-16">
+        <h2 class="font-display text-4xl font-bold mb-4">
+            Khám phá thế giới qua từng trang sách
+        </h2>
+        <p class="mb-6 text-gray-600">
+            <span th:text="${books.size()}">0</span>+ đầu sách trong hệ thống
+        </p>
+
+        <a th:href="@{/books}" class="btn-primary">Xem sách</a>
+    </section>
+
+    <!-- DANH SÁCH SÁCH -->
+    <section class="px-6 py-10">
+        <h3 class="text-2xl font-bold mb-6">Sách nổi bật</h3>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div th:each="book : ${books}" class="bg-white p-4 rounded shadow">
+                <h4 class="font-bold" th:text="${book.title}">Tên sách</h4>
+                <p th:text="${book.author}">Tác giả</p>
+                <p th:text="${book.price}">Giá</p>
+
+                <a th:href="@{/books/{id}(id=${book.id})}" 
+                   class="btn-primary mt-2 inline-block">Xem</a>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Featured Books -->
-        <section class="py-12 sm:py-16">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between mb-8 sm:mb-12">
-                    <div>
-                        <h2 class="font-display text-2xl sm:text-3xl font-bold mb-2" style="color: var(--color-text);">
-                            Sách nổi bật</h2>
-                        <p style="color: #6b6560;">Danh sách sách hiện có trong hệ thống</p>
-                    </div>
-                    <a href="/books"
-                        class="hidden sm:flex items-center gap-2 font-semibold transition-colors hover:opacity-70"
-                        style="color: var(--color-primary);">
-                        Xem tất cả
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                    </a>
-                </div>
+    <!-- ADMIN QUICK LINK -->
+    <section class="text-center py-10">
+        <a href="/admin" class="underline text-gray-600">Vào trang Admin</a>
+    </section>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
-                    <!-- Book Cards -->
-                    <div th:each="book, iterStat : ${books}" th:if="${iterStat.index < 10}"
-                        class="book-card group cursor-pointer">
-                        <a th:href="@{/books/{id}(id=${book.id})}" class="block">
-                            <div class="book-shadow relative rounded-2xl overflow-hidden mb-4"
-                                style="background-color: var(--color-surface);">
-                                <div class="aspect-[3/4] flex items-center justify-center p-4"
-                                    style="background: linear-gradient(180deg, #f0e6d3 0%, #e8dcc8 100%);">
-                                    <img th:if="${book.imageUrl != null and !book.imageUrl.isEmpty()}"
-                                        th:src="${book.imageUrl}" th:alt="${book.title}"
-                                        class="w-full h-full rounded-lg shadow-lg object-cover"
-                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                    <div th:style="${book.imageUrl != null and !book.imageUrl.isEmpty()} ? 'display:none; background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);' : 'display:flex; background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);'"
-                                        class="w-full h-full rounded-lg shadow-lg flex-col p-4 text-white">
-                                        <div class="flex-1 flex flex-col justify-between">
-                                            <div>
-                                                <div class="text-[10px] uppercase tracking-wider opacity-60 mb-1"
-                                                    th:text="${book.category != null ? book.category.name : 'Sách'}">
-                                                    Thể loại
-                                                </div>
-                                                <div class="font-display text-sm font-bold leading-tight line-clamp-3"
-                                                    th:text="${book.title}">
-                                                    Tên sách
-                                                </div>
-                                            </div>
-                                            <div class="text-[10px] opacity-70"
-                                                th:text="${book.author != null ? book.author : 'Tác giả'}">
-                                                Tác giả
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div th:if="${book.stock != null && book.stock == 0}"
-                                    class="absolute top-3 left-3 px-2 py-1 rounded-full text-[10px] font-bold text-white"
-                                    style="background-color: #e53e3e;">
-                                    Hết hàng
-                                </div>
-                            </div>
-                            <div class="px-1">
-                                <h3 class="font-semibold text-sm sm:text-base mb-1 line-clamp-2"
-                                    style="color: var(--color-text);" th:text="${book.title}">Tên sách</h3>
-                                <p class="text-xs sm:text-sm mb-2" style="color: #6b6560;" th:text="${book.author}">Tác
-                                    giả</p>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-bold" style="color: var(--color-primary);"
-                                        th:text="${book.price != null ? #numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT') + 'đ' : 'N/A'}">Giá</span>
-                                </div>
-                                <div class="flex items-center gap-1 mt-2">
-                                    <span class="text-xs px-2 py-1 rounded-full"
-                                        style="background-color: rgba(139, 69, 19, 0.1); color: var(--color-primary);"
-                                        th:text="${book.stock != null ? 'Còn ' + book.stock : 'N/A'}">
-                                        Tồn kho
-                                    </span>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+</div>
 
-                <div th:if="${books.empty}" class="text-center py-12">
-                    <svg class="w-24 h-24 mx-auto mb-4" style="color: #d4a574;" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                    <h3 class="text-xl font-semibold mb-2" style="color: var(--color-text);">Chưa có sách nào</h3>
-                    <p class="mb-4" style="color: #6b6560;">Hãy thêm sách mới vào hệ thống</p>
-                    <a href="/books/new"
-                        class="btn-primary px-6 py-3 rounded-full text-white font-semibold inline-block">
-                        Thêm sách mới
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Quick Actions -->
-        <section class="py-12 sm:py-16" style="background-color: var(--color-surface);">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <a href="/books" class="group p-6 rounded-2xl transition-all hover:shadow-lg"
-                        style="background-color: var(--color-bg);">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
-                            style="background-color: rgba(139, 69, 19, 0.1);">
-                            <svg class="w-6 h-6" style="color: var(--color-primary);" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
-                        </div>
-                        <h3 class="font-semibold mb-2" style="color: var(--color-text);">Quản lý Sách</h3>
-                        <p class="text-sm" style="color: #6b6560;">Xem, thêm, sửa, xóa sách</p>
-                    </a>
-
-                    <a href="/categories" class="group p-6 rounded-2xl transition-all hover:shadow-lg"
-                        style="background-color: var(--color-bg);">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
-                            style="background-color: rgba(139, 69, 19, 0.1);">
-                            <svg class="w-6 h-6" style="color: var(--color-primary);" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                            </svg>
-                        </div>
-                        <h3 class="font-semibold mb-2" style="color: var(--color-text);">Danh mục</h3>
-                        <p class="text-sm" style="color: #6b6560;">Quản lý danh mục sách</p>
-                    </a>
-
-                    <a href="/users" class="group p-6 rounded-2xl transition-all hover:shadow-lg"
-                        style="background-color: var(--color-bg);">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
-                            style="background-color: rgba(139, 69, 19, 0.1);">
-                            <svg class="w-6 h-6" style="color: var(--color-primary);" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
-                        </div>
-                        <h3 class="font-semibold mb-2" style="color: var(--color-text);">Người dùng</h3>
-                        <p class="text-sm" style="color: #6b6560;">Quản lý người dùng</p>
-                    </a>
-
-                    <a href="/orders" class="group p-6 rounded-2xl transition-all hover:shadow-lg"
-                        style="background-color: var(--color-bg);">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
-                            style="background-color: rgba(139, 69, 19, 0.1);">
-                            <svg class="w-6 h-6" style="color: var(--color-primary);" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                            </svg>
-                        </div>
-                        <h3 class="font-semibold mb-2" style="color: var(--color-text);">Đơn hàng</h3>
-                        <p class="text-sm" style="color: #6b6560;">Quản lý đơn hàng</p>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer style="background-color: var(--color-text); color: #e5e0d8;">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                    <div class="col-span-1">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center"
-                                style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                </svg>
-                            </div>
-                            <span class="font-display text-xl font-bold text-white">BookNest</span>
-                        </div>
-                        <p class="text-sm opacity-70 mb-4">Hệ thống quản lý cửa hàng sách trực tuyến</p>
-                    </div>
-
-                    <div>
-                        <h5 class="font-semibold text-white mb-4">Quản lý</h5>
-                        <ul class="space-y-3 text-sm opacity-70">
-                            <li><a href="/books" class="hover:opacity-100 transition-opacity">Quản lý sách</a></li>
-                            <li><a href="/categories" class="hover:opacity-100 transition-opacity">Danh mục</a></li>
-                            <li><a href="/users" class="hover:opacity-100 transition-opacity">Người dùng</a></li>
-                            <li><a href="/orders" class="hover:opacity-100 transition-opacity">Đơn hàng</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h5 class="font-semibold text-white mb-4">Thống kê</h5>
-                        <ul class="space-y-3 text-sm opacity-70">
-                            <li><span th:text="${books.size()} + ' đầu sách'">0 đầu sách</span></li>
-                            <li><span th:text="${categories.size()} + ' danh mục'">0 danh mục</span></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h5 class="font-semibold text-white mb-4">Liên hệ</h5>
-                        <ul class="space-y-3 text-sm opacity-70">
-                            <li class="flex items-center gap-2">
-                                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                                <span>hello@booknest.vn</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="border-t border-white/10 pt-8 text-center">
-                    <p class="text-sm opacity-50">© 2026 BookNest. Hệ thống quản lý cửa hàng sách.</p>
-                </div>
-            </div>
-        </footer>
-    </div>
 </body>
-
 </html>
