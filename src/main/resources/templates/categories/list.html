@@ -1,63 +1,133 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!doctype html>
+<html lang="vi" class="h-full" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh Sách Danh Mục</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Danh Mục Sách - BookNest</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #f8f6f1;
+            --color-surface: #ffffff;
+            --color-text: #1a1410;
+            --color-primary: #8b5a3c;
+            --color-secondary: #d4a574;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 90, 60, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(139, 90, 60, 0.5);
+        }
+
+        .category-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(139, 90, 60, 0.15);
+        }
+    </style>
 </head>
 
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">Bookstore</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Trang Chủ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/books">Sách</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="/categories">Danh Mục</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/users">Người Dùng</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/orders">Đơn Hàng</a></li>
-                </ul>
+<body class="h-full overflow-auto" style="background-color: var(--color-bg);">
+    <div class="min-h-full w-full">
+        <header class="sticky top-0 z-50 backdrop-blur-md" style="background-color: rgba(250, 247, 242, 0.95);">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
+                    <a th:href="@{/}" class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                            style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                        </div>
+                        <span class="font-display text-xl sm:text-2xl font-bold">BookNest</span>
+                    </a>
+                    <div class="flex items-center gap-2 sm:gap-4">
+                        <a th:href="@{/}" class="text-gray-600 hover:text-gray-900 font-medium">Trang chủ</a>
+                        <a th:href="@{/books}" class="text-gray-600 hover:text-gray-900 font-medium">Sách</a>
+                        <a th:href="@{/categories}" class="font-semibold" style="color: var(--color-primary);">Danh
+                            mục</a>
+                    </div>
+                </div>
             </div>
-        </div>
-    </nav>
+        </header>
 
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2>Danh Sách Danh Mục</h2>
-            <a href="/categories/new" class="btn btn-primary">Thêm Danh Mục Mới</a>
-        </div>
+        <section class="py-12 sm:py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-12">
+                    <h1 class="font-display text-4xl sm:text-5xl font-bold mb-4">Danh Mục Sách</h1>
+                    <p class="text-lg" style="color: #6b6560;">Khám phá các danh mục sách phong phú của chúng tôi</p>
+                </div>
 
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Tên Danh Mục</th>
-                    <th>Mô Tả</th>
-                    <th>Số Sách</th>
-                    <th>Thao Tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="category : ${categories}">
-                    <td th:text="${category.id}"></td>
-                    <td th:text="${category.name}"></td>
-                    <td th:text="${category.description}"></td>
-                    <td th:text="${category.books?.size()}"></td>
-                    <td>
-                        <a th:href="@{/categories/{id}(id=${category.id})}" class="btn btn-info btn-sm">Xem</a>
-                        <a th:href="@{/categories/edit/{id}(id=${category.id})}" class="btn btn-warning btn-sm">Sửa</a>
-                        <a th:href="@{/categories/delete/{id}(id=${category.id})}" class="btn btn-danger btn-sm"
-                            onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <th:block th:each="category : ${categories}">
+                        <a th:href="@{/categories/{id}(id=${category.id})}"
+                            class="category-card bg-white rounded-2xl p-8 shadow-md border-2 border-transparent"
+                            style="border-color: #e5e0d8;">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="w-12 h-12 rounded-lg flex items-center justify-center"
+                                    style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                </div>
+                                <span class="text-sm font-semibold px-3 py-1 rounded-full"
+                                    style="background-color: #f3e9de; color: var(--color-primary);"
+                                    th:text="${category.books?.size()} ?: '0'">0</span>
+                            </div>
+                            <h3 class="font-display text-2xl font-bold mb-3" th:text="${category.name}">Category</h3>
+                            <p class="text-sm" style="color: #6b6560;"
+                                th:text="${category.description ?: 'Khám phá bộ sưu tập sách trong danh mục này'}">
+                                Description
+                            </p>
+                        </a>
+                    </th:block>
+                </div>
+
+                <div th:if="${categories.isEmpty()}" class="text-center py-16">
+                    <p class="text-lg" style="color: #6b6560;">Chưa có danh mục nào</p>
+                    <a th:href="@{/books}"
+                        class="btn-primary inline-block mt-6 px-6 py-3 rounded-full text-white font-semibold">
+                        Xem tất cả sách
+                    </a>
+                </div>
+            </div>
+        </section>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

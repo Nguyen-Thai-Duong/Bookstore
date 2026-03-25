@@ -5,6 +5,7 @@ import com.bookstore.model.Category;
 import com.bookstore.model.Order;
 import com.bookstore.model.User;
 import com.bookstore.model.Voucher;
+import com.bookstore.repository.ReviewRepository;
 import com.bookstore.service.BookService;
 import com.bookstore.service.CategoryService;
 import com.bookstore.service.OrderService;
@@ -51,6 +52,9 @@ public class AdminController {
     @Autowired
     private VoucherService voucherService;
 
+    @Autowired
+    private ReviewRepository reviewRepository;
+
     @GetMapping
     public String dashboard(Model model) {
         // Get statistics
@@ -68,6 +72,8 @@ public class AdminController {
                 .limit(5)
                 .toList();
 
+        var latestReviews = reviewRepository.findAllByOrderByCreatedAtDesc();
+
         // Add attributes to model
         model.addAttribute("totalBooks", allBooks.size());
         model.addAttribute("totalCategories", allCategories.size());
@@ -75,6 +81,7 @@ public class AdminController {
         model.addAttribute("totalUsers", allUsers.size());
         model.addAttribute("recentBooks", recentBooks);
         model.addAttribute("categories", allCategories);
+        model.addAttribute("latestReviews", latestReviews);
 
         return "admin/dashboard";
     }
@@ -104,8 +111,11 @@ public class AdminController {
     @PostMapping("/books/save")
     public String saveBook(@ModelAttribute Book book,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+        final String[] existingImageUrl = { null };
+
         if (book.getId() != null) {
             bookService.getBookById(book.getId()).ifPresent(existingBook -> {
+                existingImageUrl[0] = existingBook.getImageUrl();
                 if (book.getCreatedAt() == null) {
                     book.setCreatedAt(existingBook.getCreatedAt());
                 }
@@ -115,12 +125,17 @@ public class AdminController {
             });
         }
 
+        if (book.getImageUrl() != null) {
+            book.setImageUrl(book.getImageUrl().trim());
+        }
+
         if (imageFile != null && !imageFile.isEmpty()) {
             try {
-                String uploadedImageUrl = storeBookImage(imageFile, book.getImageUrl());
+                // Nếu có upload file thì ưu tiên dùng file thay cho URL.
+                String uploadedImageUrl = storeBookImage(imageFile, existingImageUrl[0]);
                 book.setImageUrl(uploadedImageUrl);
             } catch (IOException e) {
-                throw new RuntimeException("Khong the luu anh sach", e);
+                throw new RuntimeException("Không thể lưu ảnh sách", e);
             }
         }
 
@@ -334,13 +349,21 @@ public class AdminController {
 
     @GetMapping("/orders/{id}")
     public String viewOrder(@PathVariable Long id, Model model) {
-        orderService.getOrderById(id).ifPresent(order -> model.addAttribute("order", order));
+        var orderOptional = orderService.getOrderById(id);
+        if (orderOptional.isEmpty()) {
+            return "redirect:/admin/orders";
+        }
+        model.addAttribute("order", orderOptional.get());
         return "admin/orders/view";
     }
 
     @GetMapping("/orders/edit/{id}")
     public String showEditOrderForm(@PathVariable Long id, Model model) {
-        orderService.getOrderById(id).ifPresent(order -> model.addAttribute("order", order));
+        var orderOptional = orderService.getOrderById(id);
+        if (orderOptional.isEmpty()) {
+            return "redirect:/admin/orders";
+        }
+        model.addAttribute("order", orderOptional.get());
         return "admin/orders/form";
     }
 

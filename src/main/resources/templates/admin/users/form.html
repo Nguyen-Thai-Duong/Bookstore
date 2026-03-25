@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${user.id != null ? 'Chỉnh Sửa Người Dùng' : 'Thêm Người Dùng Mới'}">BookNest - Form Người Dùng
+    <title th:text="${user.id != null ? 'Chỉnh sửa Người Dùng' : 'Thêm Người Dùng Mới'}">BookNest - Form Người Dùng
     </title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -69,47 +69,53 @@
                 </div>
             </div>
 
-            <nav class="flex-1 overflow-y-auto p-4 space-y-2">
-                <a href="/admin" class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
+                        <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+                <a href="/admin"
+                    class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 12l2-3m0 0l7-4 7 4M5 9v7a1 1 0 001 1h12a1 1 0 001-1V9m-9 16l-7-4m0 0V5m7 4l7-4" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-3m0 0l7-4 7 4M5 9v7a1 1 0 001 1h12a1 1 0 001-1V9m-9 16l-7-4m0 0V5m7 4l7-4" />
                     </svg>
                     <span>Dashboard</span>
                 </a>
-
                 <a href="/admin/books"
                     class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                     <span>Quản lý sách</span>
                 </a>
-
                 <a href="/admin/categories"
                     class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                     </svg>
                     <span>Danh mục</span>
                 </a>
-
                 <a href="/admin/users"
                     class="sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                     <span>Người dùng</span>
                 </a>
-
+                <a href="/admin/vouchers"
+                    class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
+                    <span>Voucher</span>
+                </a>
+                <a href="/admin/reviews"
+                    class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8M8 14h5m-9 6l3.6-3.6A2 2 0 003 15V6a2 2 0 012-2h14a2 2 0 012 2v9a2 2 0 01-2 2H9a2 2 0 00-1.4.6L4 21z" />
+                    </svg>
+                    <span>Review</span>
+                </a>
                 <a href="/admin/orders"
                     class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                     <span>Đơn hàng</span>
                 </a>
@@ -137,7 +143,7 @@
             <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
                 <div class="px-8 py-4">
                     <h2 class="text-2xl font-bold" style="color: var(--color-text);"
-                        th:text="${user.id != null ? 'Chỉnh Sửa Người Dùng' : 'Thêm Người Dùng Mới'}">
+                        th:text="${user.id != null ? 'Chỉnh sửa Người Dùng' : 'Thêm Người Dùng Mới'}">
                         Form Người Dùng
                     </h2>
                     <p class="text-sm text-gray-500"
@@ -229,7 +235,7 @@
                             <!-- Role -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Vai Trò <span class="text-red-500">*</span>
+                                    Vai Tròò <span class="text-red-500">*</span>
                                 </label>
                                 <select th:field="*{role.id}" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-0"
@@ -250,7 +256,7 @@
                                 <select th:field="*{status}" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-0"
                                     style="focus:ring-color: var(--color-primary);">
-                                    <option value="Active">Hoạt động</option>
+                                    <option value="Active">Hoạt Động</option>
                                     <option value="Inactive">Khóa</option>
                                 </select>
                                 <p class="text-xs text-gray-500 mt-1">Trạng thái tài khoản người dùng</p>

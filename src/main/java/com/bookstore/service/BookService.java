@@ -17,6 +17,8 @@ public interface BookService {
 
     List<Book> getAvailableBooks();
 
+    List<Book> getTopSellingBooksByCategory();
+
     Book saveBook(Book book);
 
     void deleteBook(Long id);

@@ -170,6 +170,15 @@
                     <span>Voucher</span>
                 </a>
 
+                <a href="/admin/reviews"
+                    class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 10h8M8 14h5m-9 6l3.6-3.6A2 2 0 003 15V6a2 2 0 012-2h14a2 2 0 012 2v9a2 2 0 01-2 2H9a2 2 0 00-1.4.6L4 21z" />
+                    </svg>
+                    <span>Review</span>
+                </a>
+
                 <a href="/admin/orders"
                     class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,7 +332,7 @@
                             <h3 class="text-lg font-bold" style="color: var(--color-text);">Sách mới nhất</h3>
                             <a href="/admin/books" class="text-sm font-medium" style="color: var(--color-primary);">Xem
                                 tất cả
-                                →</a>
+                                -></a>
                         </div>
                         <div class="space-y-3">
                             <div th:each="book, iterStat : ${recentBooks}" th:if="${iterStat.index < 5}"
@@ -358,7 +367,7 @@
                             <h3 class="text-lg font-bold" style="color: var(--color-text);">Danh mục sách</h3>
                             <a href="/admin/categories" class="text-sm font-medium"
                                 style="color: var(--color-primary);">Xem
-                                tất cả →</a>
+                                tất cả -></a>
                         </div>
                         <div class="space-y-3">
                             <div th:each="category, iterStat : ${categories}" th:if="${iterStat.index < 6}"

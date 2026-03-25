@@ -1,34 +1,373 @@
-<!doctype html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đơn hàng - BookNest</title>
+    <title>BookNest - Đơn hàng của bạn</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #f8f6f1;
+            --color-surface: #ffffff;
+            --color-text: #1a1410;
+            --color-primary: #8b5a3c;
+            --color-secondary: #d4a574;
+        }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 90, 60, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(139, 90, 60, 0.5);
+        }
+
+        .order-card {
+            transition: all 0.25s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.08);
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 4px 12px;
+            border-radius: 9999px;
+        }
+
+        .status-pending {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-delivered {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-cancelled {
+            background-color: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .status-shipping {
+            background-color: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .status-default {
+            background-color: #E5E7EB;
+            color: #374151;
+        }
+    </style>
 </head>
-<body class="bg-[#f8f6f1] text-[#1a1410]">
-<div class="max-w-5xl mx-auto px-6 py-10">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-semibold">Đơn hàng của bạn</h1>
-        <a th:href="@{/books}" class="text-sm underline">Xem sách</a>
-    </div>
 
-    <div th:if="${#lists.isEmpty(orders)}" class="bg-white rounded-2xl p-6">
-        <p>Chưa có đơn hàng.</p>
-    </div>
+<body class="min-h-screen flex flex-col">
+    <header class="sticky top-0 z-50 backdrop-blur-md" style="background-color: rgba(250, 247, 242, 0.95);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20 gap-4">
+                <a th:href="@{/}" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                        style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <span class="font-display text-xl sm:text-2xl font-bold">BookNest</span>
+                </a>
 
-    <div th:if="${!#lists.isEmpty(orders)}" class="space-y-4">
-        <div th:each="order : ${orders}" class="bg-white rounded-2xl p-4">
-            <div class="flex justify-between">
-                <div>
-                    <div class="font-semibold" th:text="${order.orderID}">ORDER-ID</div>
-                    <div class="text-sm text-gray-600" th:text="${order.orderStatus}">Status</div>
+                <div class="hidden md:flex flex-1 max-w-xl">
+                    <form th:action="@{/books/search}" method="get" class="relative w-full">
+                        <input type="text" name="title" autocomplete="off" placeholder="Tìm kiếm sách, tác giả..."
+                            class="w-full pl-12 pr-4 py-3 rounded-full border-2 focus:outline-none transition-all"
+                            style="background-color: var(--color-surface); border-color: #e5e0d8; color: var(--color-text);"
+                            onfocus="this.style.borderColor='var(--color-primary)'"
+                            onblur="this.style.borderColor='#e5e0d8'">
+                        <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5"
+                            style="color: var(--color-secondary);" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </form>
                 </div>
-                <div class="text-sm" th:text="${order.totalAmount}">0</div>
+
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <a th:href="@{/cart}" class="relative p-2 rounded-full hover:bg-white/50 transition-colors">
+                        <svg class="w-6 h-6" style="color: var(--color-text);" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                    </a>
+
+                    <a th:if="${session.loggedInUser != null and session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
+                        th:href="@{/admin}" class="px-4 py-2 rounded-full font-medium border-2"
+                        style="border-color: var(--color-primary); color: var(--color-primary);">
+                        Admin
+                    </a>
+
+                    <div class="flex items-center" th:if="${session.loggedInUser != null}">
+                        <div class="group relative">
+                            <button class="flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-colors"
+                                style="background-color: var(--color-surface); color: var(--color-text);">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <span th:text="${session.loggedInUser.fullName}">Tài khoản</span>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 rounded-2xl shadow-xl border-2 bg-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all"
+                                style="border-color: #eee7dd;">
+                                <a th:href="@{/account}"
+                                    class="block px-4 py-3 text-sm hover:bg-[#f8f6f1] rounded-t-2xl">Xem tài khoản</a>
+                                <a th:href="@{/orders}" class="block px-4 py-3 text-sm hover:bg-[#f8f6f1]">Theo dõi đơn
+                                    hàng</a>
+                                <form method="post" th:action="@{/logout}">
+                                    <button type="submit"
+                                        class="w-full text-left px-4 py-3 text-sm hover:bg-[#f8f6f1] rounded-b-2xl">Đăng
+                                        xuất</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <a th:href="@{/orders/{id}(id=${order.orderID})}" class="text-sm underline">Xem chi tiết</a>
         </div>
-    </div>
-</div>
+    </header>
+
+    <main class="max-w-5xl mx-auto w-full px-6 md:px-20 py-10 flex-1">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
+            <div>
+                <h1 class="font-display text-4xl font-bold text-[#2D241E] mb-2">Đơn hàng của bạn</h1>
+                <p class="text-sm text-[#7D6E63] font-medium">Theo dõi tình trạng và lịch sử mua sắm tại BookNest</p>
+            </div>
+            <div class="flex gap-2 bg-white p-1 rounded-2xl shadow-sm border border-gray-100"
+                th:if="${!#lists.isEmpty(orders)}">
+                <button type="button" data-filter="all"
+                    class="order-filter-btn px-5 py-2 text-xs font-bold rounded-xl bg-[#A35C33] text-white">Tất
+                    cả</button>
+                <button type="button" data-filter="pending"
+                    class="order-filter-btn px-5 py-2 text-xs font-bold rounded-xl text-[#7D6E63] hover:bg-[#F5F1E9]">Chờ
+                    xử lý</button>
+                <button type="button" data-filter="shipping"
+                    class="order-filter-btn px-5 py-2 text-xs font-bold rounded-xl text-[#7D6E63] hover:bg-[#F5F1E9]">Đang
+                    giao</button>
+                <button type="button" data-filter="delivered"
+                    class="order-filter-btn px-5 py-2 text-xs font-bold rounded-xl text-[#7D6E63] hover:bg-[#F5F1E9]">Đã
+                    giao</button>
+                <button type="button" data-filter="cancelled"
+                    class="order-filter-btn px-5 py-2 text-xs font-bold rounded-xl text-[#7D6E63] hover:bg-[#F5F1E9]">Đã
+                    hủy</button>
+            </div>
+        </div>
+
+        <div class="space-y-6" th:if="${!#lists.isEmpty(orders)}">
+            <div class="order-card bg-white rounded-[2rem] p-8 border border-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.05)]"
+                th:each="order : ${orders}" th:attr="data-status-raw=${order.status}">
+                <div class="flex flex-col md:flex-row justify-between gap-6">
+                    <div class="flex gap-6 items-start">
+                        <div
+                            class="w-16 h-16 bg-[#F5F1E9] rounded-2xl flex items-center justify-center text-[#A35C33] shrink-0 shadow-inner">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-3 mb-1">
+                                <span class="text-lg font-bold text-[#2D241E]"
+                                    th:text="'Đơn hàng #BN-' + ${order.id}">Đơn hàng #BN-1</span>
+                                <span class="status-badge"
+                                    th:classappend="${#strings.equalsIgnoreCase(order.status, 'Pending')} ? ' status-pending' : (${#strings.equalsIgnoreCase(order.status, 'Delivered')} ? ' status-delivered' : (${#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled')} ? ' status-cancelled' : (${#strings.equalsIgnoreCase(order.status, 'Shipping')} ? ' status-shipping' : ' status-default')))"
+                                    th:text="${#strings.equalsIgnoreCase(order.status, 'Pending') ? 'Chờ xử lý' : (#strings.equalsIgnoreCase(order.status, 'Delivered') ? 'Đã giao' : ((#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled')) ? 'Đã hủy' : (#strings.equalsIgnoreCase(order.status, 'Shipping') ? 'Đang giao' : order.status)))}">Đang
+                                    xử lý</span>
+                            </div>
+                            <p class="text-sm text-[#7D6E63] mb-4"
+                                th:text="'Đặt ngày: ' + ${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">Đặt
+                                ngày</p>
+
+                            <div class="text-xs text-[#7D6E63] font-semibold">Theo dõi trạng thái đơn hàng theo thời
+                                gian thực.</div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="flex flex-col items-end justify-between border-t md:border-t-0 md:border-l border-gray-100 pt-6 md:pt-0 md:pl-10">
+                        <div class="text-right">
+                            <span class="block text-xs font-bold text-[#7D6E63] uppercase tracking-widest mb-1">Tổng
+                                cộng</span>
+                            <span class="text-2xl font-bold text-[#A35C33]"
+                                th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + 'đ' : '0đ'}">0đ</span>
+                        </div>
+                        <span class="mt-4 px-6 py-2.5 bg-[#EFE9DE] text-[#7D6E63] font-bold rounded-xl text-sm">
+                            Mã đơn: <span th:text="${order.id}">0</span>
+                        </span>
+                        <a th:href="@{/orders/{id}(id=${order.id})}"
+                            class="mt-4 inline-block px-6 py-2.5 bg-[#A35C33] text-white font-bold rounded-xl text-sm hover:bg-[#8B5A3c] transition">
+                            Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="orders-filter-empty" class="hidden text-center py-10 text-[#7D6E63]"
+            th:if="${!#lists.isEmpty(orders)}">
+            Không có đơn hàng phù hợp với bộ lọc này.
+        </div>
+
+        <div class="mt-20 text-center py-20" th:if="${#lists.isEmpty(orders)}">
+            <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-[#EFE9DE]" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M16 11V7a4 4 0 11-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+            </div>
+            <h3 class="font-display text-xl font-bold mb-2">Bạn chưa có đơn hàng nào</h3>
+            <p class="text-[#7D6E63] mb-8">Hãy khám phá kho sách của BookNest nhé!</p>
+            <a th:href="@{/books}"
+                class="btn-primary text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-[#A35C33]/20">Bắt đầu mua
+                sắm</a>
+        </div>
+    </main>
+
+    <footer class="mt-auto" style="background-color: var(--color-text); color: #e5e0d8;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <span class="font-display text-xl font-bold text-white">BookNest</span>
+            </div>
+            <p class="text-sm opacity-70 mb-4">Nơi tri thức được lan tỏa và đam mê đọc sách được nuôi dưỡng.</p>
+            <div class="border-t border-white/10 pt-6 text-sm opacity-50">Copyright 2026 BookNest.</div>
+        </div>
+    </footer>
+
+    <script>
+        const filterButtons = Array.from(document.querySelectorAll('.order-filter-btn'));
+        const orderCards = Array.from(document.querySelectorAll('.order-card[data-status-raw]'));
+        const filterEmpty = document.getElementById('orders-filter-empty');
+        const allowedFilters = new Set(['all', 'pending', 'shipping', 'delivered', 'cancelled']);
+
+        const setActiveFilterButton = (activeButton) => {
+            filterButtons.forEach((button) => {
+                const isActive = button === activeButton;
+                button.classList.toggle('bg-[#A35C33]', isActive);
+                button.classList.toggle('text-white', isActive);
+                button.classList.toggle('text-[#7D6E63]', !isActive);
+            });
+        };
+
+        const normalizeVietnamese = (value) => {
+            return (value || '')
+                .trim()
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd');
+        };
+
+        const normalizeStatus = (rawStatus) => {
+            const normalized = normalizeVietnamese(rawStatus);
+
+            if (normalized.includes('pend') || normalized.includes('cho xu ly') || normalized.includes('processing')) {
+                return 'pending';
+            }
+            if (normalized.includes('ship') || normalized.includes('dang giao') || normalized.includes('in transit')) {
+                return 'shipping';
+            }
+            if (normalized.includes('deliver') || normalized.includes('da giao') || normalized.includes('hoan thanh') || normalized.includes('complete')) {
+                return 'delivered';
+            }
+            if (normalized.includes('cancel') || normalized.includes('da huy') || normalized.includes('huy')) {
+                return 'cancelled';
+            }
+
+            return 'default';
+        };
+
+        const applyOrderFilter = (filterValue) => {
+            let visibleCount = 0;
+
+            orderCards.forEach((card) => {
+                const status = normalizeStatus(card.getAttribute('data-status-raw'));
+                const show = filterValue === 'all' || status === filterValue;
+                card.classList.toggle('hidden', !show);
+                if (show) {
+                    visibleCount += 1;
+                }
+            });
+
+            if (filterEmpty) {
+                filterEmpty.classList.toggle('hidden', visibleCount > 0);
+            }
+        };
+
+        const updateFilterInUrl = (filterValue) => {
+            const url = new URL(window.location.href);
+            if (filterValue === 'all') {
+                url.searchParams.delete('status');
+            } else {
+                url.searchParams.set('status', filterValue);
+            }
+            window.history.replaceState({}, '', url);
+        };
+
+        if (filterButtons.length && orderCards.length) {
+            const getButtonByFilter = (filterValue) => filterButtons.find((button) => button.getAttribute('data-filter') === filterValue);
+
+            const currentStatusParam = new URLSearchParams(window.location.search).get('status') || 'all';
+            const initialFilter = allowedFilters.has(currentStatusParam) ? currentStatusParam : 'all';
+            const initialButton = getButtonByFilter(initialFilter) || filterButtons[0];
+            if (initialButton) {
+                setActiveFilterButton(initialButton);
+                applyOrderFilter(initialFilter);
+            }
+
+            filterButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const filterValue = button.getAttribute('data-filter') || 'all';
+                    setActiveFilterButton(button);
+                    applyOrderFilter(filterValue);
+                    updateFilterInUrl(filterValue);
+                });
+            });
+        }
+    </script>
+
 </body>
+
 </html>

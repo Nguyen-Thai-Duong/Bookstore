@@ -1,91 +1,164 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi Tiết Đơn Hàng</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title th:text="'BookNest - Chi tiết đơn hàng #BN-' + ${order.id}">BookNest - Chi tiết đơn hàng</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #f8f6f1;
+            --color-surface: #ffffff;
+            --color-text: #1a1410;
+            --color-primary: #8b5a3c;
+            --color-secondary: #d4a574;
+        }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+
+        .font-display {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
 </head>
 
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">Bookstore</a>
-        </div>
-    </nav>
-
-    <div class="container mt-4">
-        <h2>Chi Tiết Đơn Hàng #<span th:text="${order.id}"></span></h2>
-
-        <div class="card mb-3">
-            <div class="card-header bg-primary text-white">
-                <h5>Thông Tin Đơn Hàng</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>ID Đơn Hàng:</strong> <span th:text="${order.id}"></span></p>
-                        <p><strong>Khách Hàng:</strong> <span th:text="${order.user?.fullName}"></span></p>
-                        <p><strong>Số Điện Thoại:</strong> <span th:text="${order.phoneNumber}"></span></p>
+<body class="flex flex-col min-h-screen">
+    <header class="bg-white shadow-sm border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/" class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
                     </div>
-                    <div class="col-md-6">
-                        <p><strong>Ngày Đặt:</strong> <span
-                                th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></span></p>
-                        <p><strong>Trạng Thái:</strong>
-                            <span class="badge" th:classappend="${order.status == 'DELIVERED' ? 'bg-success' : 
-                                                   order.status == 'CANCELLED' ? 'bg-danger' : 'bg-warning'}"
-                                th:text="${order.status}"></span>
-                        </p>
-                        <p><strong>Địa Chỉ Giao Hàng:</strong> <span th:text="${order.shippingAddress}"></span></p>
+                    <span class="font-display text-xl font-bold text-[#A35C33]">BookNest</span>
+                </a>
+                <nav class="flex items-center gap-6">
+                    <a href="/" class="text-sm font-medium text-[#7D6E63] hover:text-[#A35C33]">Trang chủ</a>
+                    <a href="/books" class="text-sm font-medium text-[#7D6E63] hover:text-[#A35C33]">Sách</a>
+                    <a href="/orders" class="text-sm font-medium text-[#A35C33] font-bold">Đơn hàng</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto w-full px-6 md:px-20 py-10 flex-1">
+        <a href="/orders" class="inline-flex items-center gap-2 text-sm text-[#7D6E63] hover:text-[#A35C33] mb-6 font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Quay lại danh sách đơn hàng
+        </a>
+
+        <div class="mb-8">
+            <h1 class="font-display text-4xl font-bold text-[#2D241E] mb-2" th:text="'Đơn hàng #BN-' + ${order.id}">Đơn hàng #BN-0</h1>
+            <p class="text-sm text-[#7D6E63] font-medium" th:text="'Đặt ngày: ' + ${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">Đặt ngày</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-2xl p-6 border border-gray-100">
+                <h3 class="font-display text-lg font-bold text-[#2D241E] mb-4">Thông tin đơn hàng</h3>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-xs font-bold text-[#7D6E63] uppercase tracking-widest mb-1">Trạng thái</p>
+                        <span class="inline-block px-4 py-2 rounded-lg font-bold text-sm"
+                            th:classappend="${#strings.equalsIgnoreCase(order.status, 'Pending')} ? 'bg-yellow-100 text-yellow-800' : (${#strings.equalsIgnoreCase(order.status, 'Delivered')} ? 'bg-green-100 text-green-800' : (${#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled')} ? 'bg-red-100 text-red-800' : (${#strings.equalsIgnoreCase(order.status, 'Shipping')} ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800')))"
+                            th:text="${#strings.equalsIgnoreCase(order.status, 'Pending') ? 'Chờ xử lý' : (#strings.equalsIgnoreCase(order.status, 'Delivered') ? 'Đã giao' : ((#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled')) ? 'Đã hủy' : (#strings.equalsIgnoreCase(order.status, 'Shipping') ? 'Đang giao' : order.status)))}">Đang xử lý</span>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-[#7D6E63] uppercase tracking-widest mb-1">Mã đơn hàng</p>
+                        <p class="text-lg font-bold text-[#A35C33]" th:text="'#BN-' + ${order.id}">#BN-0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-gray-100">
+                <h3 class="font-display text-lg font-bold text-[#2D241E] mb-4">Thông tin giao hàng</h3>
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <p class="text-xs font-bold text-[#7D6E63] uppercase tracking-widest mb-1">Địa chỉ</p>
+                        <p class="text-[#2D241E]" th:text="${order.shippingAddress}">-</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-[#7D6E63] uppercase tracking-widest mb-1">Khách hàng</p>
+                        <p class="text-[#2D241E]" th:text="${order.user?.fullName}">-</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="card mb-3">
-            <div class="card-header bg-success text-white">
-                <h5>Chi Tiết Sản Phẩm</h5>
+        <div class="bg-white rounded-2xl p-6 border border-gray-100 mb-8">
+            <h3 class="font-display text-lg font-bold text-[#2D241E] mb-6">Sản phẩm trong đơn hàng</h3>
+            
+            <div th:if="${order.orderDetails != null and !order.orderDetails.isEmpty()}">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-3 px-4 text-xs font-bold text-[#7D6E63] uppercase tracking-widest">Tên sách</th>
+                                <th class="text-right py-3 px-4 text-xs font-bold text-[#7D6E63] uppercase tracking-widest">Đơn giá</th>
+                                <th class="text-right py-3 px-4 text-xs font-bold text-[#7D6E63] uppercase tracking-widest">Số lượng</th>
+                                <th class="text-right py-3 px-4 text-xs font-bold text-[#7D6E63] uppercase tracking-widest">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="detail : ${order.orderDetails}" class="border-b border-gray-100 hover:bg-[#F5F1E9]/50 transition">
+                                <td class="py-4 px-4" th:text="${detail.book?.title}">-</td>
+                                <td class="text-right py-4 px-4 text-[#A35C33] font-bold" th:text="${#numbers.formatDecimal(detail.unitPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
+                                <td class="text-right py-4 px-4 text-[#2D241E]" th:text="${detail.quantity}">0</td>
+                                <td class="text-right py-4 px-4 text-[#A35C33] font-bold" th:text="${#numbers.formatDecimal(detail.quantity * detail.unitPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-6 flex flex-col md:flex-row justify-end gap-8">
+                    <div class="space-y-2 text-right">
+                        <div class="flex justify-between gap-8">
+                            <span class="text-[#7D6E63]">Tổng tiền sách:</span>
+                            <span class="font-bold text-[#2D241E]" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                        </div>
+                        <div class="flex justify-between gap-8 p-3 bg-[#F5F1E9] rounded-xl">
+                            <span class="font-bold text-[#2D241E]">Tổng cộng:</span>
+                            <span class="text-2xl font-bold text-[#A35C33]" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <table class="table table-bordered"
-                    th:if="${order.orderDetails != null and !order.orderDetails.isEmpty()}">
-                    <thead>
-                        <tr>
-                            <th>Tên Sách</th>
-                            <th>Đơn Giá</th>
-                            <th>Số Lượng</th>
-                            <th>Thành Tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="detail : ${order.orderDetails}">
-                            <td th:text="${detail.book?.title}"></td>
-                            <td th:text="${detail.price} + ' VNĐ'"></td>
-                            <td th:text="${detail.quantity}"></td>
-                            <td th:text="${detail.subtotal} + ' VNĐ'"></td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="3" class="text-end"><strong>Tổng Cộng:</strong></td>
-                            <td><strong th:text="${order.totalAmount} + ' VNĐ'" class="text-danger"></strong></td>
-                        </tr>
-                    </tfoot>
-                </table>
-                <p th:if="${order.orderDetails == null or order.orderDetails.isEmpty()}">Không có sản phẩm nào trong đơn
-                    hàng này.</p>
+
+            <div th:if="${order.orderDetails == null or order.orderDetails.isEmpty()}" class="text-center py-8">
+                <p class="text-[#7D6E63]">Không có sản phẩm nào trong đơn hàng này.</p>
             </div>
         </div>
 
-        <div class="mt-3">
-            <a th:href="@{/orders/delete/{id}(id=${order.id})}" class="btn btn-danger"
-                onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa Đơn Hàng</a>
-            <a href="/orders" class="btn btn-secondary">Quay Lại</a>
+        <div class="flex gap-4 justify-end">
+            <a href="/orders" class="px-6 py-3 bg-[#F5F1E9] text-[#A35C33] rounded-2xl font-bold hover:bg-[#EFE9DE] transition">Quay lại</a>
         </div>
-    </div>
+    </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <footer style="background-color: var(--color-text); color: #e5e0d8;" class="mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                </div>
+                <span class="font-display text-xl font-bold text-white">BookNest</span>
+            </div>
+            <p class="text-sm opacity-70 mb-4">Nơi tri thức được lan tỏa và đam mê đọc sách được nuôi dưỡng.</p>
+            <div class="border-t border-white/10 pt-6 text-sm opacity-50">Copyright 2026 BookNest.</div>
+        </div>
+    </footer>
 </body>
 
 </html>

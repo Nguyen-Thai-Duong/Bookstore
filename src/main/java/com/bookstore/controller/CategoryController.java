@@ -16,14 +16,14 @@ public class CategoryController {
 
     @GetMapping
     public String listCategories(Model model) {
-        model.addAttribute("categories", categoryService.getAllCategories());
-        return "categories/list";
+        // Redirect to home page with categories section anchor
+        return "redirect:/?section=categories";
     }
 
     @GetMapping("/{id}")
     public String viewCategory(@PathVariable Long id, Model model) {
-        categoryService.getCategoryById(id).ifPresent(category -> model.addAttribute("category", category));
-        return "categories/view";
+        // Redirect to home page with categories section anchor
+        return "redirect:/?section=categories";
     }
 
     @GetMapping("/new")
