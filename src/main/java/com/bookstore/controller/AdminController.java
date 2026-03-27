@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -368,8 +369,17 @@ public class AdminController {
     }
 
     @PostMapping("/orders/save")
-    public String saveOrder(@ModelAttribute Order order) {
-        orderService.saveOrder(order);
+    public String saveOrder(@ModelAttribute Order order, RedirectAttributes redirectAttributes) {
+        try {
+            orderService.saveOrder(order);
+            redirectAttributes.addFlashAttribute("orderSuccess", "Cập nhật trạng thái đơn hàng thành công");
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("orderError", e.getMessage());
+            return "redirect:/admin/orders/edit/" + order.getId();
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("orderError", e.getMessage());
+            return "redirect:/admin/orders";
+        }
         return "redirect:/admin/orders";
     }
 

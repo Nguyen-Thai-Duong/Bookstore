@@ -1,164 +1,654 @@
-﻿<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="'BookNest - Chi tiết đơn hàng #BN-' + ${order.id}">BookNest - Chi tiết đơn hàng</title>
-    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>BookNest | Chi tiết đơn hàng</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --color-bg: #f8f6f1;
-            --color-surface: #ffffff;
-            --color-text: #1a1410;
-            --color-primary: #8b5a3c;
-            --color-secondary: #d4a574;
+            --vb-brown: #8B573C;
+            --bg-gray: #f5f5f5;
+            --border: #ddd;
+            --text: #333;
+            --price: #d0021b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
         }
 
         body {
-            font-family: 'Source Sans 3', sans-serif;
-            background-color: var(--color-bg);
-            color: var(--color-text);
+            background: var(--bg-gray);
+            color: var(--text);
+            font-size: 13px;
         }
 
-        .font-display {
-            font-family: 'Playfair Display', serif;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+
+        header {
+            background: #fff;
+            padding: 15px 0;
+            border-bottom: 2px solid var(--vb-brown);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            min-width: 220px;
+        }
+
+        .logo-text {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--vb-brown);
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .search-container {
+            flex: 1;
+            display: flex;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+
+        .search-container button {
+            background: var(--vb-brown);
+            color: #fff;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .cart-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f9f9f9;
+            padding: 8px 15px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            text-decoration: none;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .auth-links {
+            display: flex;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .auth-links a,
+        .auth-links button {
+            text-decoration: none;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: #444;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-bar {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 22px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            overflow-x: auto;
+        }
+
+        .nav-links li a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .nav-links li a:hover {
+            background: var(--vb-brown);
+            color: #fff;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 14px;
+        }
+
+        .panel-head {
+            background: #f3f3f3;
+            color: var(--vb-brown);
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+            font-weight: 700;
+            padding: 12px 14px;
+            text-transform: uppercase;
+        }
+
+        .panel-body {
+            padding: 14px;
+        }
+
+        .order-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .order-id {
+            font-size: 24px;
+            color: #2d241e;
+            font-weight: 800;
+        }
+
+        .order-sub {
+            margin-top: 4px;
+            color: #777;
+            font-size: 12px;
+        }
+
+        .status-badge {
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 4px 10px;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff6db;
+            color: #9f5a00;
+        }
+
+        .status-confirmed {
+            background: #e7ebff;
+            color: #3730a3;
+        }
+
+        .status-shipping {
+            background: #e3f0ff;
+            color: #1f3ea8;
+        }
+
+        .status-delivered {
+            background: #ddf7e5;
+            color: #14663a;
+        }
+
+        .status-cancelled {
+            background: #ffe3e3;
+            color: #a71f1f;
+        }
+
+        .status-default {
+            background: #eee;
+            color: #555;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .meta-box {
+            border: 1px solid #ececec;
+            border-radius: 4px;
+            background: #fcfcfc;
+            padding: 10px;
+        }
+
+        .meta-label {
+            display: block;
+            margin-bottom: 4px;
+            color: #666;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .meta-value {
+            color: #2f2f2f;
+            font-weight: 600;
+        }
+
+        .items-wrap {
+            border: 1px solid #ececec;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .item-row {
+            display: grid;
+            grid-template-columns: 62px 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-cover {
+            width: 62px;
+            height: 84px;
+            object-fit: cover;
+            border: 1px solid #eee;
+            background: #fafafa;
+        }
+
+        .item-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #2d241e;
+            margin-bottom: 4px;
+        }
+
+        .item-meta {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .item-price {
+            text-align: right;
+            color: var(--price);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .total-row {
+            border-top: 1px dashed #ddd;
+            margin-top: 10px;
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        .total-price {
+            color: var(--price);
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-weight: 700;
+            font-size: 12px;
+            border: 1px solid #ddd;
+            background: #fff;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .btn.primary {
+            background: var(--vb-brown);
+            border-color: var(--vb-brown);
+            color: #fff;
+        }
+
+        .btn.danger {
+            background: #fff3f3;
+            border-color: #f3c3c3;
+            color: #ba1f1f;
+        }
+
+        .empty-box {
+            text-align: center;
+            color: #777;
+            padding: 20px 10px;
+            border: 1px dashed #ddd;
+            border-radius: 4px;
+            background: #fcfcfc;
+        }
+
+        footer {
+            background: #fff;
+            border-top: 3px solid var(--vb-brown);
+            padding: 30px 0;
+            margin-top: 40px;
+        }
+
+        .footer-cols {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .footer-cols h4 {
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: var(--vb-brown);
+        }
+
+        .footer-cols ul {
+            list-style: none;
+        }
+
+        .footer-cols li {
+            margin-bottom: 8px;
+        }
+
+        .footer-cols a {
+            text-decoration: none;
+            color: #666;
+        }
+
+        .bottom-footer {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 11px;
+            color: #999;
+        }
+
+        @media (max-width: 1024px) {
+            .header-content {
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                min-width: 170px;
+            }
+
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-cols {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .logo-text {
+                font-size: 28px;
+            }
+
+            .search-container {
+                width: 100%;
+                order: 3;
+            }
+
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-cols {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 
-<body class="flex flex-col min-h-screen">
-    <header class="bg-white shadow-sm border-b border-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex justify-between items-center">
-                <a href="/" class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                    </div>
-                    <span class="font-display text-xl font-bold text-[#A35C33]">BookNest</span>
-                </a>
-                <nav class="flex items-center gap-6">
-                    <a href="/" class="text-sm font-medium text-[#7D6E63] hover:text-[#A35C33]">Trang chủ</a>
-                    <a href="/books" class="text-sm font-medium text-[#7D6E63] hover:text-[#A35C33]">Sách</a>
-                    <a href="/orders" class="text-sm font-medium text-[#A35C33] font-bold">Đơn hàng</a>
-                </nav>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <a th:href="@{/}" class="logo-text">BookNest</a>
+            </div>
+
+            <form class="search-container" th:action="@{/books/search}" method="get">
+                <input type="text" name="title" placeholder="Tìm sách theo Tựa đề, Tác giả, Công ty phát hành..."
+                    autocomplete="off">
+                <button type="submit">TÌM KIẾM</button>
+            </form>
+
+            <a th:href="@{/cart}" class="cart-box">
+                <i data-lucide="shopping-cart" size="20"></i>
+                <div>
+                    <span style="display:block; font-size: 10px; color: #999;">Giỏ hàng</span>
+                    <strong style="font-size: 12px;"
+                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) sản phẩm|">(0) sản
+                        phẩm</strong>
+                </div>
+            </a>
+
+            <div class="auth-links" th:if="${session.loggedInUser != null}">
+                <a th:href="@{/account}">Tài khoản</a>
+                <a th:href="@{/orders}">Đơn hàng</a>
+                <a th:if="${session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
+                    th:href="@{/admin}">Admin</a>
+                <form method="post" th:action="@{/logout}" style="display:inline;">
+                    <button type="submit">Đăng xuất</button>
+                </form>
+            </div>
+
+            <div class="auth-links" th:if="${session.loggedInUser == null}">
+                <a th:href="@{/login}">Đăng nhập</a>
+                <a th:href="@{/register}">Đăng ký</a>
             </div>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto w-full px-6 md:px-20 py-10 flex-1">
-        <a href="/orders" class="inline-flex items-center gap-2 text-sm text-[#7D6E63] hover:text-[#A35C33] mb-6 font-medium">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            Quay lại danh sách đơn hàng
-        </a>
-
-        <div class="mb-8">
-            <h1 class="font-display text-4xl font-bold text-[#2D241E] mb-2" th:text="'Đơn hàng #BN-' + ${order.id}">Đơn hàng #BN-0</h1>
-            <p class="text-sm text-[#7D6E63] font-medium" th:text="'Đặt ngày: ' + ${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">Đặt ngày</p>
+    <div class="nav-bar">
+        <div class="container">
+            <ul class="nav-links">
+                <li><a th:href="@{/}"><i data-lucide="home" size="14" style="margin-bottom: -2px;"></i></a></li>
+                <li><a th:href="@{/books}">Danh mục</a></li>
+                <li><a th:href="@{/orders}" style="background: var(--vb-brown); color: #fff;">Đơn hàng</a></li>
+            </ul>
         </div>
+    </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white rounded-2xl p-6 border border-gray-100">
-                <h3 class="font-display text-lg font-bold text-[#2D241E] mb-4">Thông tin đơn hàng</h3>
-                <div class="space-y-3">
+    <main class="container layout">
+        <section class="panel">
+            <div class="panel-head">Chi tiết đơn hàng</div>
+            <div class="panel-body">
+                <div class="order-top">
                     <div>
-                        <p class="text-xs font-bold text-[#7D6E63] uppercase tracking-widest mb-1">Trạng thái</p>
-                        <span class="inline-block px-4 py-2 rounded-lg font-bold text-sm"
-                            th:classappend="${#strings.equalsIgnoreCase(order.status, 'Pending')} ? 'bg-yellow-100 text-yellow-800' : (${#strings.equalsIgnoreCase(order.status, 'Delivered')} ? 'bg-green-100 text-green-800' : (${#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled')} ? 'bg-red-100 text-red-800' : (${#strings.equalsIgnoreCase(order.status, 'Shipping')} ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800')))"
-                            th:text="${#strings.equalsIgnoreCase(order.status, 'Pending') ? 'Chờ xử lý' : (#strings.equalsIgnoreCase(order.status, 'Delivered') ? 'Đã giao' : ((#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled')) ? 'Đã hủy' : (#strings.equalsIgnoreCase(order.status, 'Shipping') ? 'Đang giao' : order.status)))}">Đang xử lý</span>
+                        <p class="order-id" th:text="'Đơn hàng #BN-' + ${order.id}">Đơn hàng #BN-1</p>
+                        <p class="order-sub"
+                            th:text="'Đặt lúc: ' + ${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">Đặt lúc
+                        </p>
                     </div>
-                    <div>
-                        <p class="text-xs font-bold text-[#7D6E63] uppercase tracking-widest mb-1">Mã đơn hàng</p>
-                        <p class="text-lg font-bold text-[#A35C33]" th:text="'#BN-' + ${order.id}">#BN-0</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl p-6 border border-gray-100">
-                <h3 class="font-display text-lg font-bold text-[#2D241E] mb-4">Thông tin giao hàng</h3>
-                <div class="space-y-3 text-sm">
-                    <div>
-                        <p class="text-xs font-bold text-[#7D6E63] uppercase tracking-widest mb-1">Địa chỉ</p>
-                        <p class="text-[#2D241E]" th:text="${order.shippingAddress}">-</p>
-                    </div>
-                    <div>
-                        <p class="text-xs font-bold text-[#7D6E63] uppercase tracking-widest mb-1">Khách hàng</p>
-                        <p class="text-[#2D241E]" th:text="${order.user?.fullName}">-</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-2xl p-6 border border-gray-100 mb-8">
-            <h3 class="font-display text-lg font-bold text-[#2D241E] mb-6">Sản phẩm trong đơn hàng</h3>
-            
-            <div th:if="${order.orderDetails != null and !order.orderDetails.isEmpty()}">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="border-b border-gray-200">
-                                <th class="text-left py-3 px-4 text-xs font-bold text-[#7D6E63] uppercase tracking-widest">Tên sách</th>
-                                <th class="text-right py-3 px-4 text-xs font-bold text-[#7D6E63] uppercase tracking-widest">Đơn giá</th>
-                                <th class="text-right py-3 px-4 text-xs font-bold text-[#7D6E63] uppercase tracking-widest">Số lượng</th>
-                                <th class="text-right py-3 px-4 text-xs font-bold text-[#7D6E63] uppercase tracking-widest">Thành tiền</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="detail : ${order.orderDetails}" class="border-b border-gray-100 hover:bg-[#F5F1E9]/50 transition">
-                                <td class="py-4 px-4" th:text="${detail.book?.title}">-</td>
-                                <td class="text-right py-4 px-4 text-[#A35C33] font-bold" th:text="${#numbers.formatDecimal(detail.unitPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
-                                <td class="text-right py-4 px-4 text-[#2D241E]" th:text="${detail.quantity}">0</td>
-                                <td class="text-right py-4 px-4 text-[#A35C33] font-bold" th:text="${#numbers.formatDecimal(detail.quantity * detail.unitPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <span class="status-badge"
+                        th:classappend="${#strings.equalsIgnoreCase(order.status, 'Pending')} ? ' status-pending' : (${#strings.equalsIgnoreCase(order.status, 'Xác nhận đơn') or #strings.equalsIgnoreCase(order.status, 'Confirmed')} ? ' status-confirmed' : (${#strings.equalsIgnoreCase(order.status, 'Delivered') or #strings.equalsIgnoreCase(order.status, 'Hoàn thành')} ? ' status-delivered' : (${#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled') or #strings.equalsIgnoreCase(order.status, 'Đã hủy')} ? ' status-cancelled' : (${#strings.equalsIgnoreCase(order.status, 'Shipping') or #strings.equalsIgnoreCase(order.status, 'Đang giao')} ? ' status-shipping' : ' status-default'))))"
+                        th:text="${#strings.equalsIgnoreCase(order.status, 'Pending') ? 'Chờ xử lý' : ((#strings.equalsIgnoreCase(order.status, 'Xác nhận đơn') or #strings.equalsIgnoreCase(order.status, 'Confirmed')) ? 'Đã xác nhận' : ((#strings.equalsIgnoreCase(order.status, 'Delivered') or #strings.equalsIgnoreCase(order.status, 'Hoàn thành')) ? 'Đã giao' : (((#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled') or #strings.equalsIgnoreCase(order.status, 'Đã hủy')) ? 'Đã hủy' : ((#strings.equalsIgnoreCase(order.status, 'Shipping') or #strings.equalsIgnoreCase(order.status, 'Đang giao')) ? 'Đang giao' : order.status)))))}">Trạng
+                        thái</span>
                 </div>
 
-                <div class="mt-6 flex flex-col md:flex-row justify-end gap-8">
-                    <div class="space-y-2 text-right">
-                        <div class="flex justify-between gap-8">
-                            <span class="text-[#7D6E63]">Tổng tiền sách:</span>
-                            <span class="font-bold text-[#2D241E]" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+                <div class="meta-grid">
+                    <div class="meta-box">
+                        <span class="meta-label">Người nhận</span>
+                        <p class="meta-value" th:text="${order.user != null ? order.user.fullName : 'Đang cập nhật'}">
+                            Người nhận</p>
+                    </div>
+                    <div class="meta-box">
+                        <span class="meta-label">Số điện thoại</span>
+                        <p class="meta-value"
+                            th:text="${order.user != null and order.user.phone != null and !order.user.phone.isBlank() ? order.user.phone : 'Đang cập nhật'}">
+                            SĐT</p>
+                    </div>
+                    <div class="meta-box">
+                        <span class="meta-label">Email</span>
+                        <p class="meta-value" th:text="${order.user != null ? order.user.email : 'Đang cập nhật'}">Email
+                        </p>
+                    </div>
+                    <div class="meta-box">
+                        <span class="meta-label">Địa chỉ giao hàng</span>
+                        <p class="meta-value"
+                            th:text="${order.shippingAddress != null and !order.shippingAddress.isBlank() ? order.shippingAddress : 'Đang cập nhật'}">
+                            Địa chỉ</p>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top:14px; margin-bottom:0;">
+                    <div class="panel-head">Sản phẩm trong đơn</div>
+                    <div class="panel-body">
+                        <div th:if="${#lists.isEmpty(order.orderDetails)}" class="empty-box">Đơn hàng chưa có sản phẩm.
                         </div>
-                        <div class="flex justify-between gap-8 p-3 bg-[#F5F1E9] rounded-xl">
-                            <span class="font-bold text-[#2D241E]">Tổng cộng:</span>
-                            <span class="text-2xl font-bold text-[#A35C33]" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</span>
+
+                        <div class="items-wrap" th:if="${!#lists.isEmpty(order.orderDetails)}">
+                            <div class="item-row" th:each="item : ${order.orderDetails}">
+                                <img class="item-cover"
+                                    th:if="${item.book.imageUrl != null and !item.book.imageUrl.isEmpty()}"
+                                    th:src="${item.book.imageUrl}" th:alt="${item.book.title}">
+                                <img class="item-cover"
+                                    th:if="${item.book.imageUrl == null or item.book.imageUrl.isEmpty()}"
+                                    src="https://via.placeholder.com/62x84?text=No+Image" alt="No image">
+
+                                <div>
+                                    <p class="item-title" th:text="${item.book.title}">Tên sách</p>
+                                    <p class="item-meta">Số lượng: <span th:text="${item.quantity}">1</span></p>
+                                    <p class="item-meta"
+                                        th:text="'Đơn giá: ' + ${item.unitPrice != null ? #numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT') + 'đ' : '0đ'}">
+                                        Đơn giá</p>
+                                </div>
+
+                                <div class="item-price"
+                                    th:text="${item.unitPrice != null and item.quantity != null ? #numbers.formatDecimal(item.unitPrice * item.quantity, 0, 'COMMA', 0, 'POINT') + 'đ' : '0đ'}">
+                                    0đ</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <div th:if="${order.orderDetails == null or order.orderDetails.isEmpty()}" class="text-center py-8">
-                <p class="text-[#7D6E63]">Không có sản phẩm nào trong đơn hàng này.</p>
+        <aside class="panel" style="height: fit-content; position: sticky; top: 18px;">
+            <div class="panel-head">Tổng thanh toán</div>
+            <div class="panel-body">
+                <div class="summary-row">
+                    <span>Mã đơn hàng</span>
+                    <strong th:text="'BN-' + ${order.id}">BN-1</strong>
+                </div>
+                <div class="summary-row">
+                    <span>Ngày đặt</span>
+                    <span th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">01/01/2026</span>
+                </div>
+                <div class="summary-row">
+                    <span>Phương thức thanh toán</span>
+                    <span>Thanh toán khi nhận hàng (COD)</span>
+                </div>
+
+                <div class="total-row">
+                    <span>Tổng cộng</span>
+                    <span class="total-price"
+                        th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + 'đ' : '0đ'}">0đ</span>
+                </div>
+
+                <div class="btn-row">
+                    <a th:href="@{/orders}" class="btn">Quay lại danh sách</a>
+                    <form th:if="${#strings.equalsIgnoreCase(order.status, 'Pending')}"
+                        th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn danger">Hủy đơn</button>
+                    </form>
+                </div>
             </div>
-        </div>
-
-        <div class="flex gap-4 justify-end">
-            <a href="/orders" class="px-6 py-3 bg-[#F5F1E9] text-[#A35C33] rounded-2xl font-bold hover:bg-[#EFE9DE] transition">Quay lại</a>
-        </div>
+        </aside>
     </main>
 
-    <footer style="background-color: var(--color-text); color: #e5e0d8;" class="mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                    </svg>
-                </div>
-                <span class="font-display text-xl font-bold text-white">BookNest</span>
+    <footer>
+        <div class="container footer-cols">
+            <div>
+                <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+                <ul>
+                    <li><a th:href="@{/books}">Sản phẩm và Đơn hàng</a></li>
+                    <li><a href="#">Chính sách đổi trả</a></li>
+                    <li><a href="#">Phương thức vận chuyển</a></li>
+                </ul>
             </div>
-            <p class="text-sm opacity-70 mb-4">Nơi tri thức được lan tỏa và đam mê đọc sách được nuôi dưỡng.</p>
-            <div class="border-t border-white/10 pt-6 text-sm opacity-50">Copyright 2026 BookNest.</div>
+            <div>
+                <h4>Về BOOKNEST</h4>
+                <ul>
+                    <li><a href="#">Giới thiệu BookNest</a></li>
+                    <li><a href="#">Điều khoản sử dụng</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>TÀI KHOẢN</h4>
+                <ul>
+                    <li><a th:href="@{/login}">Đăng nhập</a></li>
+                    <li><a th:href="@{/register}">Tạo tài khoản</a></li>
+                    <li><a th:href="@{/orders}">Lịch sử đơn hàng</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>LIÊN HỆ</h4>
+                <p style="font-size: 12px; color: #666;">
+                    Email: hotro@booknest.vn<br>
+                    Hotline: 1900 1234<br>
+                    Địa chỉ: Tòa nhà Tri Thức, Quận 1, TP. HCM
+                </p>
+            </div>
+        </div>
+        <div class="bottom-footer">
+            &copy; 2026 BookNest. Bản quyền thuộc về Công ty Sách BookNest Việt Nam.
         </div>
     </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 
 </html>

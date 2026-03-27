@@ -9,13 +9,27 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 @Controller
 @RequiredArgsConstructor
 public class AccountController {
 
     private final AuthService authService;
+    private static final long MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
+    private static final Set<String> ALLOWED_AVATAR_EXTENSIONS = Set.of("jpg", "jpeg", "png", "webp", "gif");
 
     @GetMapping("/account")
     public String account(HttpSession session, Model model) {
@@ -25,7 +39,51 @@ public class AccountController {
         }
 
         model.addAttribute("user", user);
+        model.addAttribute("avatarUrl", resolveAvatarUrl(user.getId()));
         return "account";
+    }
+
+    @PostMapping("/account/avatar")
+    public String updateAvatar(@RequestParam("avatar") MultipartFile avatar,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+        User user = (User) session.getAttribute("loggedInUser");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        if (avatar == null || avatar.isEmpty()) {
+            redirectAttributes.addFlashAttribute("avatarError", "Vui lòng chọn ảnh đại diện trước khi tải lên");
+            return "redirect:/account";
+        }
+
+        if (avatar.getSize() > MAX_AVATAR_SIZE_BYTES) {
+            redirectAttributes.addFlashAttribute("avatarError", "Kích thước ảnh tối đa là 2MB");
+            return "redirect:/account";
+        }
+
+        String extension = extractExtension(avatar.getOriginalFilename());
+        if (extension.isEmpty() || !ALLOWED_AVATAR_EXTENSIONS.contains(extension)) {
+            redirectAttributes.addFlashAttribute("avatarError",
+                    "Định dạng ảnh không hợp lệ. Chỉ hỗ trợ JPG, PNG, WEBP, GIF");
+            return "redirect:/account";
+        }
+
+        Path avatarDir = Paths.get("images", "avatars").toAbsolutePath().normalize();
+        try {
+            Files.createDirectories(avatarDir);
+            removeExistingAvatarFiles(user.getId(), avatarDir);
+
+            String fileName = "user-" + user.getId() + "." + extension;
+            Path targetPath = avatarDir.resolve(fileName).normalize();
+            Files.copy(avatar.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+            redirectAttributes.addFlashAttribute("avatarSuccess", "Cập nhật avatar thành công");
+        } catch (IOException ex) {
+            redirectAttributes.addFlashAttribute("avatarError", "Không thể tải avatar lúc này. Vui lòng thử lại");
+        }
+
+        return "redirect:/account";
     }
 
     @PostMapping("/account/profile")
@@ -116,5 +174,62 @@ public class AccountController {
 
         redirectAttributes.addFlashAttribute("passwordSuccess", "Đổi mật khẩu thành công");
         return "redirect:/account";
+    }
+
+    private String extractExtension(String filename) {
+        if (filename == null || filename.isBlank()) {
+            return "";
+        }
+
+        int dotIndex = filename.lastIndexOf('.');
+        if (dotIndex < 0 || dotIndex == filename.length() - 1) {
+            return "";
+        }
+
+        return filename.substring(dotIndex + 1).toLowerCase(Locale.ROOT);
+    }
+
+    private void removeExistingAvatarFiles(Long userId, Path avatarDir) throws IOException {
+        String prefix = "user-" + userId + ".";
+        if (!Files.exists(avatarDir)) {
+            return;
+        }
+
+        try (Stream<Path> stream = Files.list(avatarDir)) {
+            stream.filter(Files::isRegularFile)
+                    .filter(path -> path.getFileName().toString().startsWith(prefix))
+                    .forEach(path -> {
+                        try {
+                            Files.deleteIfExists(path);
+                        } catch (IOException ignored) {
+                        }
+                    });
+        }
+    }
+
+    private String resolveAvatarUrl(Long userId) {
+        Path avatarDir = Paths.get("images", "avatars").toAbsolutePath().normalize();
+        String prefix = "user-" + userId + ".";
+        if (!Files.exists(avatarDir)) {
+            return null;
+        }
+
+        try (Stream<Path> stream = Files.list(avatarDir)) {
+            Optional<Path> avatarFile = stream
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.getFileName().toString().startsWith(prefix))
+                    .sorted(Comparator.comparing(Path::toString).reversed())
+                    .findFirst();
+
+            if (avatarFile.isEmpty()) {
+                return null;
+            }
+
+            Path file = avatarFile.get();
+            long lastModified = Files.getLastModifiedTime(file).toMillis();
+            return "/images/avatars/" + file.getFileName() + "?v=" + lastModified;
+        } catch (IOException ex) {
+            return null;
+        }
     }
 }

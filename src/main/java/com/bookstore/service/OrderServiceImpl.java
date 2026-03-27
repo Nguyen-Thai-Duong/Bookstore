@@ -1,13 +1,17 @@
 package com.bookstore.service;
 
+import com.bookstore.model.Book;
+import com.bookstore.model.OrderDetail;
 import com.bookstore.model.Order;
 import com.bookstore.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -20,10 +24,13 @@ import java.util.*;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final BookService bookService;
 
     @Override
     public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+        return orderRepository.findAll(Sort.by(
+                Sort.Order.desc("orderDate"),
+                Sort.Order.desc("id")));
     }
 
     @Override
@@ -48,7 +55,28 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order saveOrder(Order order) {
-        return orderRepository.save(order);
+        if (order.getId() == null) {
+            return orderRepository.save(order);
+        }
+
+        Order existingOrder = orderRepository.findById(order.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng"));
+
+        String oldStatus = normalizeStatus(existingOrder.getStatus());
+        String newStatus = normalizeStatus(order.getStatus());
+
+        if (shouldDeductStock(oldStatus, newStatus)) {
+            deductStockForOrder(existingOrder);
+        }
+
+        if (shouldRestock(oldStatus, newStatus)) {
+            restockForOrder(existingOrder);
+        }
+
+        existingOrder.setStatus(normalizeDisplayStatus(order.getStatus()));
+        existingOrder.setShippingAddress(order.getShippingAddress());
+
+        return orderRepository.save(existingOrder);
     }
 
     @Override
@@ -81,6 +109,10 @@ public class OrderServiceImpl implements OrderService {
 
         List<Order> orders = orderRepository.findByOrderDateBetween(safeStart, safeEnd);
         for (Order order : orders) {
+            if (!isCompletedStatus(order.getStatus())) {
+                continue;
+            }
+
             LocalDateTime orderDate = order.getOrderDate();
             if (orderDate == null) {
                 continue;
@@ -117,6 +149,121 @@ public class OrderServiceImpl implements OrderService {
         result.put("revenue", revenues);
         result.put("booksSold", booksSold);
         return result;
+    }
+
+    private boolean isCompletedStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return false;
+        }
+
+        String normalized = Normalizer.normalize(status, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase(Locale.ROOT)
+                .trim();
+
+        return normalized.equals("completed")
+                || normalized.equals("hoan thanh")
+                || normalized.equals("da giao");
+    }
+
+    private String normalizeDisplayStatus(String status) {
+        String normalized = normalizeStatus(status);
+        if (normalized.equals("pending")) {
+            return "Pending";
+        }
+        if (normalized.equals("xac nhan don") || normalized.equals("confirmed")) {
+            return "Xác nhận đơn";
+        }
+        if (normalized.equals("dang giao") || normalized.equals("shipping")) {
+            return "Đang giao";
+        }
+        if (normalized.equals("hoan thanh") || normalized.equals("completed") || normalized.equals("da giao")
+                || normalized.equals("delivered")) {
+            return "Hoàn thành";
+        }
+        if (normalized.equals("da huy") || normalized.equals("cancelled") || normalized.equals("canceled")) {
+            return "Đã hủy";
+        }
+
+        return status;
+    }
+
+    private String normalizeStatus(String status) {
+        if (status == null) {
+            return "";
+        }
+
+        return Normalizer.normalize(status, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase(Locale.ROOT)
+                .trim();
+    }
+
+    private boolean isDeductedStatus(String normalizedStatus) {
+        return normalizedStatus.equals("xac nhan don")
+                || normalizedStatus.equals("confirmed")
+                || normalizedStatus.equals("dang giao")
+                || normalizedStatus.equals("shipping")
+                || normalizedStatus.equals("hoan thanh")
+                || normalizedStatus.equals("completed")
+                || normalizedStatus.equals("da giao")
+                || normalizedStatus.equals("delivered");
+    }
+
+    private boolean isCancelledStatus(String normalizedStatus) {
+        return normalizedStatus.equals("da huy")
+                || normalizedStatus.equals("cancelled")
+                || normalizedStatus.equals("canceled");
+    }
+
+    private boolean shouldDeductStock(String oldStatus, String newStatus) {
+        return !isDeductedStatus(oldStatus) && isDeductedStatus(newStatus);
+    }
+
+    private boolean shouldRestock(String oldStatus, String newStatus) {
+        return isDeductedStatus(oldStatus) && !isCancelledStatus(oldStatus) && isCancelledStatus(newStatus);
+    }
+
+    private void deductStockForOrder(Order order) {
+        if (order.getOrderDetails() == null || order.getOrderDetails().isEmpty()) {
+            return;
+        }
+
+        for (OrderDetail detail : order.getOrderDetails()) {
+            if (detail.getBook() == null || detail.getBook().getId() == null) {
+                continue;
+            }
+
+            Book book = detail.getBook();
+            int quantity = detail.getQuantity() == null ? 0 : detail.getQuantity();
+            int currentStock = book.getStock() == null ? 0 : Math.max(book.getStock(), 0);
+
+            if (quantity > currentStock) {
+                throw new IllegalStateException("Không đủ tồn kho để xác nhận đơn");
+            }
+
+            book.setStock(currentStock - quantity);
+            bookService.saveBook(book);
+        }
+    }
+
+    private void restockForOrder(Order order) {
+        if (order.getOrderDetails() == null || order.getOrderDetails().isEmpty()) {
+            return;
+        }
+
+        for (OrderDetail detail : order.getOrderDetails()) {
+            if (detail.getBook() == null || detail.getBook().getId() == null) {
+                continue;
+            }
+
+            Book book = detail.getBook();
+            int quantity = detail.getQuantity() == null ? 0 : detail.getQuantity();
+            int currentStock = book.getStock() == null ? 0 : Math.max(book.getStock(), 0);
+
+            book.setStock(currentStock + Math.max(quantity, 0));
+            bookService.saveBook(book);
+        }
     }
 
     private String normalizePeriod(String period) {

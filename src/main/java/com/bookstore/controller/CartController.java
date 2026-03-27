@@ -333,13 +333,6 @@ public class CartController {
             orderDetail.setQuantity(item.getQuantity());
             orderDetail.setUnitPrice(item.getBook().getPrice());
             orderDetailRepository.save(orderDetail);
-
-            Book book = item.getBook();
-            int currentStock = normalizeStock(book.getStock());
-            int orderQty = item.getQuantity() == null ? 0 : item.getQuantity();
-            int nextStock = Math.max(0, currentStock - orderQty);
-            book.setStock(nextStock);
-            bookService.saveBook(book);
         }
 
         cartItemRepository.deleteByCart_Id(cart.getId());

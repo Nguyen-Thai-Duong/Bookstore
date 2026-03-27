@@ -1,273 +1,437 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+﻿<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest - Đăng nhập</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap"
-        rel="stylesheet">
+    <title>BookNest | Đăng nhập</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --primary: #A35C33;
-            --primary-dark: #8B4D2B;
-            --bg-light: #F5F1E9;
-            --bg-accent: #EFE9DE;
-            --text-main: #2D241E;
-            --text-muted: #7D6E63;
+            --vb-brown: #8B573C;
+            --bg-gray: #f5f5f5;
+            --border: #ddd;
+            --text: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-main);
-            margin: 0;
-            overflow-x: hidden;
+            background: var(--bg-gray);
+            color: var(--text);
+            font-size: 13px;
         }
 
-        h1,
-        h2,
-        .brand {
-            font-family: 'Playfair Display', serif;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
         }
 
-        .bg-nest-section {
-            background-color: var(--bg-accent);
+        header {
+            background: #fff;
+            padding: 15px 0;
+            border-bottom: 2px solid var(--vb-brown);
         }
 
-        .btn-primary {
-            background-color: var(--primary);
-            transition: all 0.3s ease;
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -10px rgba(163, 92, 51, 0.5);
+        .logo {
+            min-width: 220px;
         }
 
-        @keyframes float {
-            0% {
-                transform: translateY(0px) rotate(0deg);
+        .logo-text {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--vb-brown);
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .search-container {
+            flex: 1;
+            display: flex;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+
+        .search-container button {
+            background: var(--vb-brown);
+            color: #fff;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .auth-links {
+            display: flex;
+            gap: 8px;
+        }
+
+        .auth-links a {
+            text-decoration: none;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: #444;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .auth-links a.primary {
+            background: var(--vb-brown);
+            color: #fff;
+            border-color: var(--vb-brown);
+        }
+
+        .nav-bar {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 22px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            overflow-x: auto;
+        }
+
+        .nav-links li a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .nav-links li a:hover {
+            background: var(--vb-brown);
+            color: #fff;
+        }
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            max-width: 470px;
+            margin: 16px auto 30px;
+        }
+
+        .panel-head {
+            background: #f3f3f3;
+            color: var(--vb-brown);
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+            font-weight: 700;
+            padding: 12px 14px;
+            text-transform: uppercase;
+        }
+
+        .panel-body {
+            padding: 16px;
+        }
+
+        .field {
+            margin-bottom: 12px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .field input {
+            width: 100%;
+            border: 1px solid #d8d8d8;
+            border-radius: 4px;
+            padding: 11px;
+            outline: none;
+        }
+
+        .field input:focus {
+            border-color: var(--vb-brown);
+        }
+
+        .password-wrap {
+            position: relative;
+        }
+
+        .password-wrap input {
+            padding-right: 56px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #8a8a8a;
+            cursor: pointer;
+            padding: 4px 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle .icon-off {
+            display: none;
+        }
+
+        .password-toggle.showing .icon-on {
+            display: none;
+        }
+
+        .password-toggle.showing .icon-off {
+            display: inline;
+        }
+
+        .error-box {
+            margin-bottom: 12px;
+            border: 1px solid #f3c3c3;
+            background: #fff3f3;
+            color: #ba1f1f;
+            border-radius: 4px;
+            padding: 10px 12px;
+            font-weight: 500;
+        }
+
+        .btn-submit {
+            width: 100%;
+            border: none;
+            background: var(--vb-brown);
+            color: #fff;
+            font-weight: 700;
+            border-radius: 4px;
+            padding: 11px;
+            cursor: pointer;
+        }
+
+        .sub-row {
+            margin-top: 12px;
+            color: #777;
+            text-align: center;
+        }
+
+        .sub-row a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer {
+            background: #fff;
+            border-top: 3px solid var(--vb-brown);
+            padding: 30px 0;
+            margin-top: 40px;
+        }
+
+        .footer-cols {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .footer-cols h4 {
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: var(--vb-brown);
+        }
+
+        .footer-cols ul {
+            list-style: none;
+        }
+
+        .footer-cols li {
+            margin-bottom: 8px;
+        }
+
+        .footer-cols a {
+            text-decoration: none;
+            color: #666;
+        }
+
+        .bottom-footer {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 11px;
+            color: #999;
+        }
+
+        @media (max-width: 1024px) {
+            .header-content {
+                flex-wrap: wrap;
             }
 
-            50% {
-                transform: translateY(-10px) rotate(2deg);
+            .logo {
+                min-width: 170px;
             }
 
-            100% {
-                transform: translateY(0px) rotate(0deg);
+            .footer-cols {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
-        .float-anim {
-            animation: float 6s ease-in-out infinite;
-        }
+        @media (max-width: 640px) {
+            .logo-text {
+                font-size: 28px;
+            }
 
-        .float-anim-delay {
-            animation: float 8s ease-in-out infinite;
-            animation-delay: 1s;
-        }
+            .search-container {
+                width: 100%;
+                order: 3;
+            }
 
-        input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(163, 92, 51, 0.1);
+            .footer-cols {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 
-<body class="min-h-screen flex flex-col">
-
-    <header class="flex justify-between items-center px-6 md:px-12 py-6 z-50">
-        <a th:href="@{/}" class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-[#A35C33] rounded-xl flex items-center justify-center text-white shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                    stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                </svg>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <a th:href="@{/}" class="logo-text">BookNest</a>
             </div>
-            <span class="brand text-2xl font-bold tracking-tight">BookNest</span>
-        </a>
 
-        <div class="flex gap-3 md:gap-5 items-center">
-            <a th:href="@{/register}"
-                class="text-sm font-semibold border border-[#A35C33] text-[#A35C33] px-5 py-2 rounded-full hover:bg-[#A35C33] hover:text-white transition-colors">
-                Đăng ký
-            </a>
-            <a th:href="@{/login}"
-                class="btn-primary text-white text-sm font-semibold px-6 py-2 rounded-full shadow-md">
-                Đăng nhập
-            </a>
+            <form class="search-container" th:action="@{/books/search}" method="get">
+                <input type="text" name="title" placeholder="Tìm sách theo Tựa đề, Tác giả, Công ty phát hành..."
+                    autocomplete="off">
+                <button type="submit">TÌM KIẾM</button>
+            </form>
+
+            <div class="auth-links">
+                <a th:href="@{/register}">Đăng ký</a>
+                <a th:href="@{/login}" class="primary">Đăng nhập</a>
+            </div>
         </div>
     </header>
 
-    <main class="flex-1 flex flex-col md:flex-row overflow-hidden">
-
-        <div
-            class="hidden md:flex flex-1 bg-nest-section relative flex-col justify-center px-16 lg:px-24 overflow-hidden">
-            <div class="absolute inset-0 pointer-events-none select-none opacity-40">
-                <svg class="absolute top-10 left-10 float-anim" width="120" height="120" viewBox="0 0 100 100"
-                    fill="none" stroke="currentColor">
-                    <path d="M20 30 Q50 20 80 30 V70 Q50 60 20 70 Z" stroke-width="1.5" />
-                    <path d="M50 25 V65" stroke-width="1.5" />
-                    <path d="M25 35 H45 M25 45 H45 M25 55 H45" stroke-width="0.5" />
-                </svg>
-
-                <svg class="absolute bottom-0 left-[-5%] w-[60%] text-[#A35C33]" viewBox="0 0 400 400" fill="none">
-                    <ellipse cx="200" cy="300" rx="180" ry="60" stroke="currentColor" stroke-width="1"
-                        stroke-dasharray="5 5" />
-                    <ellipse cx="200" cy="290" rx="150" ry="40" stroke="currentColor" stroke-width="1.5" />
-                    <path d="M50 280 C 100 350, 300 350, 350 280" stroke="currentColor" stroke-width="2" />
-                    <path d="M80 300 L120 250 M150 310 L180 230 M250 310 L220 240" stroke="currentColor"
-                        stroke-width="1" opacity="0.5" />
-                </svg>
-
-                <svg class="absolute top-1/4 right-10 float-anim-delay" width="80" height="80" viewBox="0 0 100 100"
-                    fill="none" stroke="currentColor">
-                    <rect x="20" y="20" width="50" height="60" rx="2" stroke-width="1.5"
-                        transform="rotate(-15 45 50)" />
-                    <line x1="30" y1="35" x2="60" y2="28" stroke-width="1" transform="rotate(-15 45 50)" />
-                </svg>
-            </div>
-
-            <div class="z-10">
-                <div
-                    class="inline-flex items-center gap-2 bg-[#E5DCCB] text-[#A35C33] px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-8">
-                    <span class="w-1.5 h-1.5 bg-[#A35C33] rounded-full animate-pulse"></span>
-                    BookNest xin chào
-                </div>
-                <h1 class="text-5xl lg:text-7xl text-[#2D241E] leading-tight mb-8">Chào mừng bạn</h1>
-                <div class="relative mb-10">
-                    <p
-                        class="text-xl lg:text-2xl text-[#5C4D42] italic leading-relaxed pl-8 border-l-4 border-[#A35C33]">
-                        đến với nền tảng sách trực tuyến - <br>
-                        <span class="text-[#A35C33]">nơi tri thức hội tụ</span> và cảm hứng bắt đầu.
-                    </p>
-                    <div class="absolute -left-2 -top-4 text-6xl text-[#A35C33] opacity-10 font-serif">"</div>
-                </div>
-                <p class="text-[#7D6E63] text-lg font-medium max-w-sm">
-                    Đăng nhập để tiếp tục mua sắm và theo dõi đơn hàng của bạn.
-                </p>
-            </div>
+    <div class="nav-bar">
+        <div class="container">
+            <ul class="nav-links">
+                <li><a th:href="@{/}"><i data-lucide="home" size="14" style="margin-bottom: -2px;"></i></a></li>
+                <li><a th:href="@{/books}">Danh mục</a></li>
+                <li><a th:href="@{/orders}">Đơn hàng</a></li>
+            </ul>
         </div>
+    </div>
 
-        <div class="flex-1 flex items-center justify-center p-8 md:p-12 relative">
-            <div class="absolute inset-0 opacity-5 md:hidden pointer-events-none">
-                <svg width="100%" height="100%">
-                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#A35C33" stroke-width="0.5" />
-                    </pattern>
-                    <rect width="100%" height="100%" fill="url(#grid)" />
-                </svg>
-            </div>
+    <main class="container">
+        <section class="panel">
+            <div class="panel-head">Đăng nhập tài khoản</div>
+            <div class="panel-body">
+                <div th:if="${error}" class="error-box" th:text="${error}"></div>
 
-            <div
-                class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] w-full max-w-md z-10 border border-gray-50">
-                <div class="mb-10 text-center md:text-left">
-                    <h2 class="text-3xl font-bold text-[#2D241E] mb-3">Đăng nhập</h2>
-                    <p class="text-[#7D6E63] font-medium">Chào mừng bạn quay trở lại!</p>
-                </div>
-
-                <div th:if="${error}" class="mb-4 rounded-xl px-4 py-3 text-sm"
-                    style="background-color: rgba(220, 38, 38, 0.1); color: #b91c1c;" th:text="${error}"></div>
-
-                <form method="post" th:action="@{/login}" class="space-y-6">
-                    <div class="group">
-                        <label
-                            class="block text-sm font-bold text-[#2D241E] mb-2.5 ml-1 transition-colors group-focus-within:text-[#A35C33]">Email</label>
-                        <div class="relative">
-                            <input type="email" name="email" required
-                                class="w-full px-5 py-4 rounded-2xl border border-gray-200 bg-gray-50/30 focus:bg-white focus:outline-none transition-all text-[15px]"
-                                placeholder="name@company.com">
-                            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                                </svg>
-                            </div>
-                        </div>
+                <form method="post" th:action="@{/login}">
+                    <div class="field">
+                        <label>Email</label>
+                        <input type="email" name="email" required placeholder="name@company.com">
                     </div>
 
-                    <div class="group relative">
-                        <div class="flex justify-between items-center mb-2.5 ml-1">
-                            <label class="text-sm font-bold text-[#2D241E] group-focus-within:text-[#A35C33]">Mật
-                                khẩu</label>
-                        </div>
-                        <div class="relative">
-                            <input id="login-password" type="password" name="password" required
-                                class="w-full px-5 pr-14 py-4 rounded-2xl border border-gray-200 bg-gray-50/30 focus:bg-white focus:outline-none transition-all text-[15px]"
-                                placeholder="••••••••">
-                            <button id="toggle-login-password" type="button"
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#A35C33] transition-colors"
+                    <div class="field">
+                        <label>Mật khẩu</label>
+                        <div class="password-wrap">
+                            <input type="password" id="loginPassword" name="password" required placeholder="••••••••••">
+                            <button id="toggleLoginPassword" class="password-toggle" type="button"
                                 aria-label="Hiện mật khẩu" aria-pressed="false">
-                                <span id="icon-eye-open">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </span>
-                                <span id="icon-eye-off" class="hidden">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.27-2.943-9.543-7a9.97 9.97 0 012.75-4.36M6.223 6.223A9.965 9.965 0 0112 5c4.478 0 8.27 2.943 9.543 7a9.97 9.97 0 01-4.132 5.411M15 12a3 3 0 00-4.243-2.829M9.88 9.88A3 3 0 0014.12 14.12M3 3l18 18" />
-                                    </svg>
-                                </span>
+                                <i class="icon-on" data-lucide="eye" size="18"></i>
+                                <i class="icon-off" data-lucide="eye-off" size="18"></i>
                             </button>
                         </div>
                     </div>
 
-                    <button type="submit"
-                        class="w-full btn-primary text-white font-bold py-4 rounded-2xl shadow-lg mt-4 flex items-center justify-center gap-2 group">
-                        <span>Đăng nhập</span>
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                        </svg>
-                    </button>
+                    <button type="submit" class="btn-submit">Đăng nhập</button>
                 </form>
 
-                <p class="text-center mt-10 text-sm font-medium text-[#7D6E63]">
-                    Chưa có tài khoản? <a th:href="@{/register}"
-                        class="text-[#A35C33] font-bold hover:underline ml-1">Tham gia ngay</a>
+                <p class="sub-row">Chưa có tài khoản? <a th:href="@{/register}">Tạo tài khoản ngay</a></p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container footer-cols">
+            <div>
+                <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+                <ul>
+                    <li><a th:href="@{/books}">Sản phẩm và đơn hàng</a></li>
+                    <li><a href="#">Chính sách đổi trả</a></li>
+                    <li><a href="#">Phương thức vận chuyển</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Về BOOKNEST</h4>
+                <ul>
+                    <li><a href="#">Giới thiệu BookNest</a></li>
+                    <li><a href="#">Điều khoản sử dụng</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>TÀI KHOẢN</h4>
+                <ul>
+                    <li><a th:href="@{/login}">Đăng nhập</a></li>
+                    <li><a th:href="@{/register}">Tạo tài khoản</a></li>
+                    <li><a th:href="@{/orders}">Lịch sử đơn hàng</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>LIÊN HỆ</h4>
+                <p style="font-size: 12px; color: #666;">
+                    Email: hotro@booknest.vn<br>
+                    Hotline: 1900 1234<br>
+                    Địa chỉ: Tòa nhà Tri Thức, Quận 1, TP. HCM
                 </p>
             </div>
         </div>
-    </main>
-
-    <footer
-        class="px-10 py-6 flex flex-col md:flex-row justify-between items-center text-[11px] font-bold text-[#7D6E63] uppercase tracking-[0.2em] opacity-60">
-        <div class="mb-4 md:mb-0">© 2024 BookNest Platform. All rights reserved.</div>
-        <div class="flex gap-8">
-            <span>Điều khoản</span>
-            <span>Bảo mật</span>
-            <span>Hỗ trợ</span>
+        <div class="bottom-footer">
+            &copy; 2026 BookNest. Bản quyền thuộc về Công ty Sách BookNest Việt Nam.
         </div>
     </footer>
+
     <script>
-        const passwordInput = document.getElementById('login-password');
-        const togglePasswordButton = document.getElementById('toggle-login-password');
-        const iconEyeOpen = document.getElementById('icon-eye-open');
-        const iconEyeOff = document.getElementById('icon-eye-off');
+        lucide.createIcons();
 
-        if (passwordInput && togglePasswordButton && iconEyeOpen && iconEyeOff) {
-            togglePasswordButton.addEventListener('click', () => {
-                const showingPassword = passwordInput.type === 'text';
-                passwordInput.type = showingPassword ? 'password' : 'text';
+        const loginPasswordInput = document.getElementById('loginPassword');
+        const toggleLoginPasswordButton = document.getElementById('toggleLoginPassword');
 
-                iconEyeOpen.classList.toggle('hidden', !showingPassword);
-                iconEyeOff.classList.toggle('hidden', showingPassword);
-
-                togglePasswordButton.setAttribute('aria-pressed', String(!showingPassword));
-                togglePasswordButton.setAttribute('aria-label', showingPassword ? 'Hiện mật khẩu' : 'Ẩn mật khẩu');
+        if (loginPasswordInput && toggleLoginPasswordButton) {
+            toggleLoginPasswordButton.addEventListener('click', function () {
+                const showingPassword = loginPasswordInput.type === 'text';
+                loginPasswordInput.type = showingPassword ? 'password' : 'text';
+                toggleLoginPasswordButton.classList.toggle('showing', !showingPassword);
+                toggleLoginPasswordButton.setAttribute('aria-pressed', String(!showingPassword));
+                toggleLoginPasswordButton.setAttribute('aria-label', showingPassword ? 'Hiện mật khẩu' : 'Ẩn mật khẩu');
             });
         }
     </script>

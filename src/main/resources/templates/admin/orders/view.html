@@ -173,10 +173,15 @@
                                 <div class="w-40 font-semibold text-gray-700">Trạng thái:</div>
                                 <div class="flex-1">
                                     <span class="px-3 py-1 rounded-full text-sm font-semibold"
-                                        th:classappend="${order.status == 'Hoàn thành' ? 'bg-green-100 text-green-800' : 
-                                                       (order.status == 'Đang giao' ? 'bg-blue-100 text-blue-800' : 
-                                                       (order.status == 'Đã hủy' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'))}"
-                                        th:text="${order.status}">Pending</span>
+                                        th:classappend="${order.status == 'Hoàn thành' ? 'bg-green-100 text-green-800' :
+                                                       ((order.status == 'Xác nhận đơn' or order.status == 'Confirmed') ? 'bg-indigo-100 text-indigo-800' :
+                                                       ((order.status == 'Đang giao' or order.status == 'Shipping') ? 'bg-blue-100 text-blue-800' :
+                                                       ((order.status == 'Đã hủy' or order.status == 'Cancelled' or order.status == 'Canceled') ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')))}"
+                                        th:text="${(order.status == 'Pending' or order.status == 'pending') ? 'Chờ xử lý' :
+                                                 ((order.status == 'Confirmed' or order.status == 'confirmed') ? 'Xác nhận đơn' :
+                                                 ((order.status == 'Shipping' or order.status == 'shipping') ? 'Đang giao' :
+                                                 ((order.status == 'Completed' or order.status == 'completed' or order.status == 'Delivered' or order.status == 'delivered') ? 'Hoàn thành' :
+                                                 ((order.status == 'Cancelled' or order.status == 'Canceled' or order.status == 'cancelled' or order.status == 'canceled') ? 'Đã hủy' : order.status))))}">Pending</span>
                                 </div>
                             </div>
 
@@ -219,8 +224,8 @@
                                     </th>
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Giá
                                     </th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">S
-                                        lung</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Số
+                                        lượng</th>
                                     <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Tổng
                                     </th>
                                 </tr>
@@ -231,13 +236,13 @@
                                         th:text="${detail.book != null ? detail.book.title : 'N/A'}">Tên sách</td>
                                     <td class="px-6 py-4 text-sm text-gray-600">
                                         <span
-                                            th:text="${detail.price != null ? #numbers.formatDecimal(detail.price, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0
+                                            th:text="${detail.unitPrice != null ? #numbers.formatDecimal(detail.unitPrice, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0
                                             e</span>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-600" th:text="${detail.quantity}">1</td>
                                     <td class="px-6 py-4 text-sm font-bold text-green-600">
                                         <span
-                                            th:text="${detail.price != null && detail.quantity != null ? #numbers.formatDecimal(detail.price * detail.quantity, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0
+                                            th:text="${detail.unitPrice != null && detail.quantity != null ? #numbers.formatDecimal(detail.unitPrice * detail.quantity, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0
                                             e</span>
                                     </td>
                                 </tr>

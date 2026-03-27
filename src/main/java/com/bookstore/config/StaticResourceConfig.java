@@ -28,20 +28,11 @@ public class StaticResourceConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor)
                 .excludePathPatterns(
-                "/",
-                "/books",
-                "/books/**",
-                "/categories",
-                "/categories/**",
-                "/login",
-                "/register",
-                "/logout",
                         "/css/**",
                         "/js/**",
                         "/images/**",
                         "/webjars/**",
                         "/error",
-                        "/favicon.ico"
-                );
+                        "/favicon.ico");
     }
 }

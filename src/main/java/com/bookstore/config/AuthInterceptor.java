@@ -16,12 +16,23 @@ public class AuthInterceptor implements HandlerInterceptor {
     private final AuthService authService;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+            throws Exception {
         String path = request.getRequestURI();
         HttpSession session = request.getSession(false);
         User user = session == null ? null : (User) session.getAttribute("loggedInUser");
+        boolean isAdminPath = path.startsWith("/admin");
 
-        if (path.startsWith("/admin")) {
+        // Keep admin and user areas separated: if admin leaves /admin area,
+        // force logout to guest before allowing access.
+        if (user != null && authService.isAdmin(user) && !isAdminPath) {
+            session.removeAttribute("loggedInUser");
+            session.removeAttribute("cart");
+            session.removeAttribute("cartCount");
+            user = null;
+        }
+
+        if (isAdminPath) {
             if (user == null) {
                 response.sendRedirect("/login?error=Vui%20long%20dang%20nhap");
                 return false;
