@@ -65,9 +65,7 @@ public class OrderServiceImpl implements OrderService {
         String oldStatus = normalizeStatus(existingOrder.getStatus());
         String newStatus = normalizeStatus(order.getStatus());
 
-        if (shouldDeductStock(oldStatus, newStatus)) {
-            deductStockForOrder(existingOrder);
-        }
+        validateStatusTransition(oldStatus, newStatus);
 
         if (shouldRestock(oldStatus, newStatus)) {
             restockForOrder(existingOrder);
@@ -195,6 +193,8 @@ public class OrderServiceImpl implements OrderService {
 
         return Normalizer.normalize(status, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
+                .replace('\u00A0', ' ')
+                .replaceAll("\\s+", " ")
                 .toLowerCase(Locale.ROOT)
                 .trim();
     }
@@ -216,35 +216,66 @@ public class OrderServiceImpl implements OrderService {
                 || normalizedStatus.equals("canceled");
     }
 
-    private boolean shouldDeductStock(String oldStatus, String newStatus) {
-        return !isDeductedStatus(oldStatus) && isDeductedStatus(newStatus);
-    }
-
     private boolean shouldRestock(String oldStatus, String newStatus) {
-        return isDeductedStatus(oldStatus) && !isCancelledStatus(oldStatus) && isCancelledStatus(newStatus);
+        return !isCancelledStatus(oldStatus) && isCancelledStatus(newStatus);
     }
 
-    private void deductStockForOrder(Order order) {
-        if (order.getOrderDetails() == null || order.getOrderDetails().isEmpty()) {
+    private void validateStatusTransition(String oldStatus, String newStatus) {
+        if (newStatus.isBlank() || oldStatus.equals(newStatus)) {
             return;
         }
 
-        for (OrderDetail detail : order.getOrderDetails()) {
-            if (detail.getBook() == null || detail.getBook().getId() == null) {
-                continue;
-            }
+        String oldCanonical = canonicalProgressStatus(oldStatus);
+        String newCanonical = canonicalProgressStatus(newStatus);
 
-            Book book = detail.getBook();
-            int quantity = detail.getQuantity() == null ? 0 : detail.getQuantity();
-            int currentStock = book.getStock() == null ? 0 : Math.max(book.getStock(), 0);
-
-            if (quantity > currentStock) {
-                throw new IllegalStateException("Không đủ tồn kho để xác nhận đơn");
-            }
-
-            book.setStock(currentStock - quantity);
-            bookService.saveBook(book);
+        if ("unknown".equals(oldCanonical) || "unknown".equals(newCanonical)) {
+            throw new IllegalArgumentException("Trạng thái đơn hàng không hợp lệ");
         }
+
+        if (oldCanonical.equals(newCanonical)) {
+            return;
+        }
+
+        if ("cancelled".equals(newCanonical)) {
+            return;
+        }
+
+        if ("cancelled".equals(oldCanonical)) {
+            throw new IllegalStateException("Đơn hàng đã hủy, không thể chuyển trạng thái khác");
+        }
+
+        if ("completed".equals(oldCanonical)) {
+            throw new IllegalStateException("Đơn hàng đã hoàn thành, không thể chuyển trạng thái khác");
+        }
+
+        boolean validForward = ("pending".equals(oldCanonical) && "confirmed".equals(newCanonical))
+                || ("confirmed".equals(oldCanonical) && "shipping".equals(newCanonical))
+                || ("shipping".equals(oldCanonical) && "completed".equals(newCanonical));
+
+        if (!validForward) {
+            throw new IllegalStateException(
+                    "Trạng thái phải cập nhật tuần tự: Chờ xử lý -> Xác nhận đơn -> Đang giao -> Hoàn thành");
+        }
+    }
+
+    private String canonicalProgressStatus(String normalizedStatus) {
+        if (normalizedStatus.contains("cho xu ly") || normalizedStatus.contains("pending")) {
+            return "pending";
+        }
+        if (normalizedStatus.contains("xac nhan") || normalizedStatus.contains("confirm")) {
+            return "confirmed";
+        }
+        if (normalizedStatus.contains("dang giao") || normalizedStatus.contains("ship")) {
+            return "shipping";
+        }
+        if (normalizedStatus.contains("hoan thanh") || normalizedStatus.contains("complete")
+                || normalizedStatus.contains("deliver") || normalizedStatus.contains("da giao")) {
+            return "completed";
+        }
+        if (normalizedStatus.contains("da huy") || normalizedStatus.contains("cancel")) {
+            return "cancelled";
+        }
+        return "unknown";
     }
 
     private void restockForOrder(Order order) {

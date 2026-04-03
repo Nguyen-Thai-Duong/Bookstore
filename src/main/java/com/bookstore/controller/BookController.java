@@ -1,5 +1,8 @@
 package com.bookstore.controller;
 
+import com.bookstore.dto.BookDTO;
+import com.bookstore.dto.CategoryDTO;
+import com.bookstore.dto.ReviewDTO;
 import com.bookstore.model.Book;
 import com.bookstore.model.User;
 import com.bookstore.repository.ReviewRepository;
@@ -37,7 +40,7 @@ public class BookController {
         Long normalizedCategoryId = parseCategoryId(categoryId);
         BigDecimal normalizedMinPrice = parsePrice(minPrice);
         BigDecimal normalizedMaxPrice = parsePrice(maxPrice);
-        List<Book> books = filterBooks("", "", normalizedCategoryId, normalizedMinPrice, normalizedMaxPrice);
+        List<BookDTO> books = filterBooks("", "", normalizedCategoryId, normalizedMinPrice, normalizedMaxPrice);
         addPaginationAttributes(model, books, page, null, null, normalizedCategoryId, normalizedMinPrice,
                 normalizedMaxPrice);
         return "books/list";
@@ -51,8 +54,10 @@ public class BookController {
         }
 
         var book = bookOpt.get();
-        var reviews = reviewRepository.findByBook_IdOrderByCreatedAtDesc(book.getId());
-        model.addAttribute("book", book);
+        var reviews = reviewRepository.findByBook_IdOrderByCreatedAtDesc(book.getId()).stream()
+                .map(ReviewDTO::fromEntity)
+                .toList();
+        model.addAttribute("book", BookDTO.fromEntity(book));
         model.addAttribute("reviews", reviews);
 
         // Calculate average rating
@@ -67,6 +72,7 @@ public class BookController {
         User user = (User) session.getAttribute("loggedInUser");
         if (user != null) {
             reviewRepository.findByBook_IdAndUser_Id(book.getId(), user.getId())
+                    .map(ReviewDTO::fromEntity)
                     .ifPresent(review -> model.addAttribute("myReview", review));
         }
 
@@ -75,22 +81,37 @@ public class BookController {
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("book", new Book());
-        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("book", new BookDTO());
+        model.addAttribute("categories", categoryService.getAllCategories().stream()
+                .map(CategoryDTO::fromEntity)
+                .toList());
         return "books/form";
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         bookService.getBookById(id).ifPresent(book -> {
-            model.addAttribute("book", book);
-            model.addAttribute("categories", categoryService.getAllCategories());
+            model.addAttribute("book", BookDTO.fromEntity(book));
+            model.addAttribute("categories", categoryService.getAllCategories().stream()
+                    .map(CategoryDTO::fromEntity)
+                    .toList());
         });
         return "books/form";
     }
 
     @PostMapping
-    public String saveBook(@ModelAttribute Book book) {
+    public String saveBook(@ModelAttribute("book") BookDTO bookDto) {
+        Book book = bookDto.toEntity();
+        if (book.getId() != null) {
+            bookService.getBookById(book.getId()).ifPresent(existingBook -> {
+                if (book.getCreatedAt() == null) {
+                    book.setCreatedAt(existingBook.getCreatedAt());
+                }
+                if (book.getImageUrl() == null || book.getImageUrl().isBlank()) {
+                    book.setImageUrl(existingBook.getImageUrl());
+                }
+            });
+        }
         bookService.saveBook(book);
         return "redirect:/books";
     }
@@ -115,7 +136,7 @@ public class BookController {
         BigDecimal normalizedMinPrice = parsePrice(minPrice);
         BigDecimal normalizedMaxPrice = parsePrice(maxPrice);
 
-        List<Book> filteredBooks = filterBooks(normalizedTitle, normalizedAuthor, normalizedCategoryId,
+        List<BookDTO> filteredBooks = filterBooks(normalizedTitle, normalizedAuthor, normalizedCategoryId,
                 normalizedMinPrice,
                 normalizedMaxPrice);
 
@@ -153,7 +174,7 @@ public class BookController {
         }
     }
 
-    private List<Book> filterBooks(String title, String author, Long categoryId, BigDecimal minPrice,
+    private List<BookDTO> filterBooks(String title, String author, Long categoryId, BigDecimal minPrice,
             BigDecimal maxPrice) {
         String normalizedTitle = title == null ? "" : title.trim().toLowerCase();
         String normalizedAuthor = author == null ? "" : author.trim().toLowerCase();
@@ -169,11 +190,12 @@ public class BookController {
                         && book.getPrice().compareTo(minPrice) >= 0))
                 .filter(book -> maxPrice == null || (book.getPrice() != null
                         && book.getPrice().compareTo(maxPrice) <= 0))
+                .map(BookDTO::fromEntity)
                 .toList();
     }
 
     private void addPaginationAttributes(Model model,
-            List<Book> books,
+            List<BookDTO> books,
             int requestedPage,
             String title,
             String author,
@@ -186,7 +208,7 @@ public class BookController {
 
         int fromIndex = (page - 1) * BOOKS_PER_PAGE;
         int toIndex = Math.min(fromIndex + BOOKS_PER_PAGE, totalItems);
-        List<Book> pageItems = fromIndex < toIndex ? books.subList(fromIndex, toIndex) : List.of();
+        List<BookDTO> pageItems = fromIndex < toIndex ? books.subList(fromIndex, toIndex) : List.of();
 
         boolean isSearch = (title != null && !title.isBlank())
                 || (author != null && !author.isBlank())
@@ -228,6 +250,7 @@ public class BookController {
 
         return uniqueBooks.stream()
                 .limit(8)
+                .map(BookDTO::fromEntity)
                 .map(book -> {
                     Map<String, Object> item = new LinkedHashMap<>();
                     item.put("id", book.getId());

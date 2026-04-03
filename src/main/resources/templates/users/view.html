@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -21,12 +21,12 @@
         <div class="card">
             <div class="card-body">
                 <p><strong>ID:</strong> <span th:text="${user.id}"></span></p>
-                <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
-                <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
                 <p><strong>Họ Tên:</strong> <span th:text="${user.fullName}"></span></p>
-                <p><strong>Số Điện Thoại:</strong> <span th:text="${user.phone}"></span></p>
-                <p><strong>Địa Chỉ:</strong> <span th:text="${user.address}"></span></p>
-                <p><strong>Vai Trò:</strong> <span class="badge bg-info" th:text="${user.role}"></span></p>
+                <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                <p><strong>Số Điện Thoại:</strong> <span th:text="${user.phone != null ? user.phone : '-'}"></span></p>
+                <p><strong>Địa Chỉ:</strong> <span th:text="${user.address != null ? user.address : '-'}"></span></p>
+                <p><strong>Vai Trò:</strong> <span th:text="${user.role != null ? user.role.roleName : '-'}"></span></p>
+                <p><strong>Trạng Thái:</strong> <span th:text="${user.status}"></span></p>
                 <p><strong>Ngày Tạo:</strong> <span th:text="${user.createdAt}"></span></p>
 
                 <div class="mt-3">

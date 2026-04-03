@@ -1,5 +1,6 @@
 package com.bookstore.controller;
 
+import com.bookstore.dto.CategoryDTO;
 import com.bookstore.model.Category;
 import com.bookstore.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -28,18 +29,20 @@ public class CategoryController {
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("category", new Category());
+        model.addAttribute("category", new CategoryDTO());
         return "categories/form";
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
-        categoryService.getCategoryById(id).ifPresent(category -> model.addAttribute("category", category));
+        categoryService.getCategoryById(id)
+                .ifPresent(category -> model.addAttribute("category", CategoryDTO.fromEntity(category)));
         return "categories/form";
     }
 
     @PostMapping
-    public String saveCategory(@ModelAttribute Category category) {
+    public String saveCategory(@ModelAttribute("category") CategoryDTO categoryDto) {
+        Category category = categoryDto.toEntity();
         categoryService.saveCategory(category);
         return "redirect:/categories";
     }

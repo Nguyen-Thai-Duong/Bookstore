@@ -1,5 +1,6 @@
 package com.bookstore.controller;
 
+import com.bookstore.dto.ReviewDTO;
 import com.bookstore.model.Book;
 import com.bookstore.model.Review;
 import com.bookstore.model.User;
@@ -166,7 +167,9 @@ public class ReviewController {
             return "redirect:/login";
         }
 
-        List<Review> reviews = reviewRepository.findAllByOrderByCreatedAtDesc();
+        List<ReviewDTO> reviews = reviewRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(ReviewDTO::fromEntity)
+                .toList();
         model.addAttribute("reviews", reviews);
         return "admin-reviews";
     }

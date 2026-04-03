@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -20,15 +20,11 @@
 
         <form th:action="@{/users}" th:object="${user}" method="post">
             <input type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{createdAt}">
 
             <div class="mb-3">
-                <label for="username" class="form-label">Username *</label>
-                <input type="text" class="form-control" id="username" th:field="*{username}" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="password" class="form-label">Password *</label>
-                <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                <label for="fullName" class="form-label">Họ Tên *</label>
+                <input type="text" class="form-control" id="fullName" th:field="*{fullName}" required>
             </div>
 
             <div class="mb-3">
@@ -37,8 +33,9 @@
             </div>
 
             <div class="mb-3">
-                <label for="fullName" class="form-label">Họ Tên</label>
-                <input type="text" class="form-control" id="fullName" th:field="*{fullName}">
+                <label for="password" class="form-label">Mật Khẩu *</label>
+                <input type="password" class="form-control" id="password" th:field="*{password}"
+                    th:required="${user.id == null}" placeholder="Để trống nếu không đổi mật khẩu">
             </div>
 
             <div class="mb-3">
@@ -52,10 +49,18 @@
             </div>
 
             <div class="mb-3">
+                <label for="status" class="form-label">Trạng Thái</label>
+                <select class="form-select" id="status" th:field="*{status}">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
                 <label for="role" class="form-label">Vai Trò</label>
-                <select class="form-select" id="role" th:field="*{role}">
-                    <option value="USER">USER</option>
-                    <option value="ADMIN">ADMIN</option>
+                <select class="form-select" id="role" th:field="*{role.id}" required>
+                    <option value="">-- Chọn vai trò --</option>
+                    <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.roleName}"></option>
                 </select>
             </div>
 

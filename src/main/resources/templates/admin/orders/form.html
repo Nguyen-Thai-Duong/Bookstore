@@ -185,11 +185,10 @@
                                 </label>
                                 <select th:field="*{status}" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent transition">
-                                    <option value="Pending">Chờ xử lý</option>
-                                    <option value="Xác nhận đơn">Xác nhận đơn</option>
-                                    <option value="Đang giao">Đang giao</option>
-                                    <option value="Hoàn thành">Hoàn thành</option>
-                                    <option value="Đã hủy">Đã hủy</option>
+                                    <option th:each="statusOption : ${orderStatusChoices}" th:value="${statusOption}"
+                                        th:text="${statusOption == 'Pending' ? 'Chờ xử lý' : statusOption}">
+                                        Trạng thái
+                                    </option>
                                 </select>
                                 <p class="mt-2 text-sm text-gray-500">Chọn trạng thái hiện tại của đơn hàng</p>
                             </div>

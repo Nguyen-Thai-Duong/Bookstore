@@ -196,12 +196,13 @@
 
         .item-card {
             display: grid;
-            grid-template-columns: 92px 1fr;
+            grid-template-columns: 92px 1fr 190px;
             gap: 12px;
             border: 1px solid #eee;
             border-radius: 4px;
             padding: 10px;
             margin-bottom: 10px;
+            align-items: start;
         }
 
         .item-cover {
@@ -229,6 +230,45 @@
             color: var(--price);
             font-weight: 700;
             font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .item-summary {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            display: grid;
+            gap: 6px;
+        }
+
+        .item-summary strong {
+            color: #333;
+        }
+
+        .item-price-side {
+            text-align: right;
+            align-self: center;
+            margin-top: 14px;
+        }
+
+        .item-price-side .label {
+            font-size: 11px;
+            color: #8a8a8a;
+            margin-bottom: 2px;
+        }
+
+        .item-price-side .value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #3f3f3f;
+            margin-bottom: 8px;
+        }
+
+        .item-price-side .total {
+            font-size: 22px;
+            line-height: 1;
+            color: var(--price);
+            font-weight: 900;
         }
 
         .qty-form {
@@ -380,6 +420,17 @@
                 grid-template-columns: 1fr;
             }
 
+            .item-card {
+                grid-template-columns: 92px 1fr;
+            }
+
+            .item-price-side {
+                grid-column: 1 / -1;
+                text-align: left;
+                align-self: start;
+                margin-top: 0;
+            }
+
             .footer-cols {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -401,6 +452,12 @@
 
             .item-card {
                 grid-template-columns: 1fr;
+            }
+
+            .item-price-side {
+                text-align: left;
+                align-self: start;
+                margin-top: 0;
             }
 
             .item-cover {
@@ -503,6 +560,12 @@
                                 <input type="hidden" name="bookId" th:value="${item.book.id}">
                                 <button type="submit" class="btn-link">Xóa sản phẩm</button>
                             </form>
+                        </div>
+                        <div class="item-price-side">
+                            <div class="label">Thành tiền</div>
+                            <div class="total"
+                                th:text="${#numbers.formatDecimal(item.lineTotal, 0, 'COMMA', 0, 'POINT') + 'đ'}">0đ
+                            </div>
                         </div>
                     </div>
                 </div>

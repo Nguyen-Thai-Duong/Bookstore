@@ -1,5 +1,8 @@
 package com.bookstore.controller;
 
+import com.bookstore.dto.CartItemDTO;
+import com.bookstore.dto.UserDTO;
+import com.bookstore.dto.VoucherDTO;
 import com.bookstore.model.Book;
 import com.bookstore.model.Cart;
 import com.bookstore.model.CartItem;
@@ -7,6 +10,7 @@ import com.bookstore.model.Order;
 import com.bookstore.model.OrderDetail;
 import com.bookstore.model.User;
 import com.bookstore.model.Voucher;
+import com.bookstore.repository.BookRepository;
 import com.bookstore.repository.CartItemRepository;
 import com.bookstore.repository.CartRepository;
 import com.bookstore.repository.OrderDetailRepository;
@@ -34,6 +38,7 @@ import java.util.Optional;
 public class CartController {
 
     private final BookService bookService;
+    private final BookRepository bookRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final VoucherRepository voucherRepository;
@@ -49,16 +54,17 @@ public class CartController {
 
         Cart cart = getOrCreateCart(user);
         List<CartItem> items = cartItemRepository.findByCart_Id(cart.getId());
+        updateCartCount(session, items);
         BigDecimal subtotal = calculateSubtotal(items);
         Voucher voucher = getVoucherFromSession(session);
         BigDecimal discount = calculateDiscount(subtotal, voucher);
         BigDecimal total = subtotal.subtract(discount).max(BigDecimal.ZERO);
 
-        model.addAttribute("cart", items);
+        model.addAttribute("cart", items.stream().map(CartItemDTO::fromEntity).toList());
         model.addAttribute("subtotal", subtotal);
         model.addAttribute("discount", discount);
         model.addAttribute("total", total);
-        model.addAttribute("voucher", voucher);
+        model.addAttribute("voucher", VoucherDTO.fromEntity(voucher));
         return "cart";
     }
 
@@ -116,6 +122,8 @@ public class CartController {
             cartItemRepository.save(item);
         }
 
+        updateCartCount(session, cartItemRepository.findByCart_Id(cart.getId()));
+
         redirectAttributes.addFlashAttribute("cartSuccess", "Đã thêm vào giỏ hàng");
         return "redirect:/cart";
     }
@@ -146,6 +154,7 @@ public class CartController {
 
         if (quantity == 0) {
             cartItemRepository.delete(existing.get());
+            updateCartCount(session, cartItemRepository.findByCart_Id(cart.getId()));
             return "redirect:/cart";
         }
 
@@ -165,6 +174,7 @@ public class CartController {
         CartItem item = existing.get();
         item.setQuantity(quantity);
         cartItemRepository.save(item);
+        updateCartCount(session, cartItemRepository.findByCart_Id(cart.getId()));
         return "redirect:/cart";
     }
 
@@ -177,7 +187,10 @@ public class CartController {
 
         Cart cart = getOrCreateCart(user);
         cartItemRepository.findByCart_IdAndBook_Id(cart.getId(), bookId)
-                .ifPresent(cartItemRepository::delete);
+                .ifPresent(cartItem -> {
+                    cartItemRepository.delete(cartItem);
+                    updateCartCount(session, cartItemRepository.findByCart_Id(cart.getId()));
+                });
         return "redirect:/cart";
     }
 
@@ -229,17 +242,18 @@ public class CartController {
 
         Cart cart = getOrCreateCart(user);
         List<CartItem> items = cartItemRepository.findByCart_Id(cart.getId());
+        updateCartCount(session, items);
         BigDecimal subtotal = calculateSubtotal(items);
         Voucher voucher = getVoucherFromSession(session);
         BigDecimal discount = calculateDiscount(subtotal, voucher);
         BigDecimal total = subtotal.subtract(discount).max(BigDecimal.ZERO);
 
-        model.addAttribute("cart", items);
+        model.addAttribute("cart", items.stream().map(CartItemDTO::fromEntity).toList());
         model.addAttribute("subtotal", subtotal);
         model.addAttribute("discount", discount);
         model.addAttribute("total", total);
-        model.addAttribute("voucher", voucher);
-        model.addAttribute("user", user);
+        model.addAttribute("voucher", VoucherDTO.fromEntity(voucher));
+        model.addAttribute("user", UserDTO.fromEntity(user));
         return "checkout";
     }
 
@@ -262,25 +276,51 @@ public class CartController {
             return "redirect:/cart";
         }
 
+        List<Long> bookIds = items.stream()
+                .map(item -> item.getBook() != null ? item.getBook().getId() : null)
+                .filter(id -> id != null)
+                .distinct()
+                .toList();
+
+        if (bookIds.isEmpty()) {
+            redirectAttributes.addFlashAttribute("cartError", "Sách trong giỏ hàng không hợp lệ");
+            return "redirect:/cart";
+        }
+
+        var lockedBooks = bookRepository.findAllByIdForUpdate(bookIds);
+        if (lockedBooks.size() != bookIds.size()) {
+            redirectAttributes.addFlashAttribute("cartError", "Sách trong giỏ hàng không hợp lệ");
+            return "redirect:/cart";
+        }
+
+        var bookMap = lockedBooks.stream().collect(java.util.stream.Collectors.toMap(Book::getId, book -> book));
+
         for (CartItem item : items) {
             if (item.getBook() == null || item.getBook().getId() == null) {
                 redirectAttributes.addFlashAttribute("cartError", "Sách trong giỏ hàng không hợp lệ");
                 return "redirect:/cart";
             }
 
-            int stock = normalizeStock(item.getBook().getStock());
+            Book currentBook = bookMap.get(item.getBook().getId());
+            if (currentBook == null) {
+                redirectAttributes.addFlashAttribute("cartError", "Không tìm thấy sách: " + item.getBook().getTitle());
+                return "redirect:/cart";
+            }
+
+            int stock = normalizeStock(currentBook.getStock());
             int quantity = item.getQuantity() == null ? 0 : item.getQuantity();
             if (quantity <= 0) {
                 redirectAttributes.addFlashAttribute("cartError", "Số lượng trong giỏ hàng không hợp lệ");
                 return "redirect:/cart";
             }
             if (stock <= 0) {
-                redirectAttributes.addFlashAttribute("cartError", "Sách đã hết hàng: " + item.getBook().getTitle());
+                redirectAttributes.addFlashAttribute("cartError", "Sách đã hết hàng: " + currentBook.getTitle());
                 return "redirect:/cart";
             }
             if (quantity > stock) {
                 redirectAttributes.addFlashAttribute("cartError",
-                        "Không đủ tồn kho cho sách: " + item.getBook().getTitle());
+                        "Không đủ tồn kho cho sách: " + currentBook.getTitle() + " (còn " + stock + ", bạn đặt "
+                                + quantity + ")");
                 return "redirect:/cart";
             }
         }
@@ -312,6 +352,8 @@ public class CartController {
         BigDecimal discount = calculateDiscount(subtotal, voucher);
         BigDecimal total = subtotal.subtract(discount).max(BigDecimal.ZERO);
 
+        updateCartCount(session, items);
+
         Order order = new Order();
         order.setUser(user);
         order.setVoucher(voucher);
@@ -327,15 +369,22 @@ public class CartController {
         }
 
         for (CartItem item : items) {
+            Book currentBook = bookMap.get(item.getBook().getId());
+            int quantity = item.getQuantity() == null ? 0 : item.getQuantity();
+
+            currentBook.setStock(normalizeStock(currentBook.getStock()) - quantity);
+            bookService.saveBook(currentBook);
+
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setOrder(savedOrder);
-            orderDetail.setBook(item.getBook());
-            orderDetail.setQuantity(item.getQuantity());
-            orderDetail.setUnitPrice(item.getBook().getPrice());
+            orderDetail.setBook(currentBook);
+            orderDetail.setQuantity(quantity);
+            orderDetail.setUnitPrice(currentBook.getPrice());
             orderDetailRepository.save(orderDetail);
         }
 
         cartItemRepository.deleteByCart_Id(cart.getId());
+        session.setAttribute("cartCount", 0);
         session.removeAttribute("voucherCode");
 
         redirectAttributes.addFlashAttribute("orderMessage", "Đặt hàng thành công");
@@ -400,5 +449,13 @@ public class CartController {
 
     private int normalizeStock(Integer stock) {
         return stock == null ? 0 : Math.max(stock, 0);
+    }
+
+    private void updateCartCount(HttpSession session, List<CartItem> items) {
+        int count = items == null ? 0
+                : items.stream()
+                        .mapToInt(item -> item.getQuantity() != null ? item.getQuantity() : 0)
+                        .sum();
+        session.setAttribute("cartCount", count);
     }
 }

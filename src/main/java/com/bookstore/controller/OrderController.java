@@ -1,5 +1,6 @@
 package com.bookstore.controller;
 
+import com.bookstore.dto.OrderDTO;
 import com.bookstore.model.Order;
 import com.bookstore.model.User;
 import com.bookstore.repository.OrderRepository;
@@ -12,8 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
 import java.text.Normalizer;
+import java.util.List;
 import java.util.Locale;
 
 @Controller
@@ -32,9 +33,16 @@ public class OrderController {
             return "redirect:/login";
         }
 
-        List<Order> orders = authService.isAdmin(user)
-                ? orderService.getAllOrders()
-                : orderRepository.findByUser_IdOrderByOrderDateDesc(user.getId());
+        List<OrderDTO> orders;
+        if (authService.isAdmin(user)) {
+            orders = orderService.getAllOrders().stream()
+                    .map(OrderDTO::fromEntity)
+                    .toList();
+        } else {
+            orders = orderRepository.findByUser_IdOrderByOrderDateDesc(user.getId()).stream()
+                    .map(OrderDTO::fromEntity)
+                    .toList();
+        }
 
         model.addAttribute("orders", orders);
         return "orders";
@@ -58,7 +66,7 @@ public class OrderController {
             return "redirect:/orders";
         }
 
-        model.addAttribute("order", order);
+        model.addAttribute("order", OrderDTO.fromEntity(order));
         return "orders/view";
     }
 

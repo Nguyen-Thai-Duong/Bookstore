@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookNest - Quản Lý Review</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -58,6 +59,178 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 16px rgba(139, 90, 60, 0.3);
+        }
+
+        .review-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.06);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .rating-stars {
+            background: #fef9c3;
+            color: #854d0e;
+            padding: 5px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .review-content-area {
+            background: #f9fafb;
+            border-left: 4px solid #d1d5db;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+        }
+
+        .review-text {
+            font-size: 15px;
+            color: #374151;
+            font-style: italic;
+            margin: 0;
+        }
+
+        .delete-review-zone {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 18px;
+        }
+
+        .btn-delete-review {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-delete-review:hover {
+            background: #fecaca;
+        }
+
+        .reply-area {
+            border-top: 1px dotted #e5e7eb;
+            padding-top: 16px;
+        }
+
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #8b5a3c;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .current-reply-display {
+            background: #f5f3ff;
+            color: #5b21b6;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .reply-input {
+            width: 100%;
+            min-height: 86px;
+            resize: none;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 12px;
+        }
+
+        .reply-input:focus {
+            border-color: #8b5a3c;
+        }
+
+        .reply-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .reply-actions form {
+            margin: 0;
+        }
+
+        .btn-action {
+            border-radius: 8px;
+            padding: 9px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+        }
+
+        .btn-save {
+            background: #8b5a3c;
+            color: #fff;
+        }
+
+        .btn-save:hover {
+            background: #724630;
+        }
+
+        .btn-cancel {
+            background: #fff;
+            border-color: #d1d5db;
+            color: #4b5563;
+        }
+
+        .btn-cancel:hover {
+            background: #f9fafb;
         }
     </style>
 </head>
@@ -188,61 +361,91 @@
                 </div>
 
                 <div th:if="${!#lists.isEmpty(reviews)}" class="space-y-5">
-                    <div th:each="review : ${reviews}" class="bg-white rounded-xl border border-gray-100 p-5">
-                        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
-                            <div>
-                                <div class="font-semibold text-sm"
-                                    th:text="${review.user != null ? review.user.fullName : 'Người dùng'}">User</div>
-                                <div class="text-xs text-gray-500 mt-1">
-                                    <span
-                                        th:text="${review.book != null ? review.book.title : 'Sách đã xóa'}">Book</span>
-                                    <span class="mx-1">•</span>
-                                    <span
-                                        th:text="${review.createdAt != null ? #temporals.format(review.createdAt, 'dd/MM/yyyy HH:mm') : ''}">Time</span>
+                    <div th:each="review : ${reviews}" class="review-card">
+                        <div class="card-header">
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    <i data-lucide="user" size="20"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold"
+                                        th:text="${review.user != null ? review.user.fullName : 'Người dùng'}">User</h3>
+                                    <div class="text-sm text-gray-500 mt-1">
+                                        <span
+                                            th:text="${review.book != null ? review.book.title : 'Sách đã xóa'}">Book</span>
+                                        <span class="mx-1">•</span>
+                                        <span
+                                            th:text="${review.createdAt != null ? #temporals.format(review.createdAt, 'dd/MM/yyyy HH:mm') : ''}">Time</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="text-sm px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 font-semibold"
-                                th:text="${review.rating + ' sao'}">5 sao</div>
-                        </div>
-
-                        <p class="mt-3 text-sm text-gray-700"
-                            th:text="${review.userComment != null && !review.userComment.isBlank() ? review.userComment : 'Không có nội dung'}">
-                            Review content
-                        </p>
-
-                        <div th:if="${review.hasAdminReply()}" class="mt-3 rounded-lg p-3 text-sm"
-                            style="background-color: rgba(139, 92, 246, 0.08); color: #4c1d95;">
-                            <div class="font-semibold mb-1">Phản hồi hiện tại</div>
-                            <p th:text="${review.adminReply}">Reply</p>
-                        </div>
-
-                        <form method="post" th:action="@{/admin/reviews/reply}" class="mt-3 space-y-2">
-                            <input type="hidden" name="reviewId" th:value="${review.id}">
-                            <input type="hidden" name="redirectTo" value="/admin/reviews#reviews-panel">
-                            <textarea name="reply" rows="3" maxlength="1000"
-                                class="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm"
-                                th:text="${review.adminReply}" placeholder="Nhập phản hồi cho review này..."></textarea>
-                            <div class="flex flex-wrap gap-2">
-                                <button type="submit" class="px-4 py-2 rounded-lg text-white text-sm font-semibold"
-                                    style="background-color: #8b5a3c;">Lưu phản hồi</button>
-                                <button type="submit" name="reply" value=""
-                                    class="px-4 py-2 rounded-lg border border-gray-300 text-sm">Xóa phản hồi</button>
+                            <div class="rating-stars">
+                                <i data-lucide="star" size="14"></i>
+                                <span th:text="${review.rating + ' sao'}">5 sao</span>
                             </div>
-                        </form>
+                        </div>
 
-                        <form method="post" th:action="@{/admin/reviews/delete}" class="mt-3"
+                        <div class="review-content-area">
+                            <p class="review-text"
+                                th:text="${review.userComment != null && !review.userComment.isBlank() ? review.userComment : 'Không có nội dung'}">
+                                Review content
+                            </p>
+                        </div>
+
+                        <form method="post" th:action="@{/admin/reviews/delete}" class="delete-review-zone"
                             onsubmit="return confirm('Bạn có chắc muốn xóa review này?');">
                             <input type="hidden" name="reviewId" th:value="${review.id}">
                             <input type="hidden" name="redirectTo" value="/admin/reviews#reviews-panel">
-                            <button type="submit"
-                                class="px-4 py-2 rounded-lg text-sm border border-red-200 text-red-600 hover:bg-red-50">Xóa
-                                review</button>
+                            <button type="submit" class="btn-delete-review">
+                                <i data-lucide="trash-2" size="14"></i>
+                                Xóa đánh giá này
+                            </button>
                         </form>
+
+                        <div class="reply-area">
+                            <div class="section-label"
+                                th:text="${review.hasAdminReply() ? 'Phản hồi của shop' : 'Viết phản hồi mới'}">Phản hồi
+                                của shop</div>
+
+                            <div th:if="${review.hasAdminReply()}" class="current-reply-display">
+                                <span th:text="${review.adminReply}">Reply</span>
+                                <i data-lucide="check-circle" size="16"></i>
+                            </div>
+
+                            <form method="post" th:action="@{/admin/reviews/reply}" th:id="|reply-form-${review.id}|">
+                                <input type="hidden" name="reviewId" th:value="${review.id}">
+                                <input type="hidden" name="redirectTo" value="/admin/reviews#reviews-panel">
+                                <textarea name="reply" maxlength="1000" class="reply-input"
+                                    th:text="${review.adminReply}"
+                                    placeholder="Nhập nội dung phản hồi khách hàng..."></textarea>
+                            </form>
+
+                            <div class="reply-actions">
+                                <button type="submit" class="btn-action btn-save"
+                                    th:attr="form=|reply-form-${review.id}|">
+                                    <i data-lucide="save" size="16"></i>
+                                    <span th:if="${review.hasAdminReply()}">Cập nhật phản hồi</span>
+                                    <span th:if="${!review.hasAdminReply()}">Gửi phản hồi</span>
+                                </button>
+
+                                <form th:if="${review.hasAdminReply()}" method="post"
+                                    th:action="@{/admin/reviews/reply}">
+                                    <input type="hidden" name="reviewId" th:value="${review.id}">
+                                    <input type="hidden" name="redirectTo" value="/admin/reviews#reviews-panel">
+                                    <input type="hidden" name="reply" value="">
+                                    <button type="submit" class="btn-action btn-cancel">Xóa phản hồi</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 
 </html>

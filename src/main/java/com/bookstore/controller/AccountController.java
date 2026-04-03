@@ -1,5 +1,6 @@
 package com.bookstore.controller;
 
+import com.bookstore.dto.UserDTO;
 import com.bookstore.model.User;
 import com.bookstore.service.AuthService;
 import jakarta.servlet.http.HttpSession;
@@ -38,7 +39,7 @@ public class AccountController {
             return "redirect:/login";
         }
 
-        model.addAttribute("user", user);
+        model.addAttribute("user", UserDTO.fromEntity(user));
         model.addAttribute("avatarUrl", resolveAvatarUrl(user.getId()));
         return "account";
     }

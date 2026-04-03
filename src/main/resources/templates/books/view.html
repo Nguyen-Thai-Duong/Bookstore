@@ -524,9 +524,12 @@
                                     th:style="${avgRating != null and i <= T(java.lang.Math).round(avgRating)} ? '' : 'color:#ddd;'">★</span>
                             </div>
                             <span style="font-size:12px;color:#777;">
-                                <span
-                                    th:text="${avgRating != null ? #numbers.formatDecimal(avgRating,1,'POINT',1,'POINT') : '0.0'}">0.0</span>
-                                (<span th:text="${reviews != null ? reviews.size() : 0}">0</span> danh gia)
+                                <span th:if="${reviews != null and !reviews.isEmpty()}">
+                                    <span
+                                        th:text="${avgRating != null ? #numbers.formatDecimal(avgRating,1,'POINT',1,'POINT') : '0.0'}">0.0</span>
+                                    (<span th:text="${reviews.size()}">0</span> đánh giá)
+                                </span>
+                                <span th:if="${reviews == null or reviews.isEmpty()}">Chưa có đánh giá</span>
                             </span>
                         </div>
 
@@ -534,8 +537,8 @@
                             th:text="${book.price != null ? #numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
                             0 VND</div>
                         <div class="book-stock"
-                            th:text="${book.stock != null and book.stock > 0 ? 'Con ' + book.stock + ' cuon' : 'Hết hàng'}">
-                            Con 0 cuon</div>
+                            th:text="${book.stock != null and book.stock > 0 ? 'Còn ' + book.stock + ' cuốn' : 'Hết hàng'}">
+                            Còn 0 cuốn</div>
 
                         <div class="book-description"
                             th:text="${book.description != null and !book.description.isBlank() ? book.description : 'Chưa có mô tả cho sản phẩm này.'}">

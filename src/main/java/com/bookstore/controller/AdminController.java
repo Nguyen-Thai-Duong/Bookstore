@@ -1,10 +1,19 @@
 package com.bookstore.controller;
 
+import com.bookstore.dto.BookDTO;
+import com.bookstore.dto.CategoryDTO;
+import com.bookstore.dto.OrderDTO;
+import com.bookstore.dto.ReviewDTO;
+import com.bookstore.dto.UserDTO;
+import com.bookstore.dto.UserFormDTO;
+import com.bookstore.dto.VoucherDTO;
 import com.bookstore.model.Book;
 import com.bookstore.model.Category;
 import com.bookstore.model.Order;
+import com.bookstore.model.Role;
 import com.bookstore.model.User;
 import com.bookstore.model.Voucher;
+import com.bookstore.repository.BookRepository;
 import com.bookstore.repository.ReviewRepository;
 import com.bookstore.service.BookService;
 import com.bookstore.service.CategoryService;
@@ -18,6 +27,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,6 +37,10 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -56,11 +70,29 @@ public class AdminController {
     @Autowired
     private ReviewRepository reviewRepository;
 
+    @Autowired
+    private BookRepository bookRepository;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @GetMapping
     public String dashboard(Model model) {
         // Get statistics
         var allBooks = bookService.getAllBooks();
-        var allCategories = categoryService.getAllCategories();
+        var allCategories = categoryService.getAllCategories().stream()
+                .sorted((left, right) -> {
+                    if (left.getId() == null && right.getId() == null) {
+                        return 0;
+                    }
+                    if (left.getId() == null) {
+                        return 1;
+                    }
+                    if (right.getId() == null) {
+                        return -1;
+                    }
+                    return left.getId().compareTo(right.getId());
+                })
+                .toList();
         var allUsers = userService.getAllUsers();
 
         // Calculate total stock
@@ -71,9 +103,12 @@ public class AdminController {
         // Get recent books (last 5)
         var recentBooks = allBooks.stream()
                 .limit(5)
+                .map(BookDTO::fromEntity)
                 .toList();
 
-        var latestReviews = reviewRepository.findAllByOrderByCreatedAtDesc();
+        var latestReviews = reviewRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(ReviewDTO::fromEntity)
+                .toList();
 
         // Add attributes to model
         model.addAttribute("totalBooks", allBooks.size());
@@ -81,7 +116,13 @@ public class AdminController {
         model.addAttribute("totalStock", totalStock);
         model.addAttribute("totalUsers", allUsers.size());
         model.addAttribute("recentBooks", recentBooks);
-        model.addAttribute("categories", allCategories);
+        model.addAttribute("categories", allCategories.stream()
+                .map(category -> {
+                    CategoryDTO dto = CategoryDTO.fromEntity(category);
+                    dto.setBookCount(bookRepository.countByCategory_Id(category.getId()));
+                    return dto;
+                })
+                .toList());
         model.addAttribute("latestReviews", latestReviews);
 
         return "admin/dashboard";
@@ -89,29 +130,32 @@ public class AdminController {
 
     @GetMapping("/books")
     public String listBooks(Model model) {
-        model.addAttribute("books", bookService.getAllBooks());
+        model.addAttribute("books", bookService.getAllBooks().stream().map(BookDTO::fromEntity).toList());
         return "admin/books";
     }
 
     @GetMapping("/books/new")
     public String showCreateBookForm(Model model) {
-        model.addAttribute("book", new Book());
-        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("book", new BookDTO());
+        model.addAttribute("categories",
+                categoryService.getAllCategories().stream().map(CategoryDTO::fromEntity).toList());
         return "admin/books/form";
     }
 
     @GetMapping("/books/edit/{id}")
     public String showEditBookForm(@PathVariable Long id, Model model) {
         bookService.getBookById(id).ifPresent(book -> {
-            model.addAttribute("book", book);
-            model.addAttribute("categories", categoryService.getAllCategories());
+            model.addAttribute("book", BookDTO.fromEntity(book));
+            model.addAttribute("categories",
+                    categoryService.getAllCategories().stream().map(CategoryDTO::fromEntity).toList());
         });
         return "admin/books/form";
     }
 
     @PostMapping("/books/save")
-    public String saveBook(@ModelAttribute Book book,
+    public String saveBook(@ModelAttribute("book") BookDTO bookDto,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+        Book book = bookDto.toEntity();
         final String[] existingImageUrl = { null };
 
         if (book.getId() != null) {
@@ -212,37 +256,56 @@ public class AdminController {
                     .toList();
         }
 
-        model.addAttribute("books", books);
+        model.addAttribute("books", books.stream().map(BookDTO::fromEntity).toList());
         return "admin/books";
     }
 
     @GetMapping("/books/{id}")
     public String viewBook(@PathVariable Long id, Model model) {
-        bookService.getBookById(id).ifPresent(book -> model.addAttribute("book", book));
+        bookService.getBookById(id).ifPresent(book -> model.addAttribute("book", BookDTO.fromEntity(book)));
         return "admin/books/view";
     }
 
     @GetMapping("/categories")
     public String listCategories(Model model) {
-        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("categories", categoryService.getAllCategories().stream()
+                .sorted((left, right) -> {
+                    if (left.getId() == null && right.getId() == null) {
+                        return 0;
+                    }
+                    if (left.getId() == null) {
+                        return 1;
+                    }
+                    if (right.getId() == null) {
+                        return -1;
+                    }
+                    return left.getId().compareTo(right.getId());
+                })
+                .map(category -> {
+                    CategoryDTO dto = CategoryDTO.fromEntity(category);
+                    dto.setBookCount(bookRepository.countByCategory_Id(category.getId()));
+                    return dto;
+                })
+                .toList());
         return "admin/categories";
     }
 
     @GetMapping("/categories/new")
     public String showCreateCategoryForm(Model model) {
-        model.addAttribute("category", new Category());
+        model.addAttribute("category", new CategoryDTO());
         return "admin/categories/form";
     }
 
     @GetMapping("/categories/edit/{id}")
     public String showEditCategoryForm(@PathVariable Long id, Model model) {
-        categoryService.getCategoryById(id).ifPresent(category -> model.addAttribute("category", category));
+        categoryService.getCategoryById(id)
+                .ifPresent(category -> model.addAttribute("category", CategoryDTO.fromEntity(category)));
         return "admin/categories/form";
     }
 
     @PostMapping("/categories/save")
-    public String saveCategory(@ModelAttribute Category category) {
-        categoryService.saveCategory(category);
+    public String saveCategory(@ModelAttribute("category") CategoryDTO categoryDto) {
+        categoryService.saveCategory(categoryDto.toEntity());
         return "redirect:/admin/categories";
     }
 
@@ -254,26 +317,27 @@ public class AdminController {
 
     @GetMapping("/categories/{id}")
     public String viewCategory(@PathVariable Long id, Model model) {
-        categoryService.getCategoryById(id).ifPresent(category -> model.addAttribute("category", category));
+        categoryService.getCategoryById(id)
+                .ifPresent(category -> model.addAttribute("category", category));
         return "admin/categories/view";
     }
 
     @GetMapping("/users")
     public String listUsers(Model model) {
-        model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute("users", userService.getAllUsers().stream().map(UserDTO::fromEntity).toList());
         model.addAttribute("roles", roleService.getAllRoles());
         return "admin/users";
     }
 
     @GetMapping("/users/{id}")
     public String viewUser(@PathVariable Long id, Model model) {
-        userService.getUserById(id).ifPresent(user -> model.addAttribute("user", user));
+        userService.getUserById(id).ifPresent(user -> model.addAttribute("user", UserDTO.fromEntity(user)));
         return "admin/users/view";
     }
 
     @GetMapping("/users/new")
     public String showCreateUserForm(Model model) {
-        model.addAttribute("user", new User());
+        model.addAttribute("user", new UserFormDTO());
         model.addAttribute("roles", roleService.getAllRoles());
         return "admin/users/form";
     }
@@ -281,14 +345,38 @@ public class AdminController {
     @GetMapping("/users/edit/{id}")
     public String showEditUserForm(@PathVariable Long id, Model model) {
         userService.getUserById(id).ifPresent(user -> {
-            model.addAttribute("user", user);
+            model.addAttribute("user", UserFormDTO.fromEntity(user));
             model.addAttribute("roles", roleService.getAllRoles());
         });
         return "admin/users/form";
     }
 
     @PostMapping("/users/save")
-    public String saveUser(@ModelAttribute User user) {
+    public String saveUser(@ModelAttribute("user") UserFormDTO userForm) {
+        String rawPassword = userForm.getPassword();
+        String encodedPassword = rawPassword;
+
+        if (userForm.getId() != null) {
+            userService.getUserById(userForm.getId()).ifPresent(existingUser -> {
+                if (userForm.getCreatedAt() == null) {
+                    userForm.setCreatedAt(existingUser.getCreatedAt());
+                }
+            });
+            if (rawPassword == null || rawPassword.isBlank()) {
+                encodedPassword = userService.getUserById(userForm.getId())
+                        .map(User::getPassword)
+                        .orElse(null);
+            } else {
+                encodedPassword = passwordEncoder.encode(rawPassword);
+            }
+        } else if (rawPassword != null && !rawPassword.isBlank()) {
+            encodedPassword = passwordEncoder.encode(rawPassword);
+        }
+
+        User user = userForm.toEntity(encodedPassword);
+        if (userForm.getRole() != null && userForm.getRole().getId() != null) {
+            roleService.getRoleById(userForm.getRole().getId()).ifPresent(user::setRole);
+        }
         userService.saveUser(user);
         return "redirect:/admin/users";
     }
@@ -337,14 +425,16 @@ public class AdminController {
             }
         }
 
-        model.addAttribute("users", users);
+        model.addAttribute("users", users.stream().map(UserDTO::fromEntity).toList());
         model.addAttribute("roles", roleService.getAllRoles());
         return "admin/users";
     }
 
     @GetMapping("/orders")
     public String listOrders(Model model) {
-        model.addAttribute("orders", orderService.getAllOrders());
+        var orders = orderService.getAllOrders();
+        model.addAttribute("orders", orders.stream().map(OrderDTO::fromEntity).toList());
+        model.addAttribute("orderStatusOptions", buildOrderStatusOptions(orders));
         return "admin/orders";
     }
 
@@ -354,7 +444,7 @@ public class AdminController {
         if (orderOptional.isEmpty()) {
             return "redirect:/admin/orders";
         }
-        model.addAttribute("order", orderOptional.get());
+        model.addAttribute("order", OrderDTO.fromEntity(orderOptional.get()));
         return "admin/orders/view";
     }
 
@@ -364,18 +454,31 @@ public class AdminController {
         if (orderOptional.isEmpty()) {
             return "redirect:/admin/orders";
         }
-        model.addAttribute("order", orderOptional.get());
+        Order order = orderOptional.get();
+        model.addAttribute("order", OrderDTO.fromEntity(order));
+        model.addAttribute("orderStatusChoices", getAllowedStatusChoices(order.getStatus()));
         return "admin/orders/form";
     }
 
     @PostMapping("/orders/save")
-    public String saveOrder(@ModelAttribute Order order, RedirectAttributes redirectAttributes) {
+    public String saveOrder(@ModelAttribute("order") OrderDTO orderDto, RedirectAttributes redirectAttributes) {
         try {
+            var existingOrder = orderService.getOrderById(orderDto.getId());
+            if (existingOrder.isEmpty()) {
+                redirectAttributes.addFlashAttribute("orderError", "Không tìm thấy đơn hàng");
+                return "redirect:/admin/orders";
+            }
+
+            Order order = existingOrder.get();
+            order.setStatus(orderDto.getStatus());
+            if (orderDto.getShippingAddress() != null && !orderDto.getShippingAddress().isBlank()) {
+                order.setShippingAddress(orderDto.getShippingAddress());
+            }
             orderService.saveOrder(order);
             redirectAttributes.addFlashAttribute("orderSuccess", "Cập nhật trạng thái đơn hàng thành công");
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("orderError", e.getMessage());
-            return "redirect:/admin/orders/edit/" + order.getId();
+            return "redirect:/admin/orders";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("orderError", e.getMessage());
             return "redirect:/admin/orders";
@@ -406,37 +509,119 @@ public class AdminController {
             }
         }
 
-        model.addAttribute("orders", orders);
+        model.addAttribute("orders", orders.stream().map(OrderDTO::fromEntity).toList());
+        model.addAttribute("orderStatusOptions", buildOrderStatusOptions(orders));
         return "admin/orders";
+    }
+
+    private Map<Long, List<String>> buildOrderStatusOptions(List<Order> orders) {
+        Map<Long, List<String>> result = new LinkedHashMap<>();
+        for (Order order : orders) {
+            if (order != null && order.getId() != null) {
+                result.put(order.getId(), getAllowedStatusChoices(order.getStatus()));
+            }
+        }
+        return result;
+    }
+
+    private List<String> getAllowedStatusChoices(String currentStatus) {
+        String normalized = normalizeOrderStatus(currentStatus);
+        List<String> choices = new ArrayList<>();
+
+        switch (normalized) {
+            case "pending":
+                choices.add("Pending");
+                choices.add("Xác nhận đơn");
+                choices.add("Đã hủy");
+                break;
+            case "confirmed":
+                choices.add("Xác nhận đơn");
+                choices.add("Đang giao");
+                choices.add("Đã hủy");
+                break;
+            case "shipping":
+                choices.add("Đang giao");
+                choices.add("Hoàn thành");
+                choices.add("Đã hủy");
+                break;
+            case "completed":
+                choices.add("Hoàn thành");
+                break;
+            case "cancelled":
+                choices.add("Đã hủy");
+                break;
+            default:
+                choices.add("Pending");
+                choices.add("Xác nhận đơn");
+                choices.add("Đang giao");
+                choices.add("Hoàn thành");
+                choices.add("Đã hủy");
+                break;
+        }
+
+        return choices;
+    }
+
+    private String normalizeOrderStatus(String status) {
+        if (status == null) {
+            return "";
+        }
+
+        String normalized = Normalizer.normalize(status, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .replace('\u00A0', ' ')
+                .replaceAll("\\s+", " ")
+                .toLowerCase(Locale.ROOT)
+                .trim();
+
+        if (normalized.contains("cho xu ly") || normalized.contains("pending")) {
+            return "pending";
+        }
+        if (normalized.contains("xac nhan") || normalized.contains("confirm")) {
+            return "confirmed";
+        }
+        if (normalized.contains("dang giao") || normalized.contains("ship")) {
+            return "shipping";
+        }
+        if (normalized.contains("hoan thanh") || normalized.contains("complete") || normalized.contains("deliver")
+                || normalized.contains("da giao")) {
+            return "completed";
+        }
+        if (normalized.contains("da huy") || normalized.contains("cancel")) {
+            return "cancelled";
+        }
+        return normalized;
     }
 
     @GetMapping("/vouchers")
     public String listVouchers(Model model) {
-        model.addAttribute("vouchers", voucherService.getAllVouchers());
+        model.addAttribute("vouchers", voucherService.getAllVouchers().stream().map(VoucherDTO::fromEntity).toList());
         return "admin/vouchers";
     }
 
     @GetMapping("/vouchers/{id}")
     public String viewVoucher(@PathVariable Long id, Model model) {
-        voucherService.getVoucherById(id).ifPresent(voucher -> model.addAttribute("voucher", voucher));
+        voucherService.getVoucherById(id)
+                .ifPresent(voucher -> model.addAttribute("voucher", VoucherDTO.fromEntity(voucher)));
         return "admin/vouchers/view";
     }
 
     @GetMapping("/vouchers/new")
     public String showCreateVoucherForm(Model model) {
-        model.addAttribute("voucher", new Voucher());
+        model.addAttribute("voucher", new VoucherDTO());
         return "admin/vouchers/form";
     }
 
     @GetMapping("/vouchers/edit/{id}")
     public String showEditVoucherForm(@PathVariable Long id, Model model) {
-        voucherService.getVoucherById(id).ifPresent(voucher -> model.addAttribute("voucher", voucher));
+        voucherService.getVoucherById(id)
+                .ifPresent(voucher -> model.addAttribute("voucher", VoucherDTO.fromEntity(voucher)));
         return "admin/vouchers/form";
     }
 
     @PostMapping("/vouchers/save")
-    public String saveVoucher(@ModelAttribute Voucher voucher) {
-        voucherService.saveVoucher(voucher);
+    public String saveVoucher(@ModelAttribute("voucher") VoucherDTO voucherDto) {
+        voucherService.saveVoucher(voucherDto.toEntity());
         return "redirect:/admin/vouchers";
     }
 
@@ -477,7 +662,7 @@ public class AdminController {
                     .toList();
         }
 
-        model.addAttribute("vouchers", vouchers);
+        model.addAttribute("vouchers", vouchers.stream().map(VoucherDTO::fromEntity).toList());
         return "admin/vouchers";
     }
 

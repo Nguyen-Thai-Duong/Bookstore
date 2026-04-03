@@ -285,6 +285,19 @@
             margin-top: 2px;
         }
 
+        .order-item-summary {
+            margin-top: 0;
+            font-size: 11px;
+            color: #666;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .order-item-summary strong {
+            color: var(--price);
+        }
+
         .summary-row {
             display: flex;
             justify-content: space-between;
@@ -510,6 +523,10 @@
                             <p class="order-item-price"
                                 th:text="${item.book.price != null ? #numbers.formatDecimal(item.book.price, 0, 'COMMA', 0, 'POINT') + 'đ' : '0đ'}">
                                 0đ</p>
+                            <div class="order-item-summary">
+                                <span>Thành tiền: <strong
+                                        th:text="${#numbers.formatDecimal(item.lineTotal, 0, 'COMMA', 0, 'POINT') + 'đ'}">0đ</strong></span>
+                            </div>
                         </div>
                     </div>
                 </div>
