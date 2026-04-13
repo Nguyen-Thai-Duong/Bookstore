@@ -38,7 +38,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         if (isAdminPath) {
             if (user == null) {
-                response.sendRedirect("/login?error=Vui%20l%C3%B2ng%20%C4%91%C4%83ng%20nh%E1%BA%ADp");
+                response.sendRedirect("/login?error=Please%20sign%20in");
                 return false;
             }
             if (!authService.isAdmin(user)) {
@@ -53,7 +53,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                 || path.startsWith("/orders")
                 || path.startsWith("/reviews")) {
             if (user == null) {
-                response.sendRedirect("/login?error=Vui%20l%C3%B2ng%20%C4%91%C4%83ng%20nh%E1%BA%ADp");
+                response.sendRedirect("/login?error=Please%20sign%20in");
                 return false;
             }
         }

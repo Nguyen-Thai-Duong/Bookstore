@@ -61,7 +61,7 @@ public class OrderController {
         }
 
         Order order = orderOpt.get();
-        // Chỉ cho phép xem đơn hàng của mình hoặc admin
+        // Only allow viewing your own orders or admin access
         if (!authService.isAdmin(user) && !order.getUser().getId().equals(user.getId())) {
             return "redirect:/orders";
         }
@@ -79,24 +79,24 @@ public class OrderController {
 
         var orderOpt = orderRepository.findById(id);
         if (orderOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("orderError", "Không tìm thấy đơn hàng");
+            redirectAttributes.addFlashAttribute("orderError", "Order not found");
             return "redirect:/orders";
         }
 
         Order order = orderOpt.get();
         if (!order.getUser().getId().equals(user.getId())) {
-            redirectAttributes.addFlashAttribute("orderError", "Bạn không có quyền thao tác đơn hàng này");
+            redirectAttributes.addFlashAttribute("orderError", "You do not have permission to modify this order");
             return "redirect:/orders";
         }
 
         if (!isPendingStatus(order.getStatus())) {
-            redirectAttributes.addFlashAttribute("orderError", "Chỉ có thể hủy đơn ở trạng thái chờ xử lý");
+            redirectAttributes.addFlashAttribute("orderError", "You can only cancel orders with pending status");
             return "redirect:/orders";
         }
 
-        order.setStatus("Đã hủy");
+        order.setStatus("Cancelled");
         orderService.saveOrder(order);
-        redirectAttributes.addFlashAttribute("orderSuccess", "Hủy đơn hàng thành công");
+        redirectAttributes.addFlashAttribute("orderSuccess", "Order cancelled successfully");
         return "redirect:/orders";
     }
 

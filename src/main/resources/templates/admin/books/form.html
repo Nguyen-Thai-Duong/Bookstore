@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${book.id != null ? 'Chỉnh sửa Sách' : 'Thêm Sách Mới'} + ' - BookNest'">Quản Lý Sách - BookNest
+    <title th:text="${book.id != null ? 'Edit Book' : 'Add New Book'} + ' - BookNest'">Book Management - BookNest
     </title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -69,7 +69,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
-                    <span>Quản lý sách</span>
+                    <span>Book Management</span>
                 </a>
                 <a href="/admin/categories"
                     class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
@@ -77,7 +77,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                     </svg>
-                    <span>Danh mục</span>
+                    <span>Category</span>
                 </a>
                 <a href="/admin/users"
                     class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
@@ -85,7 +85,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
-                    <span>Người dùng</span>
+                    <span>User</span>
                 </a>
                 <a href="/admin/vouchers"
                     class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
@@ -109,7 +109,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
-                    <span>Đơn hàng</span>
+                    <span>Order</span>
                 </a>
             </nav>
 
@@ -136,8 +136,8 @@
                 <!-- Header -->
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold text-gray-900"
-                        th:text="${book.id != null ? 'Chỉnh sửa Sách' : 'Thêm Sách Mới'}">Thêm Sách Mới</h1>
-                    <p class="text-gray-600 mt-1">Điền thông tin chi tiết về sách</p>
+                        th:text="${book.id != null ? 'Edit Book' : 'Add New Book'}">Add New Book</h1>
+                    <p class="text-gray-600 mt-1">Enter detailed information about the book</p>
                 </div>
 
                 <!-- Form Card -->
@@ -147,95 +147,95 @@
                         <input type="hidden" th:field="*{id}" />
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Tiêu đề -->
+                            <!-- Title -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Tiêu đề sách <span class="text-red-500">*</span>
+                                    Book title <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" th:field="*{title}" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent transition"
-                                    placeholder="Nhập tiêu đề sách">
+                                    placeholder="Enter Book Title">
                             </div>
 
-                            <!-- Tác giả -->
+                            <!-- Author -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Tác giả <span class="text-red-500">*</span>
+                                    Author <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" th:field="*{author}" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent transition"
-                                    placeholder="Nhập tên tác giả">
+                                    placeholder="Enter Author Name">
                             </div>
 
-                            <!-- Giá -->
+                            <!-- Price -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Giá (VND) <span class="text-red-500">*</span>
+                                    Price (VND) <span class="text-red-500">*</span>
                                 </label>
                                 <input type="number" th:field="*{price}" required min="0" step="1000"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent transition"
                                     placeholder="0">
                             </div>
 
-                            <!-- Số lượng -->
+                            <!-- Quantity -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Số lượng tồn kho <span class="text-red-500">*</span>
+                                    Stock quantity <span class="text-red-500">*</span>
                                 </label>
                                 <input type="number" th:field="*{stock}" required min="0"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent transition"
                                     placeholder="0">
                             </div>
 
-                            <!-- Danh mục -->
+                            <!-- Category -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Danh mục <span class="text-red-500">*</span>
+                                    Category <span class="text-red-500">*</span>
                                 </label>
                                 <select th:field="*{category.id}" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent transition">
-                                    <option value="">-- Chọn danh mục --</option>
+                                    <option value="">-- Select Category --</option>
                                     <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">
-                                        Danh mục</option>
+                                        Category</option>
                                 </select>
                             </div>
 
-                            <!-- Tải ảnh từ máy -->
+                            <!-- Upload image -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Ảnh từ URL
+                                    Image from URL
                                 </label>
                                 <input type="url" th:field="*{imageUrl}"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent transition"
                                     placeholder="https://example.com/book-cover.jpg">
-                                <p class="text-xs text-gray-500 mt-2">Bạn có thể dán link ảnh tại đây hoặc tải file từ
-                                    máy bên dưới.</p>
+                                <p class="text-xs text-gray-500 mt-2">You can paste an image URL here or upload a file
+                                    from your device below.</p>
                             </div>
 
-                            <!-- Tải ảnh từ máy -->
+                            <!-- Upload image -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Ảnh sách
+                                    Book image
                                 </label>
                                 <input type="file" name="imageFile" accept="image/*"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent transition bg-white">
-                                <p class="text-xs text-gray-500 mt-2">Nếu vừa nhập URL vừa tải file, hệ thống sẽ ưu tiên
-                                    file tải lên. Định dạng hỗ trợ: JPG, JPEG, PNG, GIF, WEBP.</p>
+                                <p class="text-xs text-gray-500 mt-2">If both URL and file are provided, the uploaded
+                                    file will be used. Supported formats: JPG, JPEG, PNG, GIF, WEBP.</p>
                                 <div th:if="${book.imageUrl != null and !book.imageUrl.isEmpty()}" class="mt-4">
-                                    <p class="text-sm font-medium text-gray-700 mb-2">Ảnh hiện tại:</p>
+                                    <p class="text-sm font-medium text-gray-700 mb-2">Current image:</p>
                                     <img th:src="${book.imageUrl}" alt="Book Image" class="h-40 rounded-lg border"
                                         onerror="this.style.display='none'">
                                 </div>
                             </div>
 
-                            <!-- Mô tả -->
+                            <!-- Description -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                    Mô tả
+                                    Description
                                 </label>
                                 <textarea th:field="*{description}" rows="4"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brown-500 focus:border-transparent transition resize-none"
-                                    placeholder="Nhập mô tả về sách..."></textarea>
+                                    placeholder="Enter Book Description..."></textarea>
                             </div>
                         </div>
 
@@ -243,11 +243,11 @@
                         <div class="flex justify-end space-x-4 mt-8 pt-6 border-t">
                             <a href="/admin/books"
                                 class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium">
-                                Hủy
+                                Cancel
                             </a>
                             <button type="submit" class="px-6 py-3 text-white rounded-lg transition font-medium"
                                 style="background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%);">
-                                <span th:text="${book.id != null ? 'Cập Nhật' : 'Thêm Sách'}">Thêm Sách</span>
+                                <span th:text="${book.id != null ? 'Update' : 'Add Books'}">Add Books</span>
                             </button>
                         </div>
                     </form>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest | Giỏ hàng</title>
+    <title>BookNest | Shopping Cart</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -196,13 +196,64 @@
 
         .item-card {
             display: grid;
-            grid-template-columns: 92px 1fr 190px;
+            grid-template-columns: 34px 92px 1fr 190px;
             gap: 12px;
             border: 1px solid #eee;
             border-radius: 4px;
             padding: 10px;
             margin-bottom: 10px;
             align-items: start;
+        }
+
+        .item-check-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-self: center;
+        }
+
+        .check-input {
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #d6d6d6;
+            border-radius: 3px;
+            background: #fff;
+            display: inline-grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .check-input:checked {
+            background: #e45535;
+            border-color: #e45535;
+        }
+
+        .check-input:checked::before {
+            content: "";
+            width: 10px;
+            height: 6px;
+            border: 2px solid #fff;
+            border-top: 0;
+            border-right: 0;
+            transform: rotate(-45deg);
+            margin-top: -1px;
+        }
+
+        .checkout-select-all {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #555;
+            font-size: 12px;
+        }
+
+        .checkout-select-all input {
+            width: 18px;
+            height: 18px;
         }
 
         .item-cover {
@@ -421,7 +472,7 @@
             }
 
             .item-card {
-                grid-template-columns: 92px 1fr;
+                grid-template-columns: 34px 92px 1fr;
             }
 
             .item-price-side {
@@ -454,6 +505,11 @@
                 grid-template-columns: 1fr;
             }
 
+            .item-check-cell {
+                justify-content: flex-start;
+                align-self: start;
+            }
+
             .item-price-side {
                 text-align: left;
                 align-self: start;
@@ -476,31 +532,30 @@
             </div>
 
             <form class="search-container" th:action="@{/books/search}" method="get">
-                <input type="text" name="title" placeholder="Tìm sách theo Tựa đề, Tác giả, Công ty phát hành..."
+                <input type="text" name="title" placeholder="Search books by Title, Author, Publisher..."
                     autocomplete="off">
-                <button type="submit">TÌM KIẾM</button>
+                <button type="submit">SEARCH</button>
             </form>
 
             <a th:href="@{/cart}" class="cart-box">
                 <i data-lucide="shopping-cart" size="20"></i>
                 <div>
-                    <span style="display:block; font-size: 10px; color: #999;">Giỏ hàng</span>
+                    <span style="display:block; font-size: 10px; color: #999;">Shopping Cart</span>
                     <strong style="font-size: 12px;"
-                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) sản phẩm|">(0) sản
-                        phẩm</strong>
+                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) items|">(0) items</strong>
                 </div>
             </a>
 
             <div class="auth-links" th:if="${session.loggedInUser != null}">
-                <a th:href="@{/account}">Tài khoản</a>
-                <a th:href="@{/orders}">Đơn hàng</a>
+                <a th:href="@{/account}">Account</a>
+                <a th:href="@{/orders}">Order</a>
                 <a th:if="${session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
                     th:href="@{/admin}">Admin</a>
             </div>
 
             <div class="auth-links" th:if="${session.loggedInUser == null}">
-                <a th:href="@{/login}">Đăng nhập</a>
-                <a th:href="@{/register}" class="primary">Đăng ký</a>
+                <a th:href="@{/login}">Login</a>
+                <a th:href="@{/register}" class="primary">Register</a>
             </div>
         </div>
     </header>
@@ -509,15 +564,15 @@
         <div class="container">
             <ul class="nav-links">
                 <li><a th:href="@{/}"><i data-lucide="home" size="14" style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Danh mục</a></li>
-                <li><a th:href="@{/orders}">Đơn hàng</a></li>
+                <li><a th:href="@{/books}">Category</a></li>
+                <li><a th:href="@{/orders}">Order</a></li>
             </ul>
         </div>
     </div>
 
     <main class="container layout">
         <section class="panel">
-            <div class="panel-head">Giỏ hàng của bạn</div>
+            <div class="panel-head">Your Shopping Cart</div>
             <div class="panel-body">
                 <div th:if="${cartError}" class="alert error" th:text="${cartError}"></div>
                 <div th:if="${voucherError}" class="alert error" th:text="${voucherError}"></div>
@@ -525,12 +580,23 @@
                 <div th:if="${voucherSuccess}" class="alert success" th:text="${voucherSuccess}"></div>
 
                 <div th:if="${#lists.isEmpty(cart)}">
-                    <p style="color:#777; margin-bottom: 12px;">Giỏ hàng của bạn đang trống.</p>
-                    <a th:href="@{/books}" class="checkout-btn" style="width:auto;">Khám phá sách ngay</a>
+                    <p style="color:#777; margin-bottom: 12px;">Your shopping cart is empty.</p>
+                    <a th:href="@{/books}" class="checkout-btn" style="width:auto;">Explore books now</a>
                 </div>
 
                 <div th:if="${!#lists.isEmpty(cart)}">
-                    <div th:each="item : ${cart}" class="item-card">
+                    <div class="checkout-select-all">
+                        <input type="checkbox" id="select-all-cart-items" class="check-input" checked>
+                        <label for="select-all-cart-items">Select all items for checkout</label>
+                    </div>
+
+                    <div th:each="item : ${cart}" class="item-card"
+                        th:attr="data-line-total=${item.lineTotal != null ? item.lineTotal : 0}">
+                        <div class="item-check-cell">
+                            <input type="checkbox" class="check-input checkout-item" form="checkout-selected-form"
+                                name="selectedBookIds" th:value="${item.book.id}" checked>
+                        </div>
+
                         <div>
                             <img class="item-cover"
                                 th:if="${item.book.imageUrl != null and !item.book.imageUrl.isEmpty()}"
@@ -538,33 +604,34 @@
                             <div class="item-cover"
                                 th:if="${item.book.imageUrl == null or item.book.imageUrl.isEmpty()}"
                                 style="display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;">
-                                Không có ảnh</div>
+                                No image</div>
                         </div>
                         <div>
-                            <h3 class="item-title" th:text="${item.book.title}">Tên sách</h3>
+                            <h3 class="item-title" th:text="${item.book.title}">Book Title</h3>
                             <p class="item-author"
-                                th:text="${item.book.author != null ? item.book.author : 'Đang cập nhật'}">Tác giả</p>
+                                th:text="${item.book.author != null ? item.book.author : 'Updating'}">Author</p>
                             <p class="item-price"
-                                th:text="${item.book.price != null ? #numbers.formatDecimal(item.book.price, 0, 'COMMA', 0, 'POINT') + 'đ' : '0đ'}">
-                                0đ</p>
+                                th:text="${item.book.price != null ? #numbers.formatDecimal(item.book.price, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
+                                0 VND</p>
 
                             <form method="post" th:action="@{/cart/update}" class="qty-form">
                                 <input type="hidden" name="bookId" th:value="${item.book.id}">
                                 <button type="button" onclick="adjustQty(this, -1)">-</button>
                                 <input type="number" name="quantity" min="0" th:value="${item.quantity}">
                                 <button type="button" onclick="adjustQty(this, 1)">+</button>
-                                <button type="submit" style="display:none;">Cập nhật</button>
+                                <button type="submit" style="display:none;">Update</button>
                             </form>
 
                             <form method="post" th:action="@{/cart/remove}" style="display:inline-block;">
                                 <input type="hidden" name="bookId" th:value="${item.book.id}">
-                                <button type="submit" class="btn-link">Xóa sản phẩm</button>
+                                <button type="submit" class="btn-link">Delete items</button>
                             </form>
                         </div>
                         <div class="item-price-side">
-                            <div class="label">Thành tiền</div>
+                            <div class="label">Line total</div>
                             <div class="total"
-                                th:text="${#numbers.formatDecimal(item.lineTotal, 0, 'COMMA', 0, 'POINT') + 'đ'}">0đ
+                                th:text="${#numbers.formatDecimal(item.lineTotal, 0, 'COMMA', 0, 'POINT') + ' VND'}">0
+                                VND
                             </div>
                         </div>
                     </div>
@@ -573,36 +640,42 @@
         </section>
 
         <aside class="panel" th:if="${!#lists.isEmpty(cart)}">
-            <div class="panel-head">Tóm tắt đơn hàng</div>
+            <div class="panel-head">Order summary</div>
             <div class="panel-body">
                 <form method="post" th:action="@{/cart/voucher}" class="voucher-form">
-                    <input type="text" name="code" placeholder="Mã giảm giá"
+                    <input type="text" name="code" placeholder="Voucher code"
                         th:value="${voucher != null ? voucher.code : ''}">
-                    <button type="submit">Áp dụng</button>
+                    <button type="submit">Apply</button>
                 </form>
 
                 <div class="summary-row">
-                    <span>Tạm tính</span>
-                    <span
-                        th:text="${subtotal != null ? #numbers.formatDecimal(subtotal, 0, 'COMMA', 0, 'POINT') + 'đ' : '0đ'}">0đ</span>
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal" th:attr="data-raw=${subtotal != null ? subtotal : 0}"
+                        th:text="${subtotal != null ? #numbers.formatDecimal(subtotal, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
+                        VND</span>
                 </div>
                 <div class="summary-row">
-                    <span>Giảm giá</span>
-                    <span style="color:#18883a;"
-                        th:text="${discount != null ? '-' + #numbers.formatDecimal(discount, 0, 'COMMA', 0, 'POINT') + 'đ' : '-0đ'}">-0đ</span>
+                    <span>Discount</span>
+                    <span id="summary-discount" style="color:#18883a;"
+                        th:attr="data-raw=${discount != null ? discount : 0}"
+                        th:text="${discount != null ? '-' + #numbers.formatDecimal(discount, 0, 'COMMA', 0, 'POINT') + ' VND' : '-0 VND'}">-0
+                        VND</span>
                 </div>
                 <div class="summary-row">
-                    <span>Phí vận chuyển</span>
-                    <span>Miễn phí</span>
+                    <span>Shipping fee</span>
+                    <span>Free</span>
                 </div>
 
                 <div class="total-row">
-                    <span>Tổng cộng</span>
-                    <span class="total-price"
-                        th:text="${total != null ? #numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT') + 'đ' : '0đ'}">0đ</span>
+                    <span>Total</span>
+                    <span id="summary-total" class="total-price" th:attr="data-raw=${total != null ? total : 0}"
+                        th:text="${total != null ? #numbers.formatDecimal(total, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
+                        VND</span>
                 </div>
 
-                <a th:href="@{/checkout}" class="checkout-btn">Tiến hành thanh toán</a>
+                <form id="checkout-selected-form" method="get" th:action="@{/checkout}">
+                    <button type="submit" class="checkout-btn">Proceed to checkout</button>
+                </form>
             </div>
         </aside>
     </main>
@@ -610,40 +683,40 @@
     <footer>
         <div class="container footer-cols">
             <div>
-                <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+                <h4>CUSTOMER SUPPORT</h4>
                 <ul>
-                    <li><a th:href="@{/books}">Sản phẩm và Đơn hàng</a></li>
-                    <li><a href="#">Chính sách đổi trả</a></li>
-                    <li><a href="#">Phương thức vận chuyển</a></li>
+                    <li><a th:href="@{/books}">Products and orders</a></li>
+                    <li><a href="#">Return policy</a></li>
+                    <li><a href="#">Shipping method</a></li>
                 </ul>
             </div>
             <div>
-                <h4>VỀ BOOKNEST</h4>
+                <h4>ABOUT BOOKNEST</h4>
                 <ul>
-                    <li><a href="#">Giới thiệu BookNest</a></li>
-                    <li><a href="#">Điều khoản sử dụng</a></li>
-                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">About BookNest</a></li>
+                    <li><a href="#">Terms of use</a></li>
+                    <li><a href="#">Privacy policy</a></li>
                 </ul>
             </div>
             <div>
-                <h4>TÀI KHOẢN</h4>
+                <h4>ACCOUNT</h4>
                 <ul>
-                    <li><a th:href="@{/login}">Đăng nhập</a></li>
-                    <li><a th:href="@{/register}">Tạo tài khoản</a></li>
-                    <li><a th:href="@{/orders}">Lịch sử đơn hàng</a></li>
+                    <li><a th:href="@{/login}">Login</a></li>
+                    <li><a th:href="@{/register}">Create account</a></li>
+                    <li><a th:href="@{/orders}">Order history</a></li>
                 </ul>
             </div>
             <div>
-                <h4>LIÊN HỆ</h4>
+                <h4>CONTACT</h4>
                 <p style="font-size: 12px; color: #666;">
                     Email: hotro@booknest.vn<br>
                     Hotline: 1900 1234<br>
-                    Địa chỉ: Tòa nhà Tri Thức, Quận 1, TP. HCM
+                    Address: Tri Thuc Building, District 1, Ho Chi Minh City
                 </p>
             </div>
         </div>
         <div class="bottom-footer">
-            &copy; 2026 BookNest. Bản quyền thuộc về Công ty Sách BookNest Việt Nam.
+            &copy; 2026 BookNest. All rights reserved.
         </div>
     </footer>
 
@@ -660,6 +733,95 @@
             input.value = Math.max(0, current + delta);
             form.requestSubmit();
         }
+
+        const selectAllCheckbox = document.getElementById('select-all-cart-items');
+        const itemCheckboxes = Array.from(document.querySelectorAll('.checkout-item'));
+        const checkoutForm = document.getElementById('checkout-selected-form');
+        const subtotalEl = document.getElementById('summary-subtotal');
+        const discountEl = document.getElementById('summary-discount');
+        const totalEl = document.getElementById('summary-total');
+
+        function parseRawNumber(raw) {
+            if (raw == null) {
+                return 0;
+            }
+            const parsed = Number(raw);
+            if (!Number.isNaN(parsed)) {
+                return parsed;
+            }
+
+            return Number(String(raw).replace(/[^\d.-]/g, '')) || 0;
+        }
+
+        function formatCurrency(value) {
+            return Math.max(0, Math.round(value)).toLocaleString('en-US') + ' VND';
+        }
+
+        function refreshSelectedSummary() {
+            if (!subtotalEl || !discountEl || !totalEl) {
+                return;
+            }
+
+            const baseSubtotal = parseRawNumber(subtotalEl.dataset.raw);
+            const baseDiscount = parseRawNumber(discountEl.dataset.raw);
+            const discountRate = baseSubtotal > 0 ? (baseDiscount / baseSubtotal) : 0;
+
+            const selectedSubtotal = itemCheckboxes
+                .filter(cb => cb.checked)
+                .reduce((sum, cb) => {
+                    const card = cb.closest('.item-card');
+                    const lineTotal = card ? parseRawNumber(card.dataset.lineTotal) : 0;
+                    return sum + lineTotal;
+                }, 0);
+
+            const selectedDiscount = selectedSubtotal * discountRate;
+            const selectedTotal = Math.max(0, selectedSubtotal - selectedDiscount);
+
+            subtotalEl.textContent = formatCurrency(selectedSubtotal);
+            discountEl.textContent = '-' + formatCurrency(selectedDiscount);
+            totalEl.textContent = formatCurrency(selectedTotal);
+        }
+
+        function refreshCheckoutButton() {
+            if (!checkoutForm) {
+                return;
+            }
+
+            const submitButton = checkoutForm.querySelector('button[type="submit"]');
+            if (!submitButton) {
+                return;
+            }
+
+            const selectedCount = itemCheckboxes.filter(cb => cb.checked).length;
+            submitButton.disabled = selectedCount === 0;
+            submitButton.style.opacity = selectedCount === 0 ? '0.6' : '1';
+            submitButton.style.cursor = selectedCount === 0 ? 'not-allowed' : 'pointer';
+            refreshSelectedSummary();
+        }
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', () => {
+                itemCheckboxes.forEach(cb => {
+                    cb.checked = selectAllCheckbox.checked;
+                });
+                refreshCheckoutButton();
+            });
+        }
+
+        itemCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                if (!selectAllCheckbox) {
+                    refreshCheckoutButton();
+                    return;
+                }
+
+                const checkedCount = itemCheckboxes.filter(item => item.checked).length;
+                selectAllCheckbox.checked = checkedCount === itemCheckboxes.length;
+                refreshCheckoutButton();
+            });
+        });
+
+        refreshCheckoutButton();
     </script>
 </body>
 

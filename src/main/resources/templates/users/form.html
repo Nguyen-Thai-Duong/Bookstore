@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Người Dùng</title>
+    <title>User Form</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -16,14 +16,14 @@
     </nav>
 
     <div class="container mt-4">
-        <h2 th:text="${user.id != null ? 'Chỉnh Sửa Người Dùng' : 'Thêm Người Dùng Mới'}">Form Người Dùng</h2>
+        <h2 th:text="${user.id != null ? 'Edit User' : 'Add New User'}">User Form</h2>
 
         <form th:action="@{/users}" th:object="${user}" method="post">
             <input type="hidden" th:field="*{id}">
             <input type="hidden" th:field="*{createdAt}">
 
             <div class="mb-3">
-                <label for="fullName" class="form-label">Họ Tên *</label>
+                <label for="fullName" class="form-label">Full Name *</label>
                 <input type="text" class="form-control" id="fullName" th:field="*{fullName}" required>
             </div>
 
@@ -33,23 +33,23 @@
             </div>
 
             <div class="mb-3">
-                <label for="password" class="form-label">Mật Khẩu *</label>
+                <label for="password" class="form-label">Password *</label>
                 <input type="password" class="form-control" id="password" th:field="*{password}"
-                    th:required="${user.id == null}" placeholder="Để trống nếu không đổi mật khẩu">
+                    th:required="${user.id == null}" placeholder="Leave blank if not changing password">
             </div>
 
             <div class="mb-3">
-                <label for="phone" class="form-label">Số Điện Thoại</label>
+                <label for="phone" class="form-label">Phone Number</label>
                 <input type="text" class="form-control" id="phone" th:field="*{phone}">
             </div>
 
             <div class="mb-3">
-                <label for="address" class="form-label">Địa Chỉ</label>
+                <label for="address" class="form-label">Address</label>
                 <textarea class="form-control" id="address" th:field="*{address}" rows="2"></textarea>
             </div>
 
             <div class="mb-3">
-                <label for="status" class="form-label">Trạng Thái</label>
+                <label for="status" class="form-label">Status</label>
                 <select class="form-select" id="status" th:field="*{status}">
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
@@ -57,15 +57,15 @@
             </div>
 
             <div class="mb-3">
-                <label for="role" class="form-label">Vai Trò</label>
+                <label for="role" class="form-label">Role</label>
                 <select class="form-select" id="role" th:field="*{role.id}" required>
-                    <option value="">-- Chọn vai trò --</option>
+                    <option value="">-- Select role --</option>
                     <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.roleName}"></option>
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-primary">Lưu</button>
-            <a href="/users" class="btn btn-secondary">Hủy</a>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="/users" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 

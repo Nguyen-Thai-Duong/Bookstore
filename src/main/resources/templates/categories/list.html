@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh Mục Sách - BookNest</title>
+    <title>Category Books - BookNest</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,10 +75,10 @@
                         <span class="font-display text-xl sm:text-2xl font-bold">BookNest</span>
                     </a>
                     <div class="flex items-center gap-2 sm:gap-4">
-                        <a th:href="@{/}" class="text-gray-600 hover:text-gray-900 font-medium">Trang chủ</a>
-                        <a th:href="@{/books}" class="text-gray-600 hover:text-gray-900 font-medium">Sách</a>
+                        <a th:href="@{/}" class="text-gray-600 hover:text-gray-900 font-medium">Home</a>
+                        <a th:href="@{/books}" class="text-gray-600 hover:text-gray-900 font-medium">Books</a>
                         <a th:href="@{/categories}" class="font-semibold" style="color: var(--color-primary);">Danh
-                            mục</a>
+                            category</a>
                     </div>
                 </div>
             </div>
@@ -87,8 +87,8 @@
         <section class="py-12 sm:py-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="mb-12">
-                    <h1 class="font-display text-4xl sm:text-5xl font-bold mb-4">Danh Mục Sách</h1>
-                    <p class="text-lg" style="color: #6b6560;">Khám phá các danh mục sách phong phú của chúng tôi</p>
+                    <h1 class="font-display text-4xl sm:text-5xl font-bold mb-4">Category Books</h1>
+                    <p class="text-lg" style="color: #6b6560;">Explore diverse book categories của chúng tôi</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -111,7 +111,7 @@
                             </div>
                             <h3 class="font-display text-2xl font-bold mb-3" th:text="${category.name}">Category</h3>
                             <p class="text-sm" style="color: #6b6560;"
-                                th:text="${category.description ?: 'Khám phá bộ sưu tập sách trong danh mục này'}">
+                                th:text="${category.description ?: 'Explore book collection in category này'}">
                                 Description
                             </p>
                         </a>
@@ -119,7 +119,7 @@
                 </div>
 
                 <div th:if="${categories.isEmpty()}" class="text-center py-16">
-                    <p class="text-lg" style="color: #6b6560;">Chưa có danh mục nào</p>
+                    <p class="text-lg" style="color: #6b6560;">No category set</p>
                     <a th:href="@{/books}"
                         class="btn-primary inline-block mt-6 px-6 py-3 rounded-full text-white font-semibold">
                         Xem tất cả sách

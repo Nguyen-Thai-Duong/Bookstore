@@ -40,34 +40,34 @@ public class ReviewController {
         }
 
         if (bookId == null || bookId <= 0) {
-            redirectAttributes.addFlashAttribute("reviewError", "Sách không hợp lệ");
+            redirectAttributes.addFlashAttribute("reviewError", "Invalid book");
             return "redirect:/books";
         }
 
         Optional<Book> bookOpt = bookService.getBookById(bookId);
         if (bookOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("reviewError", "Sách không hợp lệ");
+            redirectAttributes.addFlashAttribute("reviewError", "Invalid book");
             return "redirect:/books";
         }
 
         if (rating < 1 || rating > 5) {
-            redirectAttributes.addFlashAttribute("reviewError", "Đánh giá phải từ 1 đến 5");
+            redirectAttributes.addFlashAttribute("reviewError", "Rating must be between 1 and 5");
             return "redirect:/books/" + bookId;
         }
 
         String normalizedContent = content == null ? "" : content.trim();
         if (normalizedContent.isEmpty()) {
-            redirectAttributes.addFlashAttribute("reviewError", "Nội dung đánh giá không được để trống");
+            redirectAttributes.addFlashAttribute("reviewError", "Review content cannot be empty");
             return "redirect:/books/" + bookId;
         }
         if (normalizedContent.length() > 1000) {
-            redirectAttributes.addFlashAttribute("reviewError", "Nội dung đánh giá quá dài");
+            redirectAttributes.addFlashAttribute("reviewError", "Review content too long");
             return "redirect:/books/" + bookId;
         }
 
         Optional<Review> existing = reviewRepository.findByBook_IdAndUser_Id(bookId, user.getId());
         if (existing.isPresent()) {
-            redirectAttributes.addFlashAttribute("reviewError", "Bạn đã đánh giá sách này");
+            redirectAttributes.addFlashAttribute("reviewError", "You have already reviewed this book");
             return "redirect:/books/" + bookId;
         }
 
@@ -79,7 +79,7 @@ public class ReviewController {
         review.setCreatedAt(LocalDateTime.now());
         reviewRepository.save(review);
 
-        redirectAttributes.addFlashAttribute("reviewSuccess", "Đã gửi đánh giá");
+        redirectAttributes.addFlashAttribute("reviewSuccess", "Review submitted");
         return "redirect:/books/" + bookId;
     }
 
@@ -100,17 +100,17 @@ public class ReviewController {
         }
 
         if (rating < 1 || rating > 5) {
-            redirectAttributes.addFlashAttribute("reviewError", "Đánh giá phải từ 1 đến 5");
+            redirectAttributes.addFlashAttribute("reviewError", "Rating must be between 1 and 5");
             return "redirect:/books/" + bookId;
         }
 
         String normalizedContent = content == null ? "" : content.trim();
         if (normalizedContent.isEmpty()) {
-            redirectAttributes.addFlashAttribute("reviewError", "Nội dung đánh giá không được để trống");
+            redirectAttributes.addFlashAttribute("reviewError", "Review content cannot be empty");
             return "redirect:/books/" + bookId;
         }
         if (normalizedContent.length() > 1000) {
-            redirectAttributes.addFlashAttribute("reviewError", "Nội dung đánh giá quá dài");
+            redirectAttributes.addFlashAttribute("reviewError", "Review content too long");
             return "redirect:/books/" + bookId;
         }
 
@@ -127,7 +127,7 @@ public class ReviewController {
         review.setRating(rating);
         review.setUserCommentPreservingAdminReply(normalizedContent);
         reviewRepository.save(review);
-        redirectAttributes.addFlashAttribute("reviewSuccess", "Đã cập nhật đánh giá");
+        redirectAttributes.addFlashAttribute("reviewSuccess", "Review updated");
         return "redirect:/books/" + bookId;
     }
 
@@ -156,7 +156,7 @@ public class ReviewController {
         }
 
         reviewRepository.delete(review);
-        redirectAttributes.addFlashAttribute("reviewSuccess", "Đã xóa đánh giá");
+        redirectAttributes.addFlashAttribute("reviewSuccess", "Review deleted");
         return "redirect:/books/" + bookId;
     }
 
@@ -188,19 +188,19 @@ public class ReviewController {
         String safeRedirect = resolveAdminRedirect(redirectTo);
 
         if (reviewId == null || reviewId <= 0) {
-            redirectAttributes.addFlashAttribute("reviewError", "Đánh giá không hợp lệ");
+            redirectAttributes.addFlashAttribute("reviewError", "Invalid review");
             return "redirect:" + safeRedirect;
         }
 
         Optional<Review> reviewOpt = reviewRepository.findById(reviewId);
         if (reviewOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("reviewError", "Không tìm thấy đánh giá");
+            redirectAttributes.addFlashAttribute("reviewError", "Review not found");
             return "redirect:" + safeRedirect;
         }
 
         String normalizedReply = reply == null ? "" : reply.trim();
         if (normalizedReply.length() > 1000) {
-            redirectAttributes.addFlashAttribute("reviewError", "Nội dung phản hồi quá dài");
+            redirectAttributes.addFlashAttribute("reviewError", "Review content too long");
             return "redirect:" + safeRedirect;
         }
 
@@ -209,9 +209,9 @@ public class ReviewController {
         reviewRepository.save(review);
 
         if (normalizedReply.isEmpty()) {
-            redirectAttributes.addFlashAttribute("reviewSuccess", "Đã xóa phản hồi");
+            redirectAttributes.addFlashAttribute("reviewSuccess", "Review deleted");
         } else {
-            redirectAttributes.addFlashAttribute("reviewSuccess", "Đã gửi phản hồi cho đánh giá");
+            redirectAttributes.addFlashAttribute("reviewSuccess", "Sent review feedback from");
         }
         return "redirect:" + safeRedirect;
     }
@@ -228,18 +228,18 @@ public class ReviewController {
 
         String safeRedirect = resolveAdminRedirect(redirectTo);
         if (reviewId == null || reviewId <= 0) {
-            redirectAttributes.addFlashAttribute("reviewError", "Đánh giá không hợp lệ");
+            redirectAttributes.addFlashAttribute("reviewError", "Reviews invalid");
             return "redirect:" + safeRedirect;
         }
 
         Optional<Review> reviewOpt = reviewRepository.findById(reviewId);
         if (reviewOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("reviewError", "Không tìm thấy đánh giá");
+            redirectAttributes.addFlashAttribute("reviewError", "Review not found");
             return "redirect:" + safeRedirect;
         }
 
         reviewRepository.delete(reviewOpt.get());
-        redirectAttributes.addFlashAttribute("reviewSuccess", "Đã xóa đánh giá");
+        redirectAttributes.addFlashAttribute("reviewSuccess", "Review deleted");
         return "redirect:" + safeRedirect;
     }
 

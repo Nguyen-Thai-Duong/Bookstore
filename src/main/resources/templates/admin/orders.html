@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest - Quản Lý Đơn Hàng</title>
+    <title>BookNest - Order Management</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -137,7 +137,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
-                    <span>Quản lý sách</span>
+                    <span>Book Management</span>
                 </a>
 
                 <a href="/admin/categories"
@@ -146,7 +146,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                     </svg>
-                    <span>Danh mục</span>
+                    <span>Category</span>
                 </a>
 
                 <a href="/admin/users"
@@ -155,7 +155,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
-                    <span>Người dùng</span>
+                    <span>User</span>
                 </a>
 
                 <a href="/admin/vouchers"
@@ -182,7 +182,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
-                    <span>Đơn hàng</span>
+                    <span>Order</span>
                 </a>
             </nav>
 
@@ -208,13 +208,13 @@
             <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
                 <div class="px-8 py-4 flex items-center justify-between">
                     <div>
-                        <h2 class="text-2xl font-bold" style="color: var(--color-text);">Quản Lý Đơn Hàng</h2>
-                        <p class="text-sm text-gray-500">Danh sách đơn hàng trong hệ thống</p>
+                        <h2 class="text-2xl font-bold" style="color: var(--color-text);">Order Management</h2>
+                        <p class="text-sm text-gray-500">List of orders in the system</p>
                     </div>
                     <div class="flex items-center gap-4">
                         <form method="post" action="/logout">
                             <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg font-medium">
-                                Đăng xuất
+                                Logout
                             </button>
                         </form>
                     </div>
@@ -235,18 +235,18 @@
                         <form action="/admin/orders/search" method="get" class="flex gap-4">
                             <select name="status"
                                 class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brown-500">
-                                <option value="">Tất cả trạng thái</option>
-                                <option value="Pending">Chờ xử lý</option>
-                                <option value="Xác nhận đơn">Xác nhận đơn</option>
-                                <option value="Đang giao">Đang giao</option>
-                                <option value="Hoàn thành">Hoàn thành</option>
-                                <option value="Đã hủy">Đã hủy</option>
+                                <option value="">All Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="Shipping">Shipping</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
                             </select>
-                            <input type="text" name="orderId" placeholder="Tìm theo mã đơn hàng..."
+                            <input type="text" name="orderId" placeholder="Search by order code..."
                                 class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brown-500">
                             <button type="submit"
                                 class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                                Lọc
+                                Filter
                             </button>
                         </form>
                     </div>
@@ -258,22 +258,22 @@
                                 <tr>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Mã ĐH</th>
+                                        Order Code</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Ngày Đặt</th>
+                                        Order Date</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Khách Hàng</th>
+                                        Customer</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Tổng Tiền</th>
+                                        Total amount</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Trạng Thái</th>
+                                        Status</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Thao Tác</th>
+                                        Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -284,29 +284,28 @@
                                         th:text="${order.orderDate != null ? #temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm') : 'N/A'}">
                                         01/01/2024</td>
                                     <td class="px-6 py-4 text-sm text-gray-900"
-                                        th:text="${order.user != null ? order.user.fullName : 'N/A'}">Tên khách hàng
+                                        th:text="${order.user != null ? order.user.fullName : 'N/A'}">Customer name
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold"
                                         style="color: var(--color-primary);"
-                                        th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + 'đ' : '0đ'}">
-                                        0đ</td>
+                                        th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
+                                        0 VND</td>
 
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <div class="status-layout">
                                             <span class="status-badge px-3 py-1 rounded-full text-xs font-semibold"
-                                                th:classappend="${order.status == 'Hoàn thành' ? 'bg-green-100 text-green-800' :
-                                                               ((order.status == 'Xác nhận đơn' or order.status == 'Confirmed') ? 'bg-indigo-100 text-indigo-800' :
-                                                               ((order.status == 'Đang giao' or order.status == 'Shipping') ? 'bg-blue-100 text-blue-800' :
-                                                               ((order.status == 'Đã hủy' or order.status == 'Cancelled' or order.status == 'Canceled') ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')))}"
-                                                th:text="${(order.status == 'Pending' or order.status == 'pending' or order.status == 'Chờ xử lý') ? 'Chờ xử lý' :
-                                                         ((order.status == 'Confirmed' or order.status == 'confirmed' or order.status == 'Xác nhận đơn') ? 'Xác nhận đơn' :
-                                                         ((order.status == 'Shipping' or order.status == 'shipping' or order.status == 'Đang giao') ? 'Đang giao' :
-                                                         ((order.status == 'Completed' or order.status == 'completed' or order.status == 'Delivered' or order.status == 'delivered' or order.status == 'Hoàn thành') ? 'Hoàn thành' :
-                                                         ((order.status == 'Cancelled' or order.status == 'Canceled' or order.status == 'cancelled' or order.status == 'canceled' or order.status == 'Đã hủy') ? 'Đã hủy' : order.status))))}">Chờ
-                                                xử lý</span>
+                                                th:classappend="${order.status == 'Completed' ? 'bg-green-100 text-green-800' :
+                                                               ((order.status == 'Confirmed' or order.status == 'Confirmed') ? 'bg-indigo-100 text-indigo-800' :
+                                                               ((order.status == 'Shipping' or order.status == 'Shipping') ? 'bg-blue-100 text-blue-800' :
+                                                               ((order.status == 'Cancelled' or order.status == 'Cancelled' or order.status == 'Canceled') ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')))}"
+                                                th:text="${(order.status == 'Pending' or order.status == 'pending' or order.status == 'Pending') ? 'Pending' :
+                                                         ((order.status == 'Confirmed' or order.status == 'confirmed' or order.status == 'Confirmed') ? 'Confirmed' :
+                                                         ((order.status == 'Shipping' or order.status == 'shipping' or order.status == 'Shipping') ? 'Shipping' :
+                                                         ((order.status == 'Completed' or order.status == 'completed' or order.status == 'Delivered' or order.status == 'delivered' or order.status == 'Completed') ? 'Completed' :
+                                                         ((order.status == 'Cancelled' or order.status == 'Canceled' or order.status == 'cancelled' or order.status == 'canceled' or order.status == 'Cancelled') ? 'Cancelled' : order.status))))}">Pending</span>
 
                                             <div class="status-editor"
-                                                th:if="${orderStatusOptions[order.id] != null and #lists.size(orderStatusOptions[order.id]) > 1 and !(order.status == 'Hoàn thành' or order.status == 'Completed' or order.status == 'completed' or order.status == 'Delivered' or order.status == 'delivered') and !(order.status == 'Đã hủy' or order.status == 'Cancelled' or order.status == 'Canceled' or order.status == 'cancelled' or order.status == 'canceled')}">
+                                                th:if="${orderStatusOptions[order.id] != null and #lists.size(orderStatusOptions[order.id]) > 1 and !(order.status == 'Completed' or order.status == 'Completed' or order.status == 'completed' or order.status == 'Delivered' or order.status == 'delivered') and !(order.status == 'Cancelled' or order.status == 'Cancelled' or order.status == 'Canceled' or order.status == 'cancelled' or order.status == 'canceled')}">
                                                 <form th:action="@{/admin/orders/save}" method="post"
                                                     class="flex items-center gap-2">
                                                     <input type="hidden" name="id" th:value="${order.id}">
@@ -314,18 +313,18 @@
                                                         class="status-select text-xs px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500">
                                                         <option th:each="statusOption : ${orderStatusOptions[order.id]}"
                                                             th:value="${statusOption}"
-                                                            th:text="${statusOption == 'Pending' ? 'Chờ xử lý' : statusOption}"
-                                                            th:selected="${(statusOption == 'Pending' and (order.status == 'Pending' or order.status == 'pending' or order.status == 'Chờ xử lý')) or
-                                                                         (statusOption == 'Xác nhận đơn' and (order.status == 'Xác nhận đơn' or order.status == 'Confirmed' or order.status == 'confirmed')) or
-                                                                         (statusOption == 'Đang giao' and (order.status == 'Đang giao' or order.status == 'Shipping' or order.status == 'shipping')) or
-                                                                         (statusOption == 'Hoàn thành' and (order.status == 'Hoàn thành' or order.status == 'Completed' or order.status == 'completed' or order.status == 'Delivered' or order.status == 'delivered')) or
-                                                                         (statusOption == 'Đã hủy' and (order.status == 'Đã hủy' or order.status == 'Cancelled' or order.status == 'Canceled' or order.status == 'cancelled' or order.status == 'canceled'))}">
-                                                            Trạng thái
+                                                            th:text="${statusOption == 'Pending' ? 'Pending' : statusOption}"
+                                                            th:selected="${(statusOption == 'Pending' and (order.status == 'Pending' or order.status == 'pending' or order.status == 'Pending')) or
+                                                                         (statusOption == 'Confirmed' and (order.status == 'Confirmed' or order.status == 'Confirmed' or order.status == 'confirmed')) or
+                                                                         (statusOption == 'Shipping' and (order.status == 'Shipping' or order.status == 'Shipping' or order.status == 'shipping')) or
+                                                                         (statusOption == 'Completed' and (order.status == 'Completed' or order.status == 'Completed' or order.status == 'completed' or order.status == 'Delivered' or order.status == 'delivered')) or
+                                                                         (statusOption == 'Cancelled' and (order.status == 'Cancelled' or order.status == 'Cancelled' or order.status == 'Canceled' or order.status == 'cancelled' or order.status == 'canceled'))}">
+                                                            Status
                                                         </option>
                                                     </select>
                                                     <button type="submit"
                                                         class="px-2 py-1 text-xs font-semibold bg-amber-600 text-white rounded-md hover:bg-amber-700 transition">
-                                                        Cập nhật
+                                                        Update
                                                     </button>
                                                 </form>
                                             </div>
@@ -337,11 +336,11 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                                         <a th:href="@{/admin/orders/{id}(id=${order.id})}"
                                             class="inline-block px-3 py-1 bg-cyan-500 text-white rounded hover:bg-cyan-600 transition">
-                                            Xem
+                                            View
                                         </a>
                                         <a th:href="@{/admin/orders/edit/{id}(id=${order.id})}"
                                             class="inline-block px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">
-                                            Sửa
+                                            Edit
                                         </a>
                                     </td>
                                 </tr>
@@ -356,7 +355,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
-                        <p class="text-gray-500 text-lg">Chưa có đơn hàng nào</p>
+                        <p class="text-gray-500 text-lg">No orders found</p>
                     </div>
                 </div>
             </div>

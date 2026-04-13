@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest | Danh sách sách</title>
+    <title>BookNest | Book List</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -441,30 +441,29 @@
             </div>
 
             <form class="search-container" th:action="@{/books/search}" method="get">
-                <input id="global-search-input" type="text" name="title" placeholder="Tìm sách theo tựa đề, tác giả..."
+                <input id="global-search-input" type="text" name="title" placeholder="Search books by title, author..."
                     autocomplete="off">
-                <button type="submit">TÌM KIẾM</button>
+                <button type="submit">SEARCH</button>
                 <div id="global-search-suggest" class="hidden"></div>
             </form>
 
             <a th:if="${session.loggedInUser != null}" th:href="@{/cart}" class="cart-box">
                 <i data-lucide="shopping-cart" size="20"></i>
                 <div>
-                    <span style="display:block; font-size: 10px; color: #999;">Giỏ hàng</span>
+                    <span style="display:block; font-size: 10px; color: #999;">Shopping Cart</span>
                     <strong style="font-size: 12px;"
-                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) sản phẩm|">(0) sản
-                        phẩm</strong>
+                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) items|">(0) items</strong>
                 </div>
             </a>
 
             <div th:if="${session.loggedInUser == null}" class="auth-links">
-                <a th:href="@{/login}">Đăng nhập</a>
-                <a th:href="@{/register}" class="primary">Đăng ký</a>
+                <a th:href="@{/login}">Login</a>
+                <a th:href="@{/register}" class="primary">Register</a>
             </div>
 
             <div th:if="${session.loggedInUser != null}" class="auth-links">
-                <a th:href="@{/account}">Tài khoản</a>
-                <a th:href="@{/orders}">Đơn hàng</a>
+                <a th:href="@{/account}">Account</a>
+                <a th:href="@{/orders}">Order</a>
                 <a th:if="${session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
                     th:href="@{/admin}">Admin</a>
             </div>
@@ -475,49 +474,49 @@
         <div class="container">
             <ul class="nav-links">
                 <li><a th:href="@{/}"><i data-lucide="home" size="14" style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Danh mục</a></li>
-                <li><a th:href="@{/orders}">Đơn hàng</a></li>
+                <li><a th:href="@{/books}">Category</a></li>
+                <li><a th:href="@{/orders}">Order</a></li>
             </ul>
         </div>
     </div>
 
     <main class="container page-main">
         <aside class="panel">
-            <div class="panel-header">Tìm kiếm nâng cao</div>
+            <div class="panel-header">Advanced search</div>
             <div class="panel-body">
                 <form th:action="@{/books/search}" method="get" class="search-grid">
                     <input type="hidden" name="categoryId" th:value="${selectedCategoryId}">
                     <div style="position: relative;">
                         <input id="title-search-input" type="text" name="title" th:value="${title}" autocomplete="off"
-                            placeholder="Nhập tên sách...">
+                            placeholder="Enter book name...">
                         <div id="title-suggest-box" class="hidden"
                             style="position:absolute;top:100%;left:0;right:0;z-index:20;background:#fff;border:1px solid #e6e6e6;max-height:220px;overflow-y:auto;">
                         </div>
                     </div>
                     <div style="position: relative;">
                         <input id="author-search-input" type="text" name="author" th:value="${author}"
-                            autocomplete="off" placeholder="Nhập tên tác giả...">
+                            autocomplete="off" placeholder="Enter Author Name...">
                         <div id="author-suggest-box" class="hidden"
                             style="position:absolute;top:100%;left:0;right:0;z-index:20;background:#fff;border:1px solid #e6e6e6;max-height:220px;overflow-y:auto;">
                         </div>
                     </div>
                     <input type="number" min="0" step="1000" name="minPrice" th:value="${minPrice}"
-                        placeholder="Giá từ (VD: 50000)">
+                        placeholder="Price from (Example: 50000)">
                     <input type="number" min="0" step="1000" name="maxPrice" th:value="${maxPrice}"
-                        placeholder="Giá đến (VD: 200000)">
-                    <button type="submit">Tìm sách</button>
+                        placeholder="Price to (Example: 200000)">
+                    <button type="submit">Search Books</button>
                 </form>
             </div>
 
-            <div class="panel-header">Bảng giá</div>
+            <div class="panel-header">Price Range</div>
             <div class="panel-body" style="padding-top: 4px;">
                 <ul class="sidebar-list">
-                    <li><a th:href="@{/books}">Tất cả sách</a></li>
-                    <li><a th:href="@{/books(maxPrice=50000)}">Dưới 50.000đ</a></li>
-                    <li><a th:href="@{/books(minPrice=50000,maxPrice=100000)}">50.000đ - 100.000đ</a></li>
-                    <li><a th:href="@{/books(minPrice=100000,maxPrice=200000)}">100.000đ - 200.000đ</a></li>
-                    <li><a th:href="@{/books(minPrice=200000,maxPrice=500000)}">200.000đ - 500.000đ</a></li>
-                    <li><a th:href="@{/books(minPrice=500000)}">Trên 500.000đ</a></li>
+                    <li><a th:href="@{/books}">All books</a></li>
+                    <li><a th:href="@{/books(maxPrice=50000)}">Under 50,000 VND</a></li>
+                    <li><a th:href="@{/books(minPrice=50000,maxPrice=100000)}">50.000 VND - 100.000 VND</a></li>
+                    <li><a th:href="@{/books(minPrice=100000,maxPrice=200000)}">100.000 VND - 200.000 VND</a></li>
+                    <li><a th:href="@{/books(minPrice=200000,maxPrice=500000)}">200.000 VND - 500.000 VND</a></li>
+                    <li><a th:href="@{/books(minPrice=500000)}">Above 500,000 VND</a></li>
                 </ul>
             </div>
         </aside>
@@ -525,11 +524,11 @@
         <section class="panel">
             <div class="panel-body">
                 <div class="books-head">
-                    <h1>Kho sách BookNest</h1>
+                    <h1>BookNest Library</h1>
                 </div>
 
-                <div th:if="${#lists.isEmpty(books)}" style="padding: 20px 6px; color: #666;">Không tìm thấy sách phù
-                    hợp. Thử thay đổi bộ lọc tìm kiếm.</div>
+                <div th:if="${#lists.isEmpty(books)}" style="padding: 20px 6px; color: #666;">No matching books found.
+                    Try changing the search filter.</div>
 
                 <div th:if="${!#lists.isEmpty(books)}" class="books-grid">
                     <a th:each="book : ${books}" th:href="@{/books/{id}(id=${book.id})}" class="book-card">
@@ -537,15 +536,16 @@
                             th:src="${book.imageUrl}" th:alt="${book.title}">
                         <img class="book-cover" th:if="${book.imageUrl == null or book.imageUrl.isEmpty()}"
                             src="https://via.placeholder.com/120x175?text=No+Image" alt="No image">
-                        <h3 class="book-title" th:text="${book.title}">Tên sách</h3>
+                        <h3 class="book-title" th:text="${book.title}">Book Title</h3>
                         <p class="book-author"
-                            th:text="${book.author != null and !book.author.isBlank() ? book.author : 'Đang cập nhật'}">
-                            Tác giả</p>
+                            th:text="${book.author != null and !book.author.isBlank() ? book.author : 'Updating'}">
+                            Author</p>
                         <p class="book-price"
                             th:text="${book.price != null ? #numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
                             0 VND</p>
                         <p class="book-stock"
-                            th:text="${book.stock != null and book.stock > 0 ? 'Còn ' + book.stock : 'Hết hàng'}">Còn 0
+                            th:text="${book.stock != null and book.stock > 0 ? 'Available: ' + book.stock : 'Out of stock'}">
+                            Available: 0
                         </p>
                     </a>
                 </div>
@@ -570,40 +570,40 @@
     <footer>
         <div class="container footer-cols">
             <div>
-                <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+                <h4>CUSTOMER SUPPORT</h4>
                 <ul>
-                    <li><a th:href="@{/books}">Sản phẩm và Đơn hàng</a></li>
-                    <li><a href="#">Chính sách đổi trả</a></li>
-                    <li><a href="#">Phương thức vận chuyển</a></li>
+                    <li><a th:href="@{/books}">Products and orders</a></li>
+                    <li><a href="#">Return policy</a></li>
+                    <li><a href="#">Shipping method</a></li>
                 </ul>
             </div>
             <div>
-                <h4>VỀ BOOKNEST</h4>
+                <h4>ABOUT BOOKNEST</h4>
                 <ul>
-                    <li><a href="#">Giới thiệu BookNest</a></li>
-                    <li><a href="#">Điều khoản sử dụng</a></li>
-                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">About BookNest</a></li>
+                    <li><a href="#">Terms of use</a></li>
+                    <li><a href="#">Privacy policy</a></li>
                 </ul>
             </div>
             <div>
-                <h4>TÀI KHOẢN</h4>
+                <h4>ACCOUNT</h4>
                 <ul>
-                    <li><a th:href="@{/login}">Đăng nhập</a></li>
-                    <li><a th:href="@{/register}">Tạo tài khoản</a></li>
-                    <li><a th:href="@{/orders}">Lịch sử đơn hàng</a></li>
+                    <li><a th:href="@{/login}">Login</a></li>
+                    <li><a th:href="@{/register}">Create account</a></li>
+                    <li><a th:href="@{/orders}">Order history</a></li>
                 </ul>
             </div>
             <div>
-                <h4>LIÊN HỆ</h4>
+                <h4>CONTACT</h4>
                 <p style="font-size: 12px; color: #666;">
                     Email: hotro@booknest.vn<br>
                     Hotline: 1900 1234<br>
-                    Địa chỉ: Tòa nhà Tri Thức, Quận 1, TP. HCM
+                    Address: Tri Thuc Building, District 1, Ho Chi Minh City
                 </p>
             </div>
         </div>
         <div class="bottom-footer">
-            &copy; 2026 BookNest. Bản quyền thuộc về Công ty Sách BookNest Việt Nam.
+            &copy; 2026 BookNest. All rights reserved.
         </div>
     </footer>
 
@@ -683,7 +683,7 @@
                 const encodedValue = encodeURIComponent(sourceTitle);
 
                 if (type === 'author') {
-                    return `<button type="button" data-value="${encodedValue}" class="suggest-item" style="width:100%;text-align:left;padding:10px 12px;border:none;border-bottom:1px solid #f0f0f0;background:#fff;cursor:pointer;"><div style="font-size:12px;font-weight:600;color:#2D241E;">${safeAuthor}</div><div style="font-size:11px;color:#777;">Tác giả</div></button>`;
+                    return `<button type="button" data-value="${encodedValue}" class="suggest-item" style="width:100%;text-align:left;padding:10px 12px;border:none;border-bottom:1px solid #f0f0f0;background:#fff;cursor:pointer;"><div style="font-size:12px;font-weight:600;color:#2D241E;">${safeAuthor}</div><div style="font-size:11px;color:#777;">Author</div></button>`;
                 }
 
                 return `<button type="button" data-value="${encodedValue}" class="suggest-item" style="width:100%;text-align:left;padding:10px 12px;border:none;border-bottom:1px solid #f0f0f0;background:#fff;cursor:pointer;"><div style="font-size:12px;font-weight:600;color:#2D241E;">${safeTitle}</div><div style="font-size:11px;color:#777;">${safeAuthor}</div></button>`;

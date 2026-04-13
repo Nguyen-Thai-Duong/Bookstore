@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest - Quản Lý Danh Mục</title>
+    <title>BookNest - Category Management</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -104,7 +104,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
-                    <span>Quản lý sách</span>
+                    <span>Book Management</span>
                 </a>
 
                 <a href="/admin/categories"
@@ -113,7 +113,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                     </svg>
-                    <span>Danh mục</span>
+                    <span>Category</span>
                 </a>
 
                 <a href="/admin/users"
@@ -122,7 +122,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
-                    <span>Người dùng</span>
+                    <span>User</span>
                 </a>
 
                 <a href="/admin/vouchers"
@@ -149,7 +149,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
-                    <span>Đơn hàng</span>
+                    <span>Order</span>
                 </a>
             </nav>
 
@@ -175,17 +175,17 @@
             <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
                 <div class="px-8 py-4 flex items-center justify-between">
                     <div>
-                        <h2 class="text-2xl font-bold" style="color: var(--color-text);">Quản Lý Danh Mục</h2>
-                        <p class="text-sm text-gray-500">Danh sách các danh mục sách</p>
+                        <h2 class="text-2xl font-bold" style="color: var(--color-text);">Category Management</h2>
+                        <p class="text-sm text-gray-500">List of book categories</p>
                     </div>
                     <div class="flex items-center gap-4">
                         <form method="post" action="/logout">
                             <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg font-medium">
-                                Đăng xuất
+                                Logout
                             </button>
                         </form>
                         <a href="/admin/categories/new" class="btn-primary text-white px-6 py-2 rounded-lg font-medium">
-                            + Thêm Danh Mục Mới
+                            + Add New Category
                         </a>
                     </div>
                 </div>
@@ -204,16 +204,16 @@
                                         ID</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Tên Danh Mục</th>
+                                        Category Name</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Mô Tả</th>
+                                        Description</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Số Sách</th>
+                                        Number of Books</th>
                                     <th
                                         class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Thao Tác</th>
+                                        Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -221,8 +221,9 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                                         th:text="${category.id}">1</td>
                                     <td class="px-6 py-4 text-sm font-medium text-gray-900" th:text="${category.name}">
-                                        Tên danh mục</td>
-                                    <td class="px-6 py-4 text-sm text-gray-600" th:text="${category.description}">Mô tả
+                                        Category Name</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600" th:text="${category.description}">
+                                        Description
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <span
@@ -232,16 +233,16 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                                         <a th:href="@{/admin/categories/{id}(id=${category.id})}"
                                             class="inline-block px-3 py-1 bg-cyan-500 text-white rounded hover:bg-cyan-600 transition">
-                                            Xem
+                                            View
                                         </a>
                                         <a th:href="@{/admin/categories/edit/{id}(id=${category.id})}"
                                             class="inline-block px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">
-                                            Sửa
+                                            Edit
                                         </a>
                                         <a th:href="@{/admin/categories/delete/{id}(id=${category.id})}"
-                                            onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này?')"
+                                            data-confirm="Are you sure you want to delete this category?"
                                             class="inline-block px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition">
-                                            Xóa
+                                            Delete
                                         </a>
                                     </td>
                                 </tr>
@@ -256,16 +257,17 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                         </svg>
-                        <p class="text-gray-500 text-lg">Chưa có danh mục nào</p>
+                        <p class="text-gray-500 text-lg">No category set</p>
                         <a href="/admin/categories/new"
                             class="mt-4 inline-block btn-primary text-white px-6 py-2 rounded-lg">
-                            Thêm Danh Mục Đầu Tiên
+                            Add First Category
                         </a>
                     </div>
                 </div>
             </div>
         </main>
     </div>
+    <script src="/js/system-confirm.js"></script>
 </body>
 
 </html>

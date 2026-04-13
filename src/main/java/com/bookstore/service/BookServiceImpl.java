@@ -75,7 +75,7 @@ public class BookServiceImpl implements BookService {
             String status = detail.getOrder() != null && detail.getOrder().getStatus() != null
                     ? detail.getOrder().getStatus().trim().toLowerCase()
                     : "";
-            if (status.contains("cancel") || status.contains("hủy") || status.contains("huy")) {
+            if (status.contains("cancel") || status.contains("cancel") || status.contains("huy")) {
                 continue;
             }
 

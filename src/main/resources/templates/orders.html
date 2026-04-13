@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest | Đơn hàng của bạn</title>
+    <title>BookNest | Your Orders</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -413,28 +413,27 @@
             </div>
 
             <form class="search-container" th:action="@{/books/search}" method="get">
-                <input type="text" name="title" placeholder="Tìm sách theo Tựa đề, Tác giả, Công ty phát hành..."
+                <input type="text" name="title" placeholder="Search books by Title, Author, Publisher..."
                     autocomplete="off">
-                <button type="submit">TÌM KIẾM</button>
+                <button type="submit">SEARCH</button>
             </form>
 
             <a th:href="@{/cart}" class="cart-box">
                 <i data-lucide="shopping-cart" size="20"></i>
                 <div>
-                    <span style="display:block; font-size: 10px; color: #999;">Giỏ hàng</span>
+                    <span style="display:block; font-size: 10px; color: #999;">Shopping Cart</span>
                     <strong style="font-size: 12px;"
-                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) sản phẩm|">(0) sản
-                        phẩm</strong>
+                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) items|">(0) items</strong>
                 </div>
             </a>
 
             <div class="auth-links" th:if="${session.loggedInUser != null}">
-                <a th:href="@{/account}">Tài khoản</a>
-                <a th:href="@{/orders}">Đơn hàng</a>
+                <a th:href="@{/account}">Account</a>
+                <a th:href="@{/orders}">Order</a>
                 <a th:if="${session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
                     th:href="@{/admin}">Admin</a>
                 <form method="post" th:action="@{/logout}" style="display:inline;">
-                    <button type="submit">Đăng xuất</button>
+                    <button type="submit">Logout</button>
                 </form>
             </div>
         </div>
@@ -444,8 +443,8 @@
         <div class="container">
             <ul class="nav-links">
                 <li><a th:href="@{/}"><i data-lucide="home" size="14" style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Danh mục</a></li>
-                <li><a th:href="@{/orders}" style="background: var(--vb-brown); color: #fff;">Đơn hàng</a></li>
+                <li><a th:href="@{/books}">Category</a></li>
+                <li><a th:href="@{/orders}" style="background: var(--vb-brown); color: #fff;">Order</a></li>
             </ul>
         </div>
     </div>
@@ -455,59 +454,60 @@
         <div th:if="${orderError}" class="alert error" th:text="${orderError}"></div>
 
         <section class="panel" th:if="${!#lists.isEmpty(orders)}">
-            <div class="panel-head">Đơn hàng của bạn</div>
+            <div class="panel-head">Your Orders</div>
             <div class="panel-body">
                 <div class="filter-row">
-                    <button type="button" data-filter="all" class="order-filter-btn active">Tất cả</button>
-                    <button type="button" data-filter="pending" class="order-filter-btn">Chờ xử lý</button>
-                    <button type="button" data-filter="confirmed" class="order-filter-btn">Đã xác nhận</button>
-                    <button type="button" data-filter="shipping" class="order-filter-btn">Đang giao</button>
-                    <button type="button" data-filter="delivered" class="order-filter-btn">Đã giao</button>
-                    <button type="button" data-filter="cancelled" class="order-filter-btn">Đã hủy</button>
+                    <button type="button" data-filter="all" class="order-filter-btn active">All</button>
+                    <button type="button" data-filter="pending" class="order-filter-btn">Pending</button>
+                    <button type="button" data-filter="confirmed" class="order-filter-btn">Confirmed</button>
+                    <button type="button" data-filter="shipping" class="order-filter-btn">Shipping</button>
+                    <button type="button" data-filter="delivered" class="order-filter-btn">Delivered</button>
+                    <button type="button" data-filter="cancelled" class="order-filter-btn">Cancelled</button>
                 </div>
 
                 <div class="order-card" th:each="order : ${orders}" th:attr="data-status-raw=${order.status}">
                     <div class="order-top">
                         <div>
-                            <p class="order-id" th:text="'Đơn hàng #BN-' + ${order.id}">Đơn hàng #BN-1</p>
+                            <p class="order-id" th:text="'Order #BN-' + ${order.id}">Order #BN-1</p>
                             <p class="order-date"
-                                th:text="'Đặt ngày: ' + ${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">Đặt
-                                ngày</p>
+                                th:text="'Ordered on: ' + ${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">
+                                Ordered
+                                on</p>
                         </div>
 
                         <span class="status-badge"
-                            th:classappend="${#strings.equalsIgnoreCase(order.status, 'Pending')} ? ' status-pending' : (${#strings.equalsIgnoreCase(order.status, 'Xác nhận đơn') or #strings.equalsIgnoreCase(order.status, 'Confirmed')} ? ' status-confirmed' : (${#strings.equalsIgnoreCase(order.status, 'Delivered') or #strings.equalsIgnoreCase(order.status, 'Hoàn thành')} ? ' status-delivered' : (${#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled') or #strings.equalsIgnoreCase(order.status, 'Đã hủy')} ? ' status-cancelled' : (${#strings.equalsIgnoreCase(order.status, 'Shipping') or #strings.equalsIgnoreCase(order.status, 'Đang giao')} ? ' status-shipping' : ' status-default'))))"
-                            th:text="${#strings.equalsIgnoreCase(order.status, 'Pending') ? 'Chờ xử lý' : ((#strings.equalsIgnoreCase(order.status, 'Xác nhận đơn') or #strings.equalsIgnoreCase(order.status, 'Confirmed')) ? 'Đã xác nhận' : ((#strings.equalsIgnoreCase(order.status, 'Delivered') or #strings.equalsIgnoreCase(order.status, 'Hoàn thành')) ? 'Đã giao' : (((#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled') or #strings.equalsIgnoreCase(order.status, 'Đã hủy')) ? 'Đã hủy' : ((#strings.equalsIgnoreCase(order.status, 'Shipping') or #strings.equalsIgnoreCase(order.status, 'Đang giao')) ? 'Đang giao' : order.status)))))}">Đang
-                            xử lý</span>
+                            th:classappend="${#strings.equalsIgnoreCase(order.status, 'Pending')} ? ' status-pending' : (${#strings.equalsIgnoreCase(order.status, 'Confirmed') or #strings.equalsIgnoreCase(order.status, 'Confirmed')} ? ' status-confirmed' : (${#strings.equalsIgnoreCase(order.status, 'Delivered') or #strings.equalsIgnoreCase(order.status, 'Completed')} ? ' status-delivered' : (${#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled') or #strings.equalsIgnoreCase(order.status, 'Cancelled')} ? ' status-cancelled' : (${#strings.equalsIgnoreCase(order.status, 'Shipping') or #strings.equalsIgnoreCase(order.status, 'Shipping')} ? ' status-shipping' : ' status-default'))))"
+                            th:text="${order.status}">Status</span>
                     </div>
 
                     <div class="order-bottom">
                         <div>
-                            <span style="color:#777;">Tổng cộng: </span>
+                            <span style="color:#777;">Total: </span>
                             <span class="order-total"
-                                th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + 'đ' : '0đ'}">0đ</span>
+                                th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
+                                VND</span>
                         </div>
                         <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                            <a th:href="@{/orders/{id}(id=${order.id})}" class="btn primary">Xem chi tiết</a>
+                            <a th:href="@{/orders/{id}(id=${order.id})}" class="btn primary">View Details</a>
                             <form th:if="${#strings.equalsIgnoreCase(order.status, 'Pending')}"
                                 th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post"
                                 style="display:inline;">
-                                <button type="submit" class="btn danger">Hủy đơn</button>
+                                <button type="submit" class="btn danger">Cancel order</button>
                             </form>
                         </div>
                     </div>
                 </div>
 
-                <div id="orders-filter-empty" class="empty-box hidden">Không có đơn hàng phù hợp với bộ lọc này.</div>
+                <div id="orders-filter-empty" class="empty-box hidden">No orders match this filter.</div>
             </div>
         </section>
 
         <section class="panel" th:if="${#lists.isEmpty(orders)}">
-            <div class="panel-head">Đơn hàng của bạn</div>
+            <div class="panel-head">Your Orders</div>
             <div class="panel-body">
                 <div class="empty-box">
-                    Bạn chưa có đơn hàng nào. <a th:href="@{/books}"
-                        style="color:#0066cc;text-decoration:none;font-weight:700;">Bắt đầu mua sắm</a>
+                    You haven't placed any orders yet. <a th:href="@{/books}"
+                        style="color:#0066cc;text-decoration:none;font-weight:700;">Start shopping</a>
                 </div>
             </div>
         </section>
@@ -516,40 +516,40 @@
     <footer>
         <div class="container footer-cols">
             <div>
-                <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+                <h4>CUSTOMER SUPPORT</h4>
                 <ul>
-                    <li><a th:href="@{/books}">Sản phẩm và Đơn hàng</a></li>
-                    <li><a href="#">Chính sách đổi trả</a></li>
-                    <li><a href="#">Phương thức vận chuyển</a></li>
+                    <li><a th:href="@{/books}">Products and orders</a></li>
+                    <li><a href="#">Return policy</a></li>
+                    <li><a href="#">Shipping method</a></li>
                 </ul>
             </div>
             <div>
-                <h4>VỀ BOOKNEST</h4>
+                <h4>ABOUT BOOKNEST</h4>
                 <ul>
-                    <li><a href="#">Giới thiệu BookNest</a></li>
-                    <li><a href="#">Điều khoản sử dụng</a></li>
-                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">About BookNest</a></li>
+                    <li><a href="#">Terms of use</a></li>
+                    <li><a href="#">Privacy policy</a></li>
                 </ul>
             </div>
             <div>
-                <h4>TÀI KHOẢN</h4>
+                <h4>ACCOUNT</h4>
                 <ul>
-                    <li><a th:href="@{/login}">Đăng nhập</a></li>
-                    <li><a th:href="@{/register}">Tạo tài khoản</a></li>
-                    <li><a th:href="@{/orders}">Lịch sử đơn hàng</a></li>
+                    <li><a th:href="@{/login}">Login</a></li>
+                    <li><a th:href="@{/register}">Create account</a></li>
+                    <li><a th:href="@{/orders}">Order history</a></li>
                 </ul>
             </div>
             <div>
-                <h4>LIÊN HỆ</h4>
+                <h4>CONTACT</h4>
                 <p style="font-size: 12px; color: #666;">
                     Email: hotro@booknest.vn<br>
                     Hotline: 1900 1234<br>
-                    Địa chỉ: Tòa nhà Tri Thức, Quận 1, TP. HCM
+                    Address: Tri Thuc Building, District 1, Ho Chi Minh City
                 </p>
             </div>
         </div>
         <div class="bottom-footer">
-            &copy; 2026 BookNest. Bản quyền thuộc về Công ty Sách BookNest Việt Nam.
+            &copy; 2026 BookNest. All rights reserved.
         </div>
     </footer>
 

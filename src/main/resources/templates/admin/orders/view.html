@@ -1,10 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết Đơn Hàng - BookNest</title>
+    <title>Order Details - BookNest</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -66,19 +66,19 @@
                         class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg><span>Quản lý sách</span></a>
+                    </svg><span>Book Management</span></a>
                 <a href="/admin/categories"
                     class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3"><svg
                         class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                    </svg><span>Danh mục</span></a>
+                    </svg><span>Category</span></a>
                 <a href="/admin/users"
                     class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3"><svg
                         class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg><span>Người dùng</span></a>
+                    </svg><span>User</span></a>
                 <a href="/admin/vouchers"
                     class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3"><svg
                         class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@
                         class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg><span>Đơn hàng</span></a>
+                    </svg><span>Order</span></a>
             </nav>
 
             <div class="p-4 border-t border-white/20">
@@ -122,43 +122,43 @@
                 <!-- Header -->
                 <div class="mb-8 flex items-center justify-between">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900">Chi tiết Đơn Hàng</h1>
-                        <p class="text-gray-600 mt-1">Thông tin chi tiết về đơn hàng</p>
+                        <h1 class="text-3xl font-bold text-gray-900">Order Details</h1>
+                        <p class="text-gray-600 mt-1">Detailed information about the order</p>
                     </div>
                     <div class="flex gap-3">
                         <a th:href="@{/admin/orders/edit/{id}(id=${order.id})}"
                             class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition font-medium">
-                            Chỉnh sửa
+                            Edit
                         </a>
                         <a href="/admin/orders"
                             class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium">
-                            Quay lại
+                            Back
                         </a>
                     </div>
                 </div>
 
                 <!-- Order Info Card -->
                 <div class="bg-white rounded-xl shadow-sm p-8 mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Thông Tin Đơn Hàng</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Order Information</h2>
 
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="space-y-4">
                             <div class="flex items-start border-b border-gray-100 pb-4">
-                                <div class="w-40 font-semibold text-gray-700">Mã đơn hàng:</div>
+                                <div class="w-40 font-semibold text-gray-700">Order code:</div>
                                 <div class="flex-1 text-gray-600" th:text="${order.id}">1</div>
                             </div>
 
                             <div class="flex items-start border-b border-gray-100 pb-4">
-                                <div class="w-40 font-semibold text-gray-700">Ngày đặt:</div>
+                                <div class="w-40 font-semibold text-gray-700">Order date:</div>
                                 <div class="flex-1 text-gray-600"
                                     th:text="${order.orderDate != null ? #temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm:ss') : 'N/A'}">
                                     01/01/2024</div>
                             </div>
 
                             <div class="flex items-start border-b border-gray-100 pb-4">
-                                <div class="w-40 font-semibold text-gray-700">Khách hàng:</div>
+                                <div class="w-40 font-semibold text-gray-700">Customer:</div>
                                 <div class="flex-1 text-gray-600"
-                                    th:text="${order.user != null ? order.user.fullName : 'N/A'}">Tên khách hàng</div>
+                                    th:text="${order.user != null ? order.user.fullName : 'N/A'}">Customer name</div>
                             </div>
 
                             <div class="flex items-start border-b border-gray-100 pb-4">
@@ -170,40 +170,40 @@
 
                         <div class="space-y-4">
                             <div class="flex items-start border-b border-gray-100 pb-4">
-                                <div class="w-40 font-semibold text-gray-700">Trạng thái:</div>
+                                <div class="w-40 font-semibold text-gray-700">Status:</div>
                                 <div class="flex-1">
                                     <span class="px-3 py-1 rounded-full text-sm font-semibold"
-                                        th:classappend="${order.status == 'Hoàn thành' ? 'bg-green-100 text-green-800' :
-                                                       ((order.status == 'Xác nhận đơn' or order.status == 'Confirmed') ? 'bg-indigo-100 text-indigo-800' :
-                                                       ((order.status == 'Đang giao' or order.status == 'Shipping') ? 'bg-blue-100 text-blue-800' :
-                                                       ((order.status == 'Đã hủy' or order.status == 'Cancelled' or order.status == 'Canceled') ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')))}"
-                                        th:text="${(order.status == 'Pending' or order.status == 'pending') ? 'Chờ xử lý' :
-                                                 ((order.status == 'Confirmed' or order.status == 'confirmed') ? 'Xác nhận đơn' :
-                                                 ((order.status == 'Shipping' or order.status == 'shipping') ? 'Đang giao' :
-                                                 ((order.status == 'Completed' or order.status == 'completed' or order.status == 'Delivered' or order.status == 'delivered') ? 'Hoàn thành' :
-                                                 ((order.status == 'Cancelled' or order.status == 'Canceled' or order.status == 'cancelled' or order.status == 'canceled') ? 'Đã hủy' : order.status))))}">Pending</span>
+                                        th:classappend="${order.status == 'Completed' ? 'bg-green-100 text-green-800' :
+                                                       ((order.status == 'Confirmed' or order.status == 'Confirmed') ? 'bg-indigo-100 text-indigo-800' :
+                                                       ((order.status == 'Shipping' or order.status == 'Shipping') ? 'bg-blue-100 text-blue-800' :
+                                                       ((order.status == 'Cancelled' or order.status == 'Cancelled' or order.status == 'Canceled') ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')))}"
+                                        th:text="${(order.status == 'Pending' or order.status == 'pending') ? 'Pending' :
+                                                 ((order.status == 'Confirmed' or order.status == 'confirmed') ? 'Confirmed' :
+                                                 ((order.status == 'Shipping' or order.status == 'shipping') ? 'Shipping' :
+                                                 ((order.status == 'Completed' or order.status == 'completed' or order.status == 'Delivered' or order.status == 'delivered') ? 'Completed' :
+                                                 ((order.status == 'Cancelled' or order.status == 'Canceled' or order.status == 'cancelled' or order.status == 'canceled') ? 'Cancelled' : order.status))))}">Pending</span>
                                 </div>
                             </div>
 
                             <div class="flex items-start border-b border-gray-100 pb-4">
-                                <div class="w-40 font-semibold text-gray-700">Tổng tiền:</div>
+                                <div class="w-40 font-semibold text-gray-700">Total amount:</div>
                                 <div class="flex-1">
                                     <span class="text-2xl font-bold text-green-600"
-                                        th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0
-                                        e</span>
+                                        th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
+                                        VND</span>
                                 </div>
                             </div>
 
                             <div class="flex items-start border-b border-gray-100 pb-4">
                                 <div class="w-40 font-semibold text-gray-700">Voucher:</div>
                                 <div class="flex-1 text-gray-600"
-                                    th:text="${order.voucher != null ? order.voucher.code : 'Không có'}">N/A</div>
+                                    th:text="${order.voucher != null ? order.voucher.code : 'None'}">N/A</div>
                             </div>
 
                             <div class="flex items-start pt-2">
-                                <div class="w-40 font-semibold text-gray-700">Địa chỉ giao:</div>
+                                <div class="w-40 font-semibold text-gray-700">Shipping address:</div>
                                 <div class="flex-1 text-gray-600"
-                                    th:text="${order.shippingAddress != null ? order.shippingAddress : 'N/A'}">Địa chỉ
+                                    th:text="${order.shippingAddress != null ? order.shippingAddress : 'N/A'}">Address
                                 </div>
                             </div>
                         </div>
@@ -214,36 +214,36 @@
                 <div class="bg-white rounded-xl shadow-sm"
                     th:if="${order.orderDetails != null && !order.orderDetails.isEmpty()}">
                     <div class="p-6 border-b border-gray-200">
-                        <h3 class="text-xl font-bold text-gray-900">Chi Tiết Sản Phẩm</h3>
+                        <h3 class="text-xl font-bold text-gray-900">Order Items</h3>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead class="bg-gray-50 border-b border-gray-200">
                                 <tr>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Sách
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Books
                                     </th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Giá
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Price
                                     </th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Số
-                                        lượng</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Tổng
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">
+                                        Quantity</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Total
                                     </th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <tr th:each="detail : ${order.orderDetails}" class="hover:bg-gray-50 transition">
                                     <td class="px-6 py-4 text-sm font-medium text-gray-900"
-                                        th:text="${detail.book != null ? detail.book.title : 'N/A'}">Tên sách</td>
+                                        th:text="${detail.book != null ? detail.book.title : 'N/A'}">Book Title</td>
                                     <td class="px-6 py-4 text-sm text-gray-600">
                                         <span
-                                            th:text="${detail.unitPrice != null ? #numbers.formatDecimal(detail.unitPrice, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0
-                                            e</span>
+                                            th:text="${detail.unitPrice != null ? #numbers.formatDecimal(detail.unitPrice, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
+                                            VND</span>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-600" th:text="${detail.quantity}">1</td>
                                     <td class="px-6 py-4 text-sm font-bold text-green-600">
                                         <span
-                                            th:text="${detail.unitPrice != null && detail.quantity != null ? #numbers.formatDecimal(detail.unitPrice * detail.quantity, 0, 'COMMA', 0, 'POINT') + ' đ' : '0 đ'}">0
-                                            e</span>
+                                            th:text="${detail.unitPrice != null && detail.quantity != null ? #numbers.formatDecimal(detail.unitPrice * detail.quantity, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
+                                            VND</span>
                                     </td>
                                 </tr>
                             </tbody>
@@ -259,8 +259,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
-                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Không có sản phẩm</h3>
-                    <p class="text-gray-500">Đơn hàng này chưa có sản phẩm nào.</p>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">No items</h3>
+                    <p class="text-gray-500">This order has no items.</p>
                 </div>
             </div>
         </main>

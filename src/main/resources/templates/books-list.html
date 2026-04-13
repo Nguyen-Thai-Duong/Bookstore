@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh sách sách - BookNest</title>
+    <title>Book List - BookNest</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,9 +46,9 @@
                 </a>
                 <div class="flex items-center gap-2 sm:gap-4">
                     <a th:href="@{/cart}" class="px-4 py-2 rounded-full font-medium border-2"
-                       style="border-color: var(--color-primary); color: var(--color-primary);">Giỏ hàng</a>
+                       style="border-color: var(--color-primary); color: var(--color-primary);">Shopping Cart</a>
                     <a th:href="@{/account}" class="btn-primary px-4 py-2 rounded-full text-white font-semibold"
-                       th:text="${session.loggedInUser != null ? session.loggedInUser.fullName : 'Tài khoản'}">Tài khoản</a>
+                       th:text="${session.loggedInUser != null ? session.loggedInUser.fullName : 'Account'}">Account</a>
                 </div>
             </div>
         </div>
@@ -59,34 +59,34 @@
             <div class="flex flex-col gap-6">
                 <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
                     <div>
-                        <h1 class="font-display text-2xl sm:text-3xl font-bold">Danh sách sách</h1>
-                        <p class="text-sm" style="color: #6b6560;">Tìm kiếm và lọc theo nhu cầu của bạn</p>
+                        <h1 class="font-display text-2xl sm:text-3xl font-bold">Book List</h1>
+                        <p class="text-sm" style="color: #6b6560;">Search and filter according to your needs</p>
                     </div>
                     <a th:href="@{/books}" class="text-sm font-semibold underline underline-offset-4"
-                       style="color: var(--color-primary);">Làm mới bộ lọc</a>
+                       style="color: var(--color-primary);">Reset filters</a>
                 </div>
 
                 <form method="get" th:action="@{/books}" class="bg-white rounded-3xl shadow-xl p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
                     <div class="lg:col-span-2">
-                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Từ khóa</label>
-                        <input type="text" name="q" placeholder="Tìm theo tên hoặc tác giả" th:value="${q}"
+                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Keywords</label>
+                        <input type="text" name="q" placeholder="Search by name or author" th:value="${q}"
                                class="w-full px-4 py-3 rounded-xl border-2 focus:outline-none"
                                style="border-color: #e5e0d8; background-color: var(--color-surface);">
                     </div>
                     <div>
-                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Danh mục</label>
+                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Category</label>
                         <input type="number" name="categoryId" placeholder="ID" min="1" th:value="${categoryId}"
                                class="w-full px-4 py-3 rounded-xl border-2 focus:outline-none"
                                style="border-color: #e5e0d8; background-color: var(--color-surface);">
                     </div>
                     <div>
-                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Giá tối thiểu</label>
+                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Price tối thiểu</label>
                         <input type="number" name="minPrice" placeholder="0" min="0" step="0.01" th:value="${minPrice}"
                                class="w-full px-4 py-3 rounded-xl border-2 focus:outline-none"
                                style="border-color: #e5e0d8; background-color: var(--color-surface);">
                     </div>
                     <div>
-                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Giá tối đa</label>
+                        <label class="text-xs uppercase tracking-wider mb-1 block" style="color: #9b8f86;">Price tối đa</label>
                         <input type="number" name="maxPrice" placeholder="0" min="0" step="0.01" th:value="${maxPrice}"
                                class="w-full px-4 py-3 rounded-xl border-2 focus:outline-none"
                                style="border-color: #e5e0d8; background-color: var(--color-surface);">
@@ -96,8 +96,8 @@
                         <select name="sort" class="w-full px-4 py-3 rounded-xl border-2 focus:outline-none"
                                 style="border-color: #e5e0d8; background-color: var(--color-surface);">
                             <option value="title_asc" th:selected="${sort == 'title_asc'}">Tên (A-Z)</option>
-                            <option value="price_asc" th:selected="${sort == 'price_asc'}">Giá tăng dần</option>
-                            <option value="price_desc" th:selected="${sort == 'price_desc'}">Giá giảm dần</option>
+                            <option value="price_asc" th:selected="${sort == 'price_asc'}">Price tăng dần</option>
+                            <option value="price_desc" th:selected="${sort == 'price_desc'}">Price giảm dần</option>
                             <option value="newest" th:selected="${sort == 'newest'}">Mới nhất</option>
                         </select>
                     </div>
@@ -107,7 +107,7 @@
                         </button>
                         <a th:href="@{/books}" class="px-5 py-3 rounded-xl font-semibold border-2 text-center w-full sm:w-auto"
                            style="border-color: var(--color-primary); color: var(--color-primary);">
-                            Xóa lọc
+                            Delete lọc
                         </a>
                     </div>
                 </form>
@@ -118,14 +118,14 @@
     <section class="py-8 sm:py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <p th:if="${#lists.isEmpty(books)}" class="bg-white rounded-3xl shadow-xl p-6 text-sm">
-                Không tìm thấy sách phù hợp.
+                Not found sách phù hợp.
             </p>
 
             <div th:if="${!#lists.isEmpty(books)}" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div th:each="book : ${books}" class="bg-white rounded-3xl shadow-lg p-5 flex flex-col gap-3">
                     <div>
-                        <h3 class="font-display text-lg font-semibold" th:text="${book.title}">Tên sách</h3>
-                        <p class="text-sm" style="color: #6b6560;" th:text="${book.author}">Tác giả</p>
+                        <h3 class="font-display text-lg font-semibold" th:text="${book.title}">Book Title</h3>
+                        <p class="text-sm" style="color: #6b6560;" th:text="${book.author}">Author</p>
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="font-semibold" th:text="${book.price}">0</span>
@@ -133,7 +133,7 @@
                     </div>
                     <a th:href="@{/books/{id}(id=${book.bookID})}"
                        class="btn-primary px-4 py-2 rounded-xl text-white font-semibold text-center">
-                        Xem chi tiết
+                        View Details
                     </a>
                 </div>
             </div>

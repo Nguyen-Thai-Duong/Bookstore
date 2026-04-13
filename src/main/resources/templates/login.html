@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest | Đăng nhập</title>
+    <title>BookNest | Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -325,14 +325,14 @@
             </div>
 
             <form class="search-container" th:action="@{/books/search}" method="get">
-                <input type="text" name="title" placeholder="Tìm sách theo Tựa đề, Tác giả, Công ty phát hành..."
+                <input type="text" name="title" placeholder="Search books by Title, Author, Publisher..."
                     autocomplete="off">
-                <button type="submit">TÌM KIẾM</button>
+                <button type="submit">SEARCH</button>
             </form>
 
             <div class="auth-links">
-                <a th:href="@{/register}">Đăng ký</a>
-                <a th:href="@{/login}" class="primary">Đăng nhập</a>
+                <a th:href="@{/register}">Register</a>
+                <a th:href="@{/login}" class="primary">Login</a>
             </div>
         </div>
     </header>
@@ -341,15 +341,15 @@
         <div class="container">
             <ul class="nav-links">
                 <li><a th:href="@{/}"><i data-lucide="home" size="14" style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Danh mục</a></li>
-                <li><a th:href="@{/orders}">Đơn hàng</a></li>
+                <li><a th:href="@{/books}">Category</a></li>
+                <li><a th:href="@{/orders}">Order</a></li>
             </ul>
         </div>
     </div>
 
     <main class="container">
         <section class="panel">
-            <div class="panel-head">Đăng nhập tài khoản</div>
+            <div class="panel-head">Login</div>
             <div class="panel-body">
                 <div th:if="${error}" class="error-box" th:text="${error}"></div>
 
@@ -360,21 +360,21 @@
                     </div>
 
                     <div class="field">
-                        <label>Mật khẩu</label>
+                        <label>Password</label>
                         <div class="password-wrap">
                             <input type="password" id="loginPassword" name="password" required placeholder="••••••••••">
                             <button id="toggleLoginPassword" class="password-toggle" type="button"
-                                aria-label="Hiện mật khẩu" aria-pressed="false">
+                                aria-label="Show password" aria-pressed="false">
                                 <i class="icon-on" data-lucide="eye" size="18"></i>
                                 <i class="icon-off" data-lucide="eye-off" size="18"></i>
                             </button>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-submit">Đăng nhập</button>
+                    <button type="submit" class="btn-submit">Login</button>
                 </form>
 
-                <p class="sub-row">Chưa có tài khoản? <a th:href="@{/register}">Tạo tài khoản ngay</a></p>
+                <p class="sub-row">Don't have an account? <a th:href="@{/register}">Create account now</a></p>
             </div>
         </section>
     </main>
@@ -382,40 +382,40 @@
     <footer>
         <div class="container footer-cols">
             <div>
-                <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+                <h4>CUSTOMER SUPPORT</h4>
                 <ul>
-                    <li><a th:href="@{/books}">Sản phẩm và đơn hàng</a></li>
-                    <li><a href="#">Chính sách đổi trả</a></li>
-                    <li><a href="#">Phương thức vận chuyển</a></li>
+                    <li><a th:href="@{/books}">Products and orders</a></li>
+                    <li><a href="#">Return policy</a></li>
+                    <li><a href="#">Shipping method</a></li>
                 </ul>
             </div>
             <div>
-                <h4>Về BOOKNEST</h4>
+                <h4>About BOOKNEST</h4>
                 <ul>
-                    <li><a href="#">Giới thiệu BookNest</a></li>
-                    <li><a href="#">Điều khoản sử dụng</a></li>
-                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">About BookNest</a></li>
+                    <li><a href="#">Terms of Use</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
                 </ul>
             </div>
             <div>
-                <h4>TÀI KHOẢN</h4>
+                <h4>ACCOUNT</h4>
                 <ul>
-                    <li><a th:href="@{/login}">Đăng nhập</a></li>
-                    <li><a th:href="@{/register}">Tạo tài khoản</a></li>
-                    <li><a th:href="@{/orders}">Lịch sử đơn hàng</a></li>
+                    <li><a th:href="@{/login}">Login</a></li>
+                    <li><a th:href="@{/register}">Create account</a></li>
+                    <li><a th:href="@{/orders}">Order history</a></li>
                 </ul>
             </div>
             <div>
-                <h4>LIÊN HỆ</h4>
+                <h4>CONTACT</h4>
                 <p style="font-size: 12px; color: #666;">
                     Email: hotro@booknest.vn<br>
                     Hotline: 1900 1234<br>
-                    Địa chỉ: Tòa nhà Tri Thức, Quận 1, TP. HCM
+                    Address: Tri Thuc Building, District 1, Ho Chi Minh City
                 </p>
             </div>
         </div>
         <div class="bottom-footer">
-            &copy; 2026 BookNest. Bản quyền thuộc về Công ty Sách BookNest Việt Nam.
+            &copy; 2026 BookNest. All rights reserved.
         </div>
     </footer>
 
@@ -431,7 +431,7 @@
                 loginPasswordInput.type = showingPassword ? 'password' : 'text';
                 toggleLoginPasswordButton.classList.toggle('showing', !showingPassword);
                 toggleLoginPasswordButton.setAttribute('aria-pressed', String(!showingPassword));
-                toggleLoginPasswordButton.setAttribute('aria-label', showingPassword ? 'Hiện mật khẩu' : 'Ẩn mật khẩu');
+                toggleLoginPasswordButton.setAttribute('aria-label', showingPassword ? 'Show password' : 'Hide password');
             });
         }
     </script>

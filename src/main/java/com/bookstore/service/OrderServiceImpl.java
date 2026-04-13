@@ -60,12 +60,16 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Order existingOrder = orderRepository.findById(order.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng"));
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
         String oldStatus = normalizeStatus(existingOrder.getStatus());
         String newStatus = normalizeStatus(order.getStatus());
 
         validateStatusTransition(oldStatus, newStatus);
+
+        if (shouldDeductOnConfirm(oldStatus, newStatus)) {
+            deductStockForOrder(existingOrder);
+        }
 
         if (shouldRestock(oldStatus, newStatus)) {
             restockForOrder(existingOrder);
@@ -170,17 +174,17 @@ public class OrderServiceImpl implements OrderService {
             return "Pending";
         }
         if (normalized.equals("xac nhan don") || normalized.equals("confirmed")) {
-            return "Xác nhận đơn";
+            return "Confirmed";
         }
         if (normalized.equals("dang giao") || normalized.equals("shipping")) {
-            return "Đang giao";
+            return "Shipping";
         }
         if (normalized.equals("hoan thanh") || normalized.equals("completed") || normalized.equals("da giao")
                 || normalized.equals("delivered")) {
-            return "Hoàn thành";
+            return "Completed";
         }
         if (normalized.equals("da huy") || normalized.equals("cancelled") || normalized.equals("canceled")) {
-            return "Đã hủy";
+            return "Cancelled";
         }
 
         return status;
@@ -220,6 +224,11 @@ public class OrderServiceImpl implements OrderService {
         return !isCancelledStatus(oldStatus) && isCancelledStatus(newStatus);
     }
 
+    private boolean shouldDeductOnConfirm(String oldStatus, String newStatus) {
+        return "pending".equals(canonicalProgressStatus(oldStatus))
+                && "confirmed".equals(canonicalProgressStatus(newStatus));
+    }
+
     private void validateStatusTransition(String oldStatus, String newStatus) {
         if (newStatus.isBlank() || oldStatus.equals(newStatus)) {
             return;
@@ -229,7 +238,7 @@ public class OrderServiceImpl implements OrderService {
         String newCanonical = canonicalProgressStatus(newStatus);
 
         if ("unknown".equals(oldCanonical) || "unknown".equals(newCanonical)) {
-            throw new IllegalArgumentException("Trạng thái đơn hàng không hợp lệ");
+            throw new IllegalArgumentException("Invalid order status");
         }
 
         if (oldCanonical.equals(newCanonical)) {
@@ -241,11 +250,11 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if ("cancelled".equals(oldCanonical)) {
-            throw new IllegalStateException("Đơn hàng đã hủy, không thể chuyển trạng thái khác");
+            throw new IllegalStateException("Order cancelled, cannot change status");
         }
 
         if ("completed".equals(oldCanonical)) {
-            throw new IllegalStateException("Đơn hàng đã hoàn thành, không thể chuyển trạng thái khác");
+            throw new IllegalStateException("Order completed, cannot change status");
         }
 
         boolean validForward = ("pending".equals(oldCanonical) && "confirmed".equals(newCanonical))
@@ -254,7 +263,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (!validForward) {
             throw new IllegalStateException(
-                    "Trạng thái phải cập nhật tuần tự: Chờ xử lý -> Xác nhận đơn -> Đang giao -> Hoàn thành");
+                    "Status must be updated sequentially: Pending -> Confirmed -> Shipping -> Completed");
         }
     }
 
@@ -293,6 +302,32 @@ public class OrderServiceImpl implements OrderService {
             int currentStock = book.getStock() == null ? 0 : Math.max(book.getStock(), 0);
 
             book.setStock(currentStock + Math.max(quantity, 0));
+            bookService.saveBook(book);
+        }
+    }
+
+    private void deductStockForOrder(Order order) {
+        if (order.getOrderDetails() == null || order.getOrderDetails().isEmpty()) {
+            return;
+        }
+
+        for (OrderDetail detail : order.getOrderDetails()) {
+            if (detail.getBook() == null || detail.getBook().getId() == null) {
+                continue;
+            }
+
+            Long bookId = detail.getBook().getId();
+            Book book = bookService.getBookById(bookId)
+                    .orElseThrow(() -> new IllegalStateException("Book not found in order"));
+
+            int quantity = detail.getQuantity() == null ? 0 : Math.max(detail.getQuantity(), 0);
+            int currentStock = book.getStock() == null ? 0 : Math.max(book.getStock(), 0);
+
+            if (quantity > currentStock) {
+                throw new IllegalStateException("Insufficient stock to confirm order for book: " + book.getTitle());
+            }
+
+            book.setStock(currentStock - quantity);
             bookService.saveBook(book);
         }
     }
