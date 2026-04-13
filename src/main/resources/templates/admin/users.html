@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest - Quản Lý Người Dùng</title>
+    <title>BookNest - User Management</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -104,7 +104,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
-                    <span>Quản lý sách</span>
+                    <span>Book Management</span>
                 </a>
 
                 <a href="/admin/categories"
@@ -113,7 +113,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                     </svg>
-                    <span>Danh mục</span>
+                    <span>Category</span>
                 </a>
 
                 <a href="/admin/users"
@@ -122,7 +122,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
-                    <span>Người dùng</span>
+                    <span>User</span>
                 </a>
 
                 <a href="/admin/vouchers"
@@ -149,7 +149,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
-                    <span>Đơn hàng</span>
+                    <span>Order</span>
                 </a>
             </nav>
 
@@ -175,13 +175,13 @@
             <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
                 <div class="px-8 py-4 flex items-center justify-between">
                     <div>
-                        <h2 class="text-2xl font-bold" style="color: var(--color-text);">Quản Lý Người Dùng</h2>
-                        <p class="text-sm text-gray-500">Danh sách người dùng trong hệ thống</p>
+                        <h2 class="text-2xl font-bold" style="color: var(--color-text);">User Management</h2>
+                        <p class="text-sm text-gray-500">List of users in the system</p>
                     </div>
                     <div class="flex items-center gap-4">
                         <form method="post" action="/logout">
                             <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg font-medium">
-                                Đăng xuất
+                                Logout
                             </button>
                         </form>
                     </div>
@@ -194,31 +194,31 @@
                 <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
                     <form action="/admin/users/search" method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm</label>
-                            <input type="text" name="keyword" placeholder="Tên hoặc email..."
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                            <input type="text" name="keyword" placeholder="Name or email..."
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-0">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                             <select name="status"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-0">
-                                <option value="Tất cả trạng thái">Tất cả trạng thái</option>
-                                <option value="Active">Hoạt động</option>
-                                <option value="Inactive">Khóa</option>
+                                <option value="All Status">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Locked</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Vai trò</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
                             <select name="roleId"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-0">
-                                <option value="Tất cả vai trò">Tất cả vai trò</option>
+                                <option value="All Roles">All Roles</option>
                                 <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.roleName}">
                                 </option>
                             </select>
                         </div>
                         <div class="flex items-end">
                             <button type="submit" class="btn-primary text-white px-6 py-2 rounded-lg w-full">
-                                Lọc
+                                Filter
                             </button>
                         </div>
                     </form>
@@ -228,7 +228,7 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <p class="text-sm text-gray-600">
-                            Tổng số: <span class="font-semibold" th:text="${users.size()}">0</span> người dùng
+                            Total: <span class="font-semibold" th:text="${users.size()}">0</span> users
                         </p>
                     </div>
                     <a href="/admin/users/new"
@@ -236,7 +236,7 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
-                        <span>Thêm Người Dùng</span>
+                        <span>Add User</span>
                     </a>
                 </div>
 
@@ -251,7 +251,7 @@
                                 </th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Họ Tên
+                                    Full Name
                                 </th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -259,23 +259,23 @@
                                 </th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Số Điện Thoại
+                                    Phone Number
                                 </th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Vai Trò
+                                    Role
                                 </th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Trạng Thái
+                                    Status
                                 </th>
                                 <th
                                     class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Ngày Tạo
+                                    Creation Date
                                 </th>
                                 <th
                                     class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                    Thao Tác
+                                    Actions
                                 </th>
                             </tr>
                         </thead>
@@ -287,7 +287,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                     </svg>
-                                    <p class="text-lg font-medium">Không có người dùng nào</p>
+                                    <p class="text-lg font-medium">No users found</p>
                                 </td>
                             </tr>
                             <tr th:each="user : ${users}" class="table-row">
@@ -308,22 +308,22 @@
                                 <td class="px-6 py-4 text-sm text-gray-700" th:text="${user.email}">
                                     admin@example.com</td>
                                 <td class="px-6 py-4 text-sm text-gray-700"
-                                    th:text="${user.phone != null ? user.phone : 'Chưa có'}">0123456789</td>
+                                    th:text="${user.phone != null ? user.phone : 'Not Set'}">0123456789</td>
                                 <td class="px-6 py-4">
                                     <span class="px-3 py-1 text-xs font-medium rounded-full"
                                         style="background-color: rgba(139, 90, 60, 0.1); color: var(--color-primary);"
-                                        th:text="${user.role != null ? user.role.roleName : 'Chưa có'}">
+                                        th:text="${user.role != null ? user.role.roleName : 'Not Set'}">
                                         Admin
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
                                     <span th:if="${user.status == 'Active'}"
                                         class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                                        Hoạt động
+                                        Active
                                     </span>
                                     <span th:if="${user.status == 'Inactive'}"
                                         class="px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
-                                        Khóa
+                                        Locked
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-700"
@@ -332,7 +332,7 @@
                                 <td class="px-6 py-4 text-right text-sm font-medium">
                                     <div class="flex justify-end gap-2">
                                         <a th:href="@{/admin/users/{id}(id=${user.id})}"
-                                            class="text-blue-600 hover:text-blue-800 transition" title="Xem chi tiết">
+                                            class="text-blue-600 hover:text-blue-800 transition" title="View Details">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -342,7 +342,7 @@
                                         </a>
                                         <a th:href="@{/admin/users/edit/{id}(id=${user.id})}"
                                             class="hover:text-yellow-800 transition"
-                                            style="color: var(--color-warning);" title="Chỉnh sửa">
+                                            style="color: var(--color-warning);" title="Edit">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -350,9 +350,8 @@
                                         </a>
                                         <a th:href="@{/admin/users/toggle-status/{id}(id=${user.id})}"
                                             th:classappend="${user.status == 'Active' ? 'text-red-600 hover:text-red-800' : 'text-green-600 hover:text-green-800'}"
-                                            class="transition"
-                                            th:title="${user.status == 'Active' ? 'Khóa' : 'Mở khóa'}"
-                                            onclick="return confirm('Bạn có chắc muốn thay đổi trạng thái?')">
+                                            class="transition" th:title="${user.status == 'Active' ? 'Lock' : 'Unlock'}"
+                                            data-confirm="Are you sure you want to change the status?">
                                             <svg th:if="${user.status == 'Active'}" class="w-5 h-5" fill="none"
                                                 stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -373,6 +372,7 @@
             </div>
         </main>
     </div>
+    <script src="/js/system-confirm.js"></script>
 </body>
 
 </html>

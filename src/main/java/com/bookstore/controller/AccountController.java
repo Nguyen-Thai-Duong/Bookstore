@@ -54,19 +54,19 @@ public class AccountController {
         }
 
         if (avatar == null || avatar.isEmpty()) {
-            redirectAttributes.addFlashAttribute("avatarError", "Vui lòng chọn ảnh đại diện trước khi tải lên");
+            redirectAttributes.addFlashAttribute("avatarError", "Please select an avatar image before uploading");
             return "redirect:/account";
         }
 
         if (avatar.getSize() > MAX_AVATAR_SIZE_BYTES) {
-            redirectAttributes.addFlashAttribute("avatarError", "Kích thước ảnh tối đa là 2MB");
+            redirectAttributes.addFlashAttribute("avatarError", "Maximum image size is 2MB");
             return "redirect:/account";
         }
 
         String extension = extractExtension(avatar.getOriginalFilename());
         if (extension.isEmpty() || !ALLOWED_AVATAR_EXTENSIONS.contains(extension)) {
             redirectAttributes.addFlashAttribute("avatarError",
-                    "Định dạng ảnh không hợp lệ. Chỉ hỗ trợ JPG, PNG, WEBP, GIF");
+                    "Invalid image format. Only JPG, PNG, WEBP, GIF are supported");
             return "redirect:/account";
         }
 
@@ -79,9 +79,10 @@ public class AccountController {
             Path targetPath = avatarDir.resolve(fileName).normalize();
             Files.copy(avatar.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
 
-            redirectAttributes.addFlashAttribute("avatarSuccess", "Cập nhật avatar thành công");
+            redirectAttributes.addFlashAttribute("avatarSuccess", "Avatar updated successfully");
         } catch (IOException ex) {
-            redirectAttributes.addFlashAttribute("avatarError", "Không thể tải avatar lúc này. Vui lòng thử lại");
+            redirectAttributes.addFlashAttribute("avatarError",
+                    "Unable to upload avatar at this time. Please try again");
         }
 
         return "redirect:/account";
@@ -103,19 +104,19 @@ public class AccountController {
         String normalizedAddress = address == null ? "" : address.trim();
 
         if (normalizedName.length() > 100) {
-            redirectAttributes.addFlashAttribute("profileError", "Họ và tên quá dài");
+            redirectAttributes.addFlashAttribute("profileError", "Full name too long");
             return "redirect:/account";
         }
         if (!normalizedAddress.isEmpty() && normalizedAddress.length() > 255) {
-            redirectAttributes.addFlashAttribute("profileError", "Địa chỉ quá dài");
+            redirectAttributes.addFlashAttribute("profileError", "Address too long");
             return "redirect:/account";
         }
         if (normalizedName.isEmpty()) {
-            redirectAttributes.addFlashAttribute("profileError", "Họ và tên không được để trống");
+            redirectAttributes.addFlashAttribute("profileError", "Full name is required");
             return "redirect:/account";
         }
         if (!normalizedPhone.isEmpty() && !normalizedPhone.matches("\\d{8,15}")) {
-            redirectAttributes.addFlashAttribute("profileError", "Số điện thoại phải từ 10-11 chữ số");
+            redirectAttributes.addFlashAttribute("profileError", "Phone number must be 10-11 digits");
             return "redirect:/account";
         }
 
@@ -126,12 +127,12 @@ public class AccountController {
                 normalizedAddress.isEmpty() ? null : normalizedAddress);
 
         if (updated == null) {
-            redirectAttributes.addFlashAttribute("profileError", "Không thể cập nhật thông tin");
+            redirectAttributes.addFlashAttribute("profileError", "Unable to update profile");
             return "redirect:/account";
         }
 
         session.setAttribute("loggedInUser", updated);
-        redirectAttributes.addFlashAttribute("profileSuccess", "Cập nhật thông tin thành công");
+        redirectAttributes.addFlashAttribute("profileSuccess", "Profile updated successfully");
         return "redirect:/account";
     }
 
@@ -147,33 +148,34 @@ public class AccountController {
         }
 
         if (currentPassword == null || currentPassword.isBlank()) {
-            redirectAttributes.addFlashAttribute("passwordError", "Vui lòng nhập mật khẩu hiện tại");
+            redirectAttributes.addFlashAttribute("passwordError", "Please enter current password");
             return "redirect:/account";
         }
         if (newPassword == null || newPassword.length() < 6) {
-            redirectAttributes.addFlashAttribute("passwordError", "Mật khẩu mới phải có ít nhất 6 ký tự");
+            redirectAttributes.addFlashAttribute("passwordError", "New password must be at least 6 characters");
             return "redirect:/account";
         }
         if (newPassword.length() > 72) {
-            redirectAttributes.addFlashAttribute("passwordError", "Mật khẩu quá dài");
+            redirectAttributes.addFlashAttribute("passwordError", "Password too long");
             return "redirect:/account";
         }
         if (newPassword.equals(currentPassword)) {
-            redirectAttributes.addFlashAttribute("passwordError", "Mật khẩu mới phải khác mật khẩu hiện tại");
+            redirectAttributes.addFlashAttribute("passwordError",
+                    "New password must be different from current password");
             return "redirect:/account";
         }
         if (confirmPassword == null || !newPassword.equals(confirmPassword)) {
-            redirectAttributes.addFlashAttribute("passwordError", "Xác nhận mật khẩu không khớp");
+            redirectAttributes.addFlashAttribute("passwordError", "Password confirmation does not match");
             return "redirect:/account";
         }
 
         boolean changed = authService.changePassword(user.getId(), currentPassword, newPassword);
         if (!changed) {
-            redirectAttributes.addFlashAttribute("passwordError", "Mật khẩu hiện tại không đúng");
+            redirectAttributes.addFlashAttribute("passwordError", "Current password is incorrect");
             return "redirect:/account";
         }
 
-        redirectAttributes.addFlashAttribute("passwordSuccess", "Đổi mật khẩu thành công");
+        redirectAttributes.addFlashAttribute("passwordSuccess", "Password changed successfully");
         return "redirect:/account";
     }
 

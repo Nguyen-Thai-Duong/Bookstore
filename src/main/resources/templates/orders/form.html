@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo Đơn Hàng Mới</title>
+    <title>Create New Order</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -16,37 +16,37 @@
     </nav>
 
     <div class="container mt-4">
-        <h2>Tạo Đơn Hàng Mới</h2>
+        <h2>Create New Order</h2>
 
         <form th:action="@{/orders}" th:object="${order}" method="post">
             <div class="mb-3">
-                <label for="user" class="form-label">Khách Hàng *</label>
+                <label for="user" class="form-label">Customer *</label>
                 <select class="form-select" id="user" th:field="*{user.id}" required>
-                    <option value="">-- Chọn Khách Hàng --</option>
+                    <option value="">-- Chọn Customer --</option>
                     <option th:each="u : ${users}" th:value="${u.id}"
                         th:text="${u.fullName} + ' (' + ${u.username} + ')'"></option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label for="totalAmount" class="form-label">Tổng Tiền *</label>
+                <label for="totalAmount" class="form-label">Total amount *</label>
                 <input type="number" step="0.01" class="form-control" id="totalAmount" th:field="*{totalAmount}"
                     required>
             </div>
 
             <div class="mb-3">
-                <label for="shippingAddress" class="form-label">Địa Chỉ Giao Hàng *</label>
+                <label for="shippingAddress" class="form-label">Address Giao Hàng *</label>
                 <textarea class="form-control" id="shippingAddress" th:field="*{shippingAddress}" rows="2"
                     required></textarea>
             </div>
 
             <div class="mb-3">
-                <label for="phoneNumber" class="form-label">Số Điện Thoại *</label>
+                <label for="phoneNumber" class="form-label">Phone Number *</label>
                 <input type="text" class="form-control" id="phoneNumber" th:field="*{phoneNumber}" required>
             </div>
 
             <div class="mb-3">
-                <label for="status" class="form-label">Trạng Thái</label>
+                <label for="status" class="form-label">Status</label>
                 <select class="form-select" id="status" th:field="*{status}">
                     <option value="PENDING">PENDING</option>
                     <option value="PROCESSING">PROCESSING</option>
@@ -56,8 +56,8 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-primary">Tạo Đơn Hàng</button>
-            <a href="/orders" class="btn btn-secondary">Hủy</a>
+            <button type="submit" class="btn btn-primary">Tạo Orders</button>
+            <a href="/orders" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 

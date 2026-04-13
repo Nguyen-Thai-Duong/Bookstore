@@ -34,7 +34,7 @@ public class AuthService {
         Role defaultRole = roleRepository.findById(defaultRoleId)
                 .or(() -> roleRepository.findByRoleName("Customer"))
                 .or(() -> roleRepository.findByRoleName("User"))
-                .orElseThrow(() -> new IllegalStateException("Không tìm thấy role mặc định"));
+                .orElseThrow(() -> new IllegalStateException("Default role not found"));
 
         User user = new User();
         user.setFullName(fullName);

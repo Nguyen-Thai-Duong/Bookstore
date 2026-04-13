@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest - Chi Tiết Voucher</title>
+    <title>BookNest - Voucher Details</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -80,19 +80,19 @@
                         class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg><span>Quản lý sách</span></a>
+                    </svg><span>Book Management</span></a>
                 <a href="/admin/categories"
                     class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3"><svg
                         class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                    </svg><span>Danh mục</span></a>
+                    </svg><span>Category</span></a>
                 <a href="/admin/users"
                     class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3"><svg
                         class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg><span>Người dùng</span></a>
+                    </svg><span>User</span></a>
                 <a href="/admin/vouchers"
                     class="sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3"><svg
                         class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,7 +110,7 @@
                         class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg><span>Đơn hàng</span></a>
+                    </svg><span>Order</span></a>
             </nav>
 
             <div class="p-4 border-t border-white/20">
@@ -136,8 +136,8 @@
                 <div class="px-8 py-4">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h2 class="text-2xl font-bold" style="color: var(--color-text);">Chi Tiết Voucher</h2>
-                            <p class="text-sm text-gray-500">Xem thông tin chi tiết mã giảm giá</p>
+                            <h2 class="text-2xl font-bold" style="color: var(--color-text);">Voucher Details</h2>
+                            <p class="text-sm text-gray-500">View detailed discount code information</p>
                         </div>
                         <div class="flex gap-3">
                             <a th:href="@{/admin/vouchers/edit/{id}(id=${voucher.id})}"
@@ -146,11 +146,11 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
-                                <span>Chỉnh sửa</span>
+                                <span>Edit</span>
                             </a>
                             <a href="/admin/vouchers" class="px-6 py-2 border-2 rounded-lg hover:bg-gray-50 transition"
                                 style="border-color: var(--color-primary); color: var(--color-primary);">
-                                Quay lại
+                                Back
                             </a>
                         </div>
                     </div>
@@ -180,11 +180,11 @@
                                 <div class="flex items-center gap-4">
                                     <span th:if="${voucher.status == 'Active'}"
                                         class="px-4 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800">
-                                        Đang hoạt động
+                                        Active
                                     </span>
                                     <span th:if="${voucher.status == 'Inactive'}"
                                         class="px-4 py-1 text-sm font-medium rounded-full bg-red-100 text-red-800">
-                                        Ngừng sử dụng
+                                        Inactive
                                     </span>
                                 </div>
                             </div>
@@ -193,55 +193,55 @@
                         <!-- Voucher Details Grid -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="text-lg font-semibold mb-4" style="color: var(--color-text);">Thông Tin Cá
-                                    Bun</h4>
+                                <h4 class="text-lg font-semibold mb-4" style="color: var(--color-text);">Basic
+                                    Information</h4>
                                 <div class="space-y-4">
                                     <div>
                                         <label class="text-sm font-medium text-gray-500">ID Voucher</label>
                                         <p class="text-base mt-1 font-medium" th:text="${voucher.id}">1</p>
                                     </div>
                                     <div>
-                                        <label class="text-sm font-medium text-gray-500">Mã Voucher</label>
+                                        <label class="text-sm font-medium text-gray-500">Voucher Code</label>
                                         <p class="text-base mt-1 font-mono font-bold"
                                             style="color: var(--color-primary);" th:text="${voucher.code}">SUMMER2024
                                         </p>
                                     </div>
                                     <div>
-                                        <label class="text-sm font-medium text-gray-500">Phần Trăm Giảm Giá</label>
+                                        <label class="text-sm font-medium text-gray-500">Discount Percentage</label>
                                         <p class="text-2xl mt-1 font-bold text-green-600"
                                             th:text="${voucher.discountPercent} + '%'">
                                             20%</p>
                                     </div>
                                     <div>
-                                        <label class="text-sm font-medium text-gray-500">Số Lượng Còn Lại</label>
+                                        <label class="text-sm font-medium text-gray-500">Quantity Remaining</label>
                                         <p class="text-base mt-1" th:text="${voucher.quantity}">100</p>
                                     </div>
                                 </div>
                             </div>
 
                             <div>
-                                <h4 class="text-lg font-semibold mb-4" style="color: var(--color-text);">Thể Hiện Sử
-                                    Dụng</h4>
+                                <h4 class="text-lg font-semibold mb-4" style="color: var(--color-text);">Usage Window
+                                </h4>
                                 <div class="space-y-4">
                                     <div>
-                                        <label class="text-sm font-medium text-gray-500">Ngày Bắt Đầu</label>
+                                        <label class="text-sm font-medium text-gray-500">Start Date</label>
                                         <p class="text-base mt-1"
-                                            th:text="${voucher.startDate != null ? #temporals.format(voucher.startDate, 'dd/MM/yyyy HH:mm') : 'Chưa đặt'}">
+                                            th:text="${voucher.startDate != null ? #temporals.format(voucher.startDate, 'dd/MM/yyyy HH:mm') : 'Not set'}">
                                             01/01/2024 00:00</p>
                                     </div>
                                     <div>
-                                        <label class="text-sm font-medium text-gray-500">Ngày Kết Thúc</label>
+                                        <label class="text-sm font-medium text-gray-500">End Date</label>
                                         <p class="text-base mt-1"
-                                            th:text="${voucher.endDate != null ? #temporals.format(voucher.endDate, 'dd/MM/yyyy HH:mm') : 'Chưa đặt'}">
+                                            th:text="${voucher.endDate != null ? #temporals.format(voucher.endDate, 'dd/MM/yyyy HH:mm') : 'Not set'}">
                                             31/12/2024 23:59</p>
                                     </div>
                                     <div>
-                                        <label class="text-sm font-medium text-gray-500">Trạng Thái</label>
+                                        <label class="text-sm font-medium text-gray-500">Status</label>
                                         <p class="text-base mt-1">
                                             <span th:if="${voucher.status == 'Active'}"
-                                                class="text-green-600 font-medium">Đang hoạt động</span>
+                                                class="text-green-600 font-medium">Active</span>
                                             <span th:if="${voucher.status == 'Inactive'}"
-                                                class="text-red-600 font-medium">Ngừng sử dụng</span>
+                                                class="text-red-600 font-medium">Inactive</span>
                                         </p>
                                     </div>
                                 </div>
@@ -253,34 +253,33 @@
                 <!-- Usage Statistics -->
                 <div class="bg-white rounded-lg shadow-sm">
                     <div class="p-6 border-b border-gray-200">
-                        <h4 class="text-lg font-semibold" style="color: var(--color-text);">Thống Kê Sử Dụng</h4>
+                        <h4 class="text-lg font-semibold" style="color: var(--color-text);">Usage Statistics</h4>
                     </div>
                     <div class="p-6">
-                        <div th:if="${voucher.orders != null and !voucher.orders.empty}">
+                        <div th:if="${voucherOrders != null and !voucherOrders.empty}">
                             <p class="text-sm text-gray-600 mb-4">
-                                Số lần đã sử dụng: <span class="font-semibold"
-                                    th:text="${voucher.orders.size()}">0</span>
+                                Times used: <span class="font-semibold" th:text="${voucherOrders.size()}">0</span>
                             </p>
                             <div class="space-y-3">
-                                <div th:each="order : ${voucher.orders}"
+                                <div th:each="order : ${voucherOrders}"
                                     class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
                                     <div>
-                                        <p class="font-medium">Đơn hàng #<span th:text="${order.id}">1</span></p>
+                                        <p class="font-medium">Order #<span th:text="${order.id}">1</span></p>
                                         <p class="text-sm text-gray-600"
                                             th:text="${order.orderDate != null ? #temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm') : 'N/A'}">
                                             01/01/2024 10:00</p>
                                         <p class="text-xs text-gray-500" th:if="${order.user != null}"
-                                            th:text="'Khách hàng: ' + ${order.user.fullName}">
-                                            Khách hàng: Nguyễn Văn A</p>
+                                            th:text="${'Customer: ' + order.user.fullName}">
+                                            Customer: Nguyen Van A</p>
                                     </div>
                                     <div class="text-right">
                                         <p class="font-semibold text-lg" style="color: var(--color-primary);"
-                                            th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ''">
+                                            th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VND'}">
                                             100,000</p>
                                         <span
                                             th:class="${order.status == 'Pending' ? 'px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800' : 
-                                                         order.status == 'Đang giao' ? 'px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800' :
-                                                         order.status == 'Hoàn thành' ? 'px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800' :
+                                                         order.status == 'Shipping' ? 'px-3 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800' :
+                                                         order.status == 'Completed' ? 'px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800' :
                                                          'px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800'}"
                                             th:text="${order.status}">
                                             Pending
@@ -289,13 +288,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div th:if="${voucher.orders == null or voucher.orders.empty}" class="text-center py-8">
+                        <div th:if="${voucherOrders == null or voucherOrders.empty}" class="text-center py-8">
                             <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <p class="text-gray-500">Voucher chưa được sử dụng</p>
+                            <p class="text-gray-500">This voucher has not been used yet</p>
                         </div>
                     </div>
                 </div>

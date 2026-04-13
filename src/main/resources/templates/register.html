@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest | Đăng ký tài khoản</title>
+    <title>BookNest | Register Account</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -333,14 +333,14 @@
             </div>
 
             <form class="search-container" th:action="@{/books/search}" method="get">
-                <input type="text" name="title" placeholder="Tìm sách theo Tựa đề, Tác giả, Công ty phát hành..."
+                <input type="text" name="title" placeholder="Search books by Title, Author, Publisher..."
                     autocomplete="off">
-                <button type="submit">TÌM KIẾM</button>
+                <button type="submit">SEARCH</button>
             </form>
 
             <div class="auth-links">
-                <a th:href="@{/register}" class="primary">Đăng ký</a>
-                <a th:href="@{/login}">Đăng nhập</a>
+                <a th:href="@{/register}" class="primary">Register</a>
+                <a th:href="@{/login}">Login</a>
             </div>
         </div>
     </header>
@@ -349,21 +349,21 @@
         <div class="container">
             <ul class="nav-links">
                 <li><a th:href="@{/}"><i data-lucide="home" size="14" style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Danh mục</a></li>
-                <li><a th:href="@{/orders}">Đơn hàng</a></li>
+                <li><a th:href="@{/books}">Category</a></li>
+                <li><a th:href="@{/orders}">Order</a></li>
             </ul>
         </div>
     </div>
 
     <main class="container">
         <section class="panel">
-            <div class="panel-head">Đăng ký tài khoản</div>
+            <div class="panel-head">Register Account</div>
             <div class="panel-body">
                 <div th:if="${error}" class="error-box" th:text="${error}"></div>
 
                 <form id="registerForm" method="post" th:action="@{/register}">
                     <div class="field">
-                        <label>Họ và tên</label>
+                        <label>Full name</label>
                         <input type="text" id="fullName" name="fullName" required>
                         <div id="fullNameError" class="error-message"></div>
                     </div>
@@ -375,11 +375,11 @@
                     </div>
 
                     <div class="field">
-                        <label>Mật khẩu</label>
+                        <label>Password</label>
                         <div class="password-wrap">
                             <input type="password" id="password" name="password" required placeholder="••••••••••">
                             <button id="toggleRegisterPassword" class="password-toggle" type="button"
-                                aria-label="Hiện mật khẩu" aria-pressed="false">
+                                aria-label="Show password" aria-pressed="false">
                                 <i class="icon-on" data-lucide="eye" size="18"></i>
                                 <i class="icon-off" data-lucide="eye-off" size="18"></i>
                             </button>
@@ -388,20 +388,20 @@
                     </div>
 
                     <div class="field">
-                        <label>Số điện thoại</label>
-                        <input type="text" id="phone" name="phone" placeholder="Ví dụ: 0912345678">
+                        <label>Phone number</label>
+                        <input type="text" id="phone" name="phone" placeholder="Example: 0912345678">
                         <div id="phoneError" class="error-message"></div>
                     </div>
 
                     <div class="field">
-                        <label>Địa chỉ</label>
-                        <input type="text" id="address" name="address" placeholder="Nhập địa chỉ nhận hàng">
+                        <label>Address</label>
+                        <input type="text" id="address" name="address" placeholder="Enter delivery address">
                     </div>
 
-                    <button type="submit" class="btn-submit">Đăng ký</button>
+                    <button type="submit" class="btn-submit">Register</button>
                 </form>
 
-                <p class="sub-row">Đã có tài khoản? <a th:href="@{/login}">Đăng nhập</a></p>
+                <p class="sub-row">Already have an account? <a th:href="@{/login}">Login</a></p>
             </div>
         </section>
     </main>
@@ -409,40 +409,40 @@
     <footer>
         <div class="container footer-cols">
             <div>
-                <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+                <h4>CUSTOMER SUPPORT</h4>
                 <ul>
-                    <li><a th:href="@{/books}">Sản phẩm và đơn hàng</a></li>
-                    <li><a href="#">Chính sách đổi trả</a></li>
-                    <li><a href="#">Phương thức vận chuyển</a></li>
+                    <li><a th:href="@{/books}">Products and orders</a></li>
+                    <li><a href="#">Return policy</a></li>
+                    <li><a href="#">Shipping method</a></li>
                 </ul>
             </div>
             <div>
-                <h4>Về BOOKNEST</h4>
+                <h4>About BOOKNEST</h4>
                 <ul>
-                    <li><a href="#">Giới thiệu BookNest</a></li>
-                    <li><a href="#">Điều khoản sử dụng</a></li>
-                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">About BookNest</a></li>
+                    <li><a href="#">Terms of Use</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
                 </ul>
             </div>
             <div>
-                <h4>TÀI KHOẢN</h4>
+                <h4>ACCOUNT</h4>
                 <ul>
-                    <li><a th:href="@{/login}">Đăng nhập</a></li>
-                    <li><a th:href="@{/register}">Tạo tài khoản</a></li>
-                    <li><a th:href="@{/orders}">Lịch sử đơn hàng</a></li>
+                    <li><a th:href="@{/login}">Login</a></li>
+                    <li><a th:href="@{/register}">Create account</a></li>
+                    <li><a th:href="@{/orders}">Order history</a></li>
                 </ul>
             </div>
             <div>
-                <h4>LIÊN HỆ</h4>
+                <h4>CONTACT</h4>
                 <p style="font-size: 12px; color: #666;">
                     Email: hotro@booknest.vn<br>
                     Hotline: 1900 1234<br>
-                    Địa chỉ: Tòa nhà Tri Thức, Quận 1, TP. HCM
+                    Address: Tri Thuc Building, District 1, Ho Chi Minh City
                 </p>
             </div>
         </div>
         <div class="bottom-footer">
-            &copy; 2026 BookNest. Bản quyền thuộc về Công ty Sách BookNest Việt Nam.
+            &copy; 2026 BookNest. All rights reserved.
         </div>
     </footer>
 
@@ -466,10 +466,10 @@
         function validateFullName() {
             const fullName = document.getElementById('fullName').value.trim();
             if (fullName === '') {
-                return setError('fullName', 'fullNameError', 'Họ và tên: Vui lòng nhập họ và tên');
+                return setError('fullName', 'fullNameError', 'Full name: Please enter your full name');
             }
             if (fullName.length < 3) {
-                return setError('fullName', 'fullNameError', 'Họ và tên: Phải có ít nhất 3 ký tự');
+                return setError('fullName', 'fullNameError', 'Full name: Must contain at least 3 characters');
             }
             return setError('fullName', 'fullNameError', '');
         }
@@ -478,10 +478,10 @@
             const email = document.getElementById('email').value.trim();
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (email === '') {
-                return setError('email', 'emailError', 'Email: Vui lòng nhập email');
+                return setError('email', 'emailError', 'Email: Please enter an email address');
             }
             if (!emailRegex.test(email)) {
-                return setError('email', 'emailError', 'Email: Định dạng email không hợp lệ');
+                return setError('email', 'emailError', 'Email: Invalid email format');
             }
             return setError('email', 'emailError', '');
         }
@@ -489,10 +489,10 @@
         function validatePassword() {
             const password = document.getElementById('password').value;
             if (password === '') {
-                return setError('password', 'passwordError', 'Mật khẩu: Vui lòng nhập mật khẩu');
+                return setError('password', 'passwordError', 'Password: Please enter a password');
             }
             if (password.length < 6) {
-                return setError('password', 'passwordError', 'Mật khẩu: Phải có ít nhất 6 ký tự');
+                return setError('password', 'passwordError', 'Password: Must contain at least 6 characters');
             }
             return setError('password', 'passwordError', '');
         }
@@ -504,7 +504,7 @@
                 return setError('phone', 'phoneError', '');
             }
             if (!phoneRegex.test(phone)) {
-                return setError('phone', 'phoneError', 'Số điện thoại: Phải nhập 10-11 chữ số');
+                return setError('phone', 'phoneError', 'Phone number: Must be 10-11 digits');
             }
             return setError('phone', 'phoneError', '');
         }
@@ -534,7 +534,7 @@
                 registerPasswordInput.type = showingPassword ? 'password' : 'text';
                 toggleRegisterPasswordButton.classList.toggle('showing', !showingPassword);
                 toggleRegisterPasswordButton.setAttribute('aria-pressed', String(!showingPassword));
-                toggleRegisterPasswordButton.setAttribute('aria-label', showingPassword ? 'Hiện mật khẩu' : 'Ẩn mật khẩu');
+                toggleRegisterPasswordButton.setAttribute('aria-label', showingPassword ? 'Show password' : 'Hide password');
             });
         }
     </script>

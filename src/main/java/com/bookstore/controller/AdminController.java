@@ -176,11 +176,11 @@ public class AdminController {
 
         if (imageFile != null && !imageFile.isEmpty()) {
             try {
-                // Nếu có upload file thì ưu tiên dùng file thay cho URL.
+                // If file is uploaded, prioritize file over URL.
                 String uploadedImageUrl = storeBookImage(imageFile, existingImageUrl[0]);
                 book.setImageUrl(uploadedImageUrl);
             } catch (IOException e) {
-                throw new RuntimeException("Không thể lưu ảnh sách", e);
+                throw new RuntimeException("Unable to save book image", e);
             }
         }
 
@@ -408,13 +408,13 @@ public class AdminController {
                     .toList();
         }
 
-        if (status != null && !status.isEmpty() && !status.equals("Tất cả trạng thái")) {
+        if (status != null && !status.isEmpty() && !status.equals("All Status")) {
             users = users.stream()
                     .filter(user -> user.getStatus().equals(status))
                     .toList();
         }
 
-        if (roleId != null && !roleId.isEmpty() && !roleId.equals("Tất cả vai trò")) {
+        if (roleId != null && !roleId.isEmpty() && !roleId.equals("All Roles")) {
             try {
                 Long rid = Long.parseLong(roleId);
                 users = users.stream()
@@ -465,17 +465,25 @@ public class AdminController {
         try {
             var existingOrder = orderService.getOrderById(orderDto.getId());
             if (existingOrder.isEmpty()) {
-                redirectAttributes.addFlashAttribute("orderError", "Không tìm thấy đơn hàng");
+                redirectAttributes.addFlashAttribute("orderError", "Order not found");
                 return "redirect:/admin/orders";
             }
 
-            Order order = existingOrder.get();
-            order.setStatus(orderDto.getStatus());
+            // Build an update request object to avoid mutating the managed entity in the
+            // current request context. This keeps old/new status comparison reliable in
+            // service.
+            Order updateRequest = new Order();
+            updateRequest.setId(orderDto.getId());
+            updateRequest.setStatus(orderDto.getStatus());
+
+            String shippingAddress = existingOrder.get().getShippingAddress();
             if (orderDto.getShippingAddress() != null && !orderDto.getShippingAddress().isBlank()) {
-                order.setShippingAddress(orderDto.getShippingAddress());
+                shippingAddress = orderDto.getShippingAddress();
             }
-            orderService.saveOrder(order);
-            redirectAttributes.addFlashAttribute("orderSuccess", "Cập nhật trạng thái đơn hàng thành công");
+            updateRequest.setShippingAddress(shippingAddress);
+
+            orderService.saveOrder(updateRequest);
+            redirectAttributes.addFlashAttribute("orderSuccess", "Order status updated successfully");
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("orderError", e.getMessage());
             return "redirect:/admin/orders";
@@ -492,7 +500,7 @@ public class AdminController {
             Model model) {
         var orders = orderService.getAllOrders();
 
-        if (status != null && !status.isEmpty() && !status.equals("Tất cả trạng thái")) {
+        if (status != null && !status.isEmpty() && !status.equals("All Status")) {
             orders = orders.stream()
                     .filter(order -> order.getStatus().equals(status))
                     .toList();
@@ -531,31 +539,31 @@ public class AdminController {
         switch (normalized) {
             case "pending":
                 choices.add("Pending");
-                choices.add("Xác nhận đơn");
-                choices.add("Đã hủy");
+                choices.add("Confirmed");
+                choices.add("Cancelled");
                 break;
             case "confirmed":
-                choices.add("Xác nhận đơn");
-                choices.add("Đang giao");
-                choices.add("Đã hủy");
+                choices.add("Confirmed");
+                choices.add("Shipping");
+                choices.add("Cancelled");
                 break;
             case "shipping":
-                choices.add("Đang giao");
-                choices.add("Hoàn thành");
-                choices.add("Đã hủy");
+                choices.add("Shipping");
+                choices.add("Completed");
+                choices.add("Cancelled");
                 break;
             case "completed":
-                choices.add("Hoàn thành");
+                choices.add("Completed");
                 break;
             case "cancelled":
-                choices.add("Đã hủy");
+                choices.add("Cancelled");
                 break;
             default:
                 choices.add("Pending");
-                choices.add("Xác nhận đơn");
-                choices.add("Đang giao");
-                choices.add("Hoàn thành");
-                choices.add("Đã hủy");
+                choices.add("Confirmed");
+                choices.add("Shipping");
+                choices.add("Completed");
+                choices.add("Cancelled");
                 break;
         }
 
@@ -602,7 +610,12 @@ public class AdminController {
     @GetMapping("/vouchers/{id}")
     public String viewVoucher(@PathVariable Long id, Model model) {
         voucherService.getVoucherById(id)
-                .ifPresent(voucher -> model.addAttribute("voucher", VoucherDTO.fromEntity(voucher)));
+                .ifPresent(voucher -> {
+                    model.addAttribute("voucher", VoucherDTO.fromEntity(voucher));
+                    model.addAttribute("voucherOrders", voucher.getOrders() == null
+                            ? List.of()
+                            : voucher.getOrders().stream().map(OrderDTO::fromEntity).toList());
+                });
         return "admin/vouchers/view";
     }
 
@@ -656,7 +669,7 @@ public class AdminController {
                     .toList();
         }
 
-        if (status != null && !status.isEmpty() && !status.equals("Tất cả trạng thái")) {
+        if (status != null && !status.isEmpty() && !status.equals("All Status")) {
             vouchers = vouchers.stream()
                     .filter(voucher -> voucher.getStatus().equals(status))
                     .toList();

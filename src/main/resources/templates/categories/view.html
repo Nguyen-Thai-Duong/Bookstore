@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${category.name}">Danh Mục - BookNest</title>
+    <title th:text="${category.name}">Category - BookNest</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,10 +73,10 @@
                         <span class="font-display text-xl sm:text-2xl font-bold">BookNest</span>
                     </a>
                     <div class="flex items-center gap-2 sm:gap-4">
-                        <a th:href="@{/}" class="text-gray-600 hover:text-gray-900 font-medium">Trang chủ</a>
-                        <a th:href="@{/books}" class="text-gray-600 hover:text-gray-900 font-medium">Sách</a>
+                        <a th:href="@{/}" class="text-gray-600 hover:text-gray-900 font-medium">Home</a>
+                        <a th:href="@{/books}" class="text-gray-600 hover:text-gray-900 font-medium">Books</a>
                         <a th:href="@{/categories}" class="font-semibold" style="color: var(--color-primary);">Danh
-                            mục</a>
+                            category</a>
                     </div>
                 </div>
             </div>
@@ -86,17 +86,17 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="mb-12">
                     <div class="flex items-center gap-3 mb-4">
-                        <a th:href="@{/categories}" class="text-gray-600 hover:text-gray-900">← Quay lại danh mục</a>
+                        <a th:href="@{/categories}" class="text-gray-600 hover:text-gray-900">← Back danh category</a>
                     </div>
                     <h1 class="font-display text-4xl sm:text-5xl font-bold mb-4" th:text="${category.name}">Category
                         Name</h1>
                     <p class="text-lg" style="color: #6b6560;"
-                        th:text="${category.description ?: 'Khám phá bộ sưu tập sách tuyệt vời'}">Description</p>
+                        th:text="${category.description ?: 'Explore wonderful book collection'}">Description</p>
                 </div>
 
                 <div class="mb-6">
                     <p class="text-sm" style="color: #6b6560;">
-                        <span th:text="${category.books?.size()} ?: '0'">0</span> sách trong danh mục này
+                        <span th:text="${category.books?.size()} ?: '0'">0</span> books in category này
                     </p>
                 </div>
 
@@ -118,7 +118,7 @@
                                 </h3>
                                 <p class="text-xs" style="color: #6b6560;" th:text="${book.author}">Author</p>
                                 <p class="text-lg font-bold mt-3" style="color: var(--color-primary);"
-                                    th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA')} + ' đ'">0 đ</p>
+                                    th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA')} + ' VND">0 đ</p>
                             </div>
                         </a>
                     </th:block>
@@ -130,7 +130,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
-                    <p class="text-lg mb-6" style="color: #6b6560;">Chưa có sách nào trong danh mục này</p>
+                    <p class="text-lg mb-6" style="color: #6b6560;">Not Set any books trong danh category này</p>
                     <a th:href="@{/books}"
                         class="btn-primary inline-block px-6 py-3 rounded-full text-white font-semibold">
                         Xem tất cả sách

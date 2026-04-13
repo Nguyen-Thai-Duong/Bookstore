@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest | Nhà Sách Trực Tuyến - Mua Sách Online</title>
+    <title>BookNest | Online Bookstore - Buy Books Online</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -416,7 +416,7 @@
 
             <form class="search-container" th:action="@{/books/search}" method="get">
                 <input id="search-input" type="text" name="title"
-                    placeholder="Tìm sách theo Tựa đề, Tác giả, Công ty phát hành..." autocomplete="off">
+                    placeholder="Search books by Title, Author, Publisher..." autocomplete="off">
                 <button type="submit">TÌM KIẾM</button>
                 <div id="search-suggest" class="hidden"></div>
             </form>
@@ -424,21 +424,21 @@
             <a th:if="${session.loggedInUser != null}" th:href="@{/cart}" class="cart-box">
                 <i data-lucide="shopping-cart" size="20"></i>
                 <div>
-                    <span style="display:block; font-size: 10px; color: #999;">Giỏ hàng</span>
+                    <span style="display:block; font-size: 10px; color: #999;">Shopping Cart</span>
                     <strong style="font-size: 12px;"
-                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) sản phẩm|">(0) san
+                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) items|">(0) san
                         pham</strong>
                 </div>
             </a>
 
             <div th:if="${session.loggedInUser == null}" class="auth-links">
-                <a th:href="@{/login}">Đăng nhập</a>
-                <a th:href="@{/register}" class="primary">Đăng ký</a>
+                <a th:href="@{/login}">Login</a>
+                <a th:href="@{/register}" class="primary">Register</a>
             </div>
 
             <div th:if="${session.loggedInUser != null}" class="auth-links">
-                <a th:href="@{/account}">Tài khoản</a>
-                <a th:href="@{/orders}">Đơn hàng</a>
+                <a th:href="@{/account}">Account</a>
+                <a th:href="@{/orders}">Order</a>
                 <a th:if="${session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
                     th:href="@{/admin}">Admin</a>
             </div>
@@ -450,8 +450,8 @@
             <ul class="nav-links">
                 <li><a th:href="@{/}" style="background: var(--vb-brown); color: #fff;"><i data-lucide="home" size="14"
                             style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Danh mục</a></li>
-                <li><a th:href="@{/orders}">Đơn hàng</a></li>
+                <li><a th:href="@{/books}">Category</a></li>
+                <li><a th:href="@{/orders}">Order</a></li>
             </ul>
         </div>
     </div>
@@ -459,11 +459,11 @@
     <main class="container main-grid">
         <aside>
             <div class="sidebar-box">
-                <h3>Danh mục sách</h3>
+                <h3>Book Category</h3>
                 <ul class="sidebar-list">
-                    <li><a th:href="@{/books}">Tất cả sách</a></li>
+                    <li><a th:href="@{/books}">All books</a></li>
                     <li th:each="category : ${categories}">
-                        <a th:href="@{/books(categoryId=${category.id})}" th:text="${category.name}">Danh mục</a>
+                        <a th:href="@{/books(categoryId=${category.id})}" th:text="${category.name}">Category</a>
                     </li>
                 </ul>
             </div>
@@ -477,8 +477,8 @@
 
             <div class="content-section">
                 <div class="section-header">
-                    <h2>Sách mới nổi bật</h2>
-                    <a th:href="@{/books}" style="font-size: 11px; text-decoration: none; color: #0066cc;">Xem thêm</a>
+                    <h2>Featured new books</h2>
+                    <a th:href="@{/books}" style="font-size: 11px; text-decoration: none; color: #0066cc;">View more</a>
                 </div>
                 <div class="book-item-grid" th:if="${!books.empty}">
                     <div class="book-card" th:each="book,iter : ${books}" th:if="${iter.index < 8}">
@@ -489,43 +489,43 @@
                             <img th:if="${book.imageUrl == null or book.imageUrl.isEmpty()}"
                                 src="https://via.placeholder.com/110x160?text=No+Image" alt="No Image">
                         </a>
-                        <a class="book-title" th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}">Ten
-                            sach</a>
-                        <p class="author" th:text="${book.author}">Tác giả</p>
+                        <a class="book-title" th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}">Book
+                            title</a>
+                        <p class="author" th:text="${book.author}">Author</p>
                         <p class="price"
                             th:text="${book.price != null ? #numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
                             0 VND</p>
                     </div>
                 </div>
-                <p th:if="${books.empty}" style="color:#777; font-size: 12px;">Chưa có sách trong hệ thống.</p>
+                <p th:if="${books.empty}" style="color:#777; font-size: 12px;">No books available in the system.</p>
             </div>
 
         </section>
 
         <aside>
             <div class="sidebar-box">
-                <h3>Sách bán chạy</h3>
+                <h3>Best-selling Books</h3>
                 <div class="rank-item" th:each="book,iter : ${books}" th:if="${iter.index < 3}">
                     <span class="rank-num"
                         th:text="${iter.index + 1 < 10 ? '0' + (iter.index + 1) : (iter.index + 1)}">01</span>
                     <div>
                         <a th:href="@{/books/{id}(id=${book.id})}"
-                            style="text-decoration: none; color: #333; font-weight: 500;" th:text="${book.title}">Ten
-                            sach</a>
-                        <p style="font-size: 11px; color: #999;" th:text="${book.author}">Tác giả</p>
+                            style="text-decoration: none; color: #333; font-weight: 500;" th:text="${book.title}">Book
+                            title</a>
+                        <p style="font-size: 11px; color: #999;" th:text="${book.author}">Author</p>
                     </div>
                 </div>
-                <p th:if="${books.empty}" style="padding:10px; color:#777; font-size:12px;">Chưa có dữ liệu xếp hạng.
+                <p th:if="${books.empty}" style="padding:10px; color:#777; font-size:12px;">No ranking data available.
                 </p>
             </div>
 
             <div class="sidebar-box">
-                <h3>Tin tức sách</h3>
+                <h3>Book News</h3>
                 <div style="padding: 10px; font-size: 12px;">
-                    <p style="margin-bottom: 10px;"><a href="#" style="color: #666; text-decoration: none;">5 cuốn sách
-                            truyền cảm hứng giúp bạn bắt đầu thói quen đọc mỗi ngày.</a></p>
-                    <p style="margin-bottom: 10px;"><a href="#" style="color: #666; text-decoration: none;">Gợi ý các
-                            tựa sách kinh điển nên đọc ít nhất một lần trong đời.</a></p>
+                    <p style="margin-bottom: 10px;"><a href="#" style="color: #666; text-decoration: none;">5 books
+                            to inspire your daily reading habit.</a></p>
+                    <p style="margin-bottom: 10px;"><a href="#" style="color: #666; text-decoration: none;">Suggested
+                            classic titles everyone should read at least once.</a></p>
                 </div>
             </div>
         </aside>
@@ -534,40 +534,40 @@
     <footer>
         <div class="container footer-cols">
             <div>
-                <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+                <h4>CUSTOMER SUPPORT</h4>
                 <ul>
-                    <li><a th:href="@{/books}">Sản phẩm và Đơn hàng</a></li>
-                    <li><a href="#">Chính sách đổi trả</a></li>
-                    <li><a href="#">Phương thức vận chuyển</a></li>
+                    <li><a th:href="@{/books}">Products and orders</a></li>
+                    <li><a href="#">Return policy</a></li>
+                    <li><a href="#">Shipping method</a></li>
                 </ul>
             </div>
             <div>
-                <h4>VỀ BOOKNEST</h4>
+                <h4>ABOUT BOOKNEST</h4>
                 <ul>
-                    <li><a href="#">Giới thiệu BookNest</a></li>
-                    <li><a href="#">Điều khoản sử dụng</a></li>
-                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">About BookNest</a></li>
+                    <li><a href="#">Terms of use</a></li>
+                    <li><a href="#">Privacy policy</a></li>
                 </ul>
             </div>
             <div>
-                <h4>TÀI KHOẢN</h4>
+                <h4>ACCOUNT</h4>
                 <ul>
-                    <li><a th:href="@{/login}">Đăng nhập</a></li>
-                    <li><a th:href="@{/register}">Tạo tài khoản</a></li>
-                    <li><a th:href="@{/orders}">Lịch sử đơn hàng</a></li>
+                    <li><a th:href="@{/login}">Login</a></li>
+                    <li><a th:href="@{/register}">Create account</a></li>
+                    <li><a th:href="@{/orders}">Order history</a></li>
                 </ul>
             </div>
             <div>
-                <h4>LIÊN HỆ</h4>
+                <h4>CONTACT</h4>
                 <p style="font-size: 12px; color: #666;">
                     Email: hotro@booknest.vn<br>
                     Hotline: 1900 1234<br>
-                    Địa chỉ: Tòa nhà Tri Thức, Quận 1, TP. HCM
+                    Address: Tri Thuc Building, District 1, Ho Chi Minh City
                 </p>
             </div>
         </div>
         <div class="bottom-footer">
-            &copy; 2026 BookNest. Bản quyền thuộc về Công ty Sách BookNest Việt Nam.
+            &copy; 2026 BookNest. All rights reserved.
         </div>
     </footer>
 

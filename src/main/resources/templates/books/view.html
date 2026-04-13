@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest | Chi tiet sach</title>
+    <title>BookNest | Book Details</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -450,28 +450,27 @@
             </div>
 
             <form class="search-container" th:action="@{/books/search}" method="get">
-                <input type="text" name="title" placeholder="Tìm sách theo tựa đề, tác giả..." autocomplete="off">
-                <button type="submit">TÌM KIẾM</button>
+                <input type="text" name="title" placeholder="Search books by title, author..." autocomplete="off">
+                <button type="submit">SEARCH</button>
             </form>
 
             <a th:if="${session.loggedInUser != null}" th:href="@{/cart}" class="cart-box">
                 <i data-lucide="shopping-cart" size="20"></i>
                 <div>
-                    <span style="display:block; font-size: 10px; color: #999;">Giỏ hàng</span>
+                    <span style="display:block; font-size: 10px; color: #999;">Shopping Cart</span>
                     <strong style="font-size: 12px;"
-                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) sản phẩm|">(0) san
-                        pham</strong>
+                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) items|">(0) items</strong>
                 </div>
             </a>
 
             <div th:if="${session.loggedInUser == null}" class="auth-links">
-                <a th:href="@{/login}">Đăng nhập</a>
-                <a th:href="@{/register}" class="primary">Đăng ký</a>
+                <a th:href="@{/login}">Login</a>
+                <a th:href="@{/register}" class="primary">Register</a>
             </div>
 
             <div th:if="${session.loggedInUser != null}" class="auth-links">
-                <a th:href="@{/account}">Tài khoản</a>
-                <a th:href="@{/orders}">Đơn hàng</a>
+                <a th:href="@{/account}">Account</a>
+                <a th:href="@{/orders}">Order</a>
                 <a th:if="${session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
                     th:href="@{/admin}">Admin</a>
             </div>
@@ -482,25 +481,25 @@
         <div class="container">
             <ul class="nav-links">
                 <li><a th:href="@{/}"><i data-lucide="home" size="14" style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Danh mục</a></li>
-                <li><a th:href="@{/orders}">Đơn hàng</a></li>
+                <li><a th:href="@{/books}">Category</a></li>
+                <li><a th:href="@{/orders}">Order</a></li>
             </ul>
         </div>
     </div>
 
     <main class="container content-wrap">
         <div th:if="${cartError != null}" class="error-box" th:text="${cartError}">
-            Có lỗi xảy ra khi thêm vào giỏ hàng.
+            An error occurred while adding to cart.
         </div>
 
         <div class="panel">
             <div class="panel-body">
                 <div class="breadcrumbs">
-                    <a th:href="@{/}" style="text-decoration:none;color:#777;">Trang chu</a>
+                    <a th:href="@{/}" style="text-decoration:none;color:#777;">Home</a>
                     <span> / </span>
-                    <a th:href="@{/books}" style="text-decoration:none;color:#777;">Sach</a>
+                    <a th:href="@{/books}" style="text-decoration:none;color:#777;">Books</a>
                     <span> / </span>
-                    <span th:text="${book.title}">Chi tiet</span>
+                    <span th:text="${book.title}">Details</span>
                 </div>
 
                 <div class="book-layout">
@@ -512,10 +511,10 @@
                     </div>
 
                     <div>
-                        <h1 class="book-title" th:text="${book.title}">Tên sách</h1>
-                        <p class="book-meta">Tác giả: <strong
-                                th:text="${book.author != null and !book.author.isBlank() ? book.author : 'Đang cập nhật'}">Tac
-                                gia</strong></p>
+                        <h1 class="book-title" th:text="${book.title}">Book Title</h1>
+                        <p class="book-meta">Author: <strong
+                                th:text="${book.author != null and !book.author.isBlank() ? book.author : 'Updating'}">Author</strong>
+                        </p>
 
                         <div class="rating-row">
                             <div>
@@ -527,9 +526,9 @@
                                 <span th:if="${reviews != null and !reviews.isEmpty()}">
                                     <span
                                         th:text="${avgRating != null ? #numbers.formatDecimal(avgRating,1,'POINT',1,'POINT') : '0.0'}">0.0</span>
-                                    (<span th:text="${reviews.size()}">0</span> đánh giá)
+                                    (<span th:text="${reviews.size()}">0</span> reviews)
                                 </span>
-                                <span th:if="${reviews == null or reviews.isEmpty()}">Chưa có đánh giá</span>
+                                <span th:if="${reviews == null or reviews.isEmpty()}">No reviews yet</span>
                             </span>
                         </div>
 
@@ -537,12 +536,12 @@
                             th:text="${book.price != null ? #numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
                             0 VND</div>
                         <div class="book-stock"
-                            th:text="${book.stock != null and book.stock > 0 ? 'Còn ' + book.stock + ' cuốn' : 'Hết hàng'}">
-                            Còn 0 cuốn</div>
+                            th:text="${book.stock != null and book.stock > 0 ? 'Available: ' + book.stock + ' book(s)' : 'Out of stock'}">
+                            Available: 0 book(s)</div>
 
                         <div class="book-description"
-                            th:text="${book.description != null and !book.description.isBlank() ? book.description : 'Chưa có mô tả cho sản phẩm này.'}">
-                            Mo ta sach</div>
+                            th:text="${book.description != null and !book.description.isBlank() ? book.description : 'Description is not available for this item.'}">
+                            Description</div>
 
                         <div th:if="${session.loggedInUser != null and book.stock != null and book.stock > 0}"
                             style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -555,22 +554,22 @@
                                         th:attr="max=${book.stock}">
                                     <button type="button" onclick="changeQty(1)">+</button>
                                 </div>
-                                <button class="btn-primary" type="submit">Thêm vào giỏ hàng</button>
+                                <button class="btn-primary" type="submit">Add to cart</button>
                             </form>
-                            <a th:href="@{/books}" class="btn-outline">Quay lại danh sách</a>
+                            <a th:href="@{/books}" class="btn-outline">Go back to list</a>
                         </div>
 
                         <div th:if="${session.loggedInUser != null and (book.stock == null or book.stock <= 0)}"
                             style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                            <span style="color:#b91c1c;font-weight:700;">Hết hàng</span>
-                            <a th:href="@{/books}" class="btn-outline">Quay lại danh sách</a>
+                            <span style="color:#b91c1c;font-weight:700;">Out of stock</span>
+                            <a th:href="@{/books}" class="btn-outline">Go back to list</a>
                         </div>
 
                         <div th:if="${session.loggedInUser == null}"
                             style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                             <a th:href="@{/login}" class="btn-primary"
-                                style="text-decoration:none;display:inline-block;">Đăng nhập để mua hàng</a>
-                            <a th:href="@{/books}" class="btn-outline">Quay lại danh sách</a>
+                                style="text-decoration:none;display:inline-block;">Login to buy</a>
+                            <a th:href="@{/books}" class="btn-outline">Go back to list</a>
                         </div>
                     </div>
                 </div>
@@ -579,38 +578,37 @@
 
         <section class="panel">
             <div class="panel-body">
-                <h2 class="review-title">Đánh giá từ độc giả</h2>
+                <h2 class="review-title">Reader Reviews</h2>
 
                 <div class="reviews-grid" th:if="${!#lists.isEmpty(reviews)}">
                     <article class="review-card" th:each="review : ${reviews}">
                         <div
                             style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
                             <strong
-                                th:text="${review.user != null and review.user.fullName != null and !review.user.fullName.isBlank() ? review.user.fullName : 'Người dùng'}">Nguoi
-                                dung</strong>
+                                th:text="${review.user != null and review.user.fullName != null and !review.user.fullName.isBlank() ? review.user.fullName : 'User'}">User</strong>
                             <div>
                                 <span th:each="i : ${#numbers.sequence(1,5)}"
                                     th:style="${review.rating != null and i <= review.rating} ? 'color:#f59e0b;' : 'color:#ddd;'">★</span>
                             </div>
                         </div>
                         <p style="line-height:1.5;color:#555;"
-                            th:text="${review.userComment != null and !review.userComment.isBlank() ? review.userComment : 'Không có nội dung.'}">
-                            Nội dung đánh giá</p>
+                            th:text="${review.userComment != null and !review.userComment.isBlank() ? review.userComment : 'No content.'}">
+                            Content reviews</p>
 
                         <div th:if="${review.hasAdminReply()}" class="admin-reply">
-                            <div style="font-size:11px;font-weight:700;color:#6D28D9;margin-bottom:4px;">BookNest phan
-                                hoi</div>
-                            <p th:text="${review.adminReply}">Noi dung phan hoi</p>
+                            <div style="font-size:11px;font-weight:700;color:#6D28D9;margin-bottom:4px;">BookNest reply
+                            </div>
+                            <p th:text="${review.adminReply}">Reply content</p>
                         </div>
                     </article>
                 </div>
 
-                <p th:if="${#lists.isEmpty(reviews)}" style="color:#777;">Chưa có đánh giá nào cho sách này.</p>
+                <p th:if="${#lists.isEmpty(reviews)}" style="color:#777;">No reviews yet for this book.</p>
 
                 <div id="review-form" class="review-form" th:if="${session.loggedInUser != null and myReview == null}">
                     <form method="post" th:action="@{/reviews/add}">
                         <input type="hidden" name="bookId" th:value="${book.id}">
-                        <label style="display:block;font-weight:700;margin-bottom:8px;">Đánh giá của bạn</label>
+                        <label style="display:block;font-weight:700;margin-bottom:8px;">Your Review</label>
                         <div class="star-input"
                             style="display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:4px;margin-bottom:10px;">
                             <input type="radio" id="add-star-5" name="rating" value="5" checked>
@@ -624,8 +622,8 @@
                             <input type="radio" id="add-star-1" name="rating" value="1">
                             <label for="add-star-1">★</label>
                         </div>
-                        <textarea name="content" rows="4" placeholder="Chia sẻ cảm nhận của bạn..."></textarea>
-                        <button type="submit" class="btn-primary">Gửi đánh giá</button>
+                        <textarea name="content" rows="4" placeholder="Share your thoughts..."></textarea>
+                        <button type="submit" class="btn-primary">Submit Review</button>
                     </form>
                 </div>
             </div>
@@ -635,40 +633,40 @@
     <footer>
         <div class="container footer-cols">
             <div>
-                <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+                <h4>CUSTOMER SUPPORT</h4>
                 <ul>
-                    <li><a th:href="@{/books}">San pham va Đơn hàng</a></li>
-                    <li><a href="#">Chính sách đổi trả</a></li>
-                    <li><a href="#">Phương thức vận chuyển</a></li>
+                    <li><a th:href="@{/books}">Products and orders</a></li>
+                    <li><a href="#">Return policy</a></li>
+                    <li><a href="#">Shipping method</a></li>
                 </ul>
             </div>
             <div>
-                <h4>VỀ BOOKNEST</h4>
+                <h4>ABOUT BOOKNEST</h4>
                 <ul>
-                    <li><a href="#">Giới thiệu BookNest</a></li>
-                    <li><a href="#">Điều khoản sử dụng</a></li>
-                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">About BookNest</a></li>
+                    <li><a href="#">Terms of use</a></li>
+                    <li><a href="#">Privacy policy</a></li>
                 </ul>
             </div>
             <div>
-                <h4>TÀI KHOẢN</h4>
+                <h4>ACCOUNT</h4>
                 <ul>
-                    <li><a th:href="@{/login}">Đăng nhập</a></li>
-                    <li><a th:href="@{/register}">Tạo tài khoản</a></li>
-                    <li><a th:href="@{/orders}">Lịch sử đơn hàng</a></li>
+                    <li><a th:href="@{/login}">Login</a></li>
+                    <li><a th:href="@{/register}">Create account</a></li>
+                    <li><a th:href="@{/orders}">Order history</a></li>
                 </ul>
             </div>
             <div>
-                <h4>LIÊN HỆ</h4>
+                <h4>CONTACT</h4>
                 <p style="font-size: 12px; color: #666;">
                     Email: hotro@booknest.vn<br>
                     Hotline: 1900 1234<br>
-                    Địa chỉ: Tòa nhà Tri Thức, Quận 1, TP. HCM
+                    Address: Tri Thuc Building, District 1, Ho Chi Minh City
                 </p>
             </div>
         </div>
         <div class="bottom-footer">
-            &copy; 2026 BookNest. Bản quyền thuộc về Công ty Sách BookNest Việt Nam.
+            &copy; 2026 BookNest. All rights reserved.
         </div>
     </footer>
 
