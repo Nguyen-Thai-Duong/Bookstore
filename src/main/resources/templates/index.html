@@ -430,7 +430,7 @@
                         pham</strong>
                 </div>
             </a>
-
+            
             <div th:if="${session.loggedInUser == null}" class="auth-links">
                 <a th:href="@{/login}">Đăng nhập</a>
                 <a th:href="@{/register}" class="primary">Đăng ký</a>
@@ -439,10 +439,10 @@
             <div th:if="${session.loggedInUser != null}" class="auth-links">
                 <a th:href="@{/account}">Tài khoản</a>
                 <a th:href="@{/orders}">Đơn hàng</a>
+                <a th:href="@{/logout}">Đăng xuất</a>
                 <a th:if="${session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
                     th:href="@{/admin}">Admin</a>
             </div>
-        </div>
     </header>
 
     <div class="nav-bar">
