@@ -471,6 +471,11 @@
             if (fullName.length < 3) {
                 return setError('fullName', 'fullNameError', 'Họ và tên: Phải có ít nhất 3 ký tự');
             }
+            // Kiểm tra ký tự hợp lệ (chỉ cho phép chữ cái, dấu cách, dấu chấm, dấu gạch ngang, dấu nháy đơn)
+            const namePattern = /^[\p{L}\s\.\-']+$/u;
+            if (!namePattern.test(fullName)) {
+                return setError('fullName', 'fullNameError', 'Họ và tên: Chỉ được chứa chữ cái và ký tự hợp lệ');
+            }
             return setError('fullName', 'fullNameError', '');
         }
 
