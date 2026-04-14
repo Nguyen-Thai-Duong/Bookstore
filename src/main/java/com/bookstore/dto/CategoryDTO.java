@@ -24,6 +24,6 @@ public class CategoryDTO {
     }
 
     public Category toEntity() {
-        return new Category(id, name, description, null);
+        return new Category(id, name, description, null, null);
     }
 }

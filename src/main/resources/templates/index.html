@@ -201,6 +201,13 @@
             border-bottom: 1px dotted #eee;
         }
 
+        .sidebar-list li span {
+            display: block;
+            padding: 8px 10px;
+            color: #444;
+            border-bottom: 1px dotted #eee;
+        }
+
         .sidebar-list li a:hover {
             background: #fafafa;
             color: var(--vb-brown);
@@ -417,7 +424,7 @@
             <form class="search-container" th:action="@{/books/search}" method="get">
                 <input id="search-input" type="text" name="title"
                     placeholder="Search books by Title, Author, Publisher..." autocomplete="off">
-                <button type="submit">TÌM KIẾM</button>
+                <button type="submit">SEARCH</button>
                 <div id="search-suggest" class="hidden"></div>
             </form>
 
@@ -450,7 +457,7 @@
             <ul class="nav-links">
                 <li><a th:href="@{/}" style="background: var(--vb-brown); color: #fff;"><i data-lucide="home" size="14"
                             style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Category</a></li>
+                <li><a th:href="@{/books}">Books</a></li>
                 <li><a th:href="@{/orders}">Order</a></li>
             </ul>
         </div>
@@ -459,12 +466,10 @@
     <main class="container main-grid">
         <aside>
             <div class="sidebar-box">
-                <h3>Book Category</h3>
+                <h3>Product</h3>
                 <ul class="sidebar-list">
-                    <li><a th:href="@{/books}">All books</a></li>
-                    <li th:each="category : ${categories}">
-                        <a th:href="@{/books(categoryId=${category.id})}" th:text="${category.name}">Category</a>
-                    </li>
+                    <li><a th:href="@{/books}">Book</a></li>
+                    <li><span>Stationery</span></li>
                 </ul>
             </div>
 

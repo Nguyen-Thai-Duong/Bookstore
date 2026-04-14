@@ -27,6 +27,10 @@ public class Category {
     @Column(name = "Description", length = 255)
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ProductTypeID", referencedColumnName = "ProductTypeID")
+    private ProductType productType;
+
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
