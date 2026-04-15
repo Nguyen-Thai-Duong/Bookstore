@@ -24,7 +24,7 @@ public class OrderDetail {
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name = "BookID", nullable = false, referencedColumnName = "BookID")
+    @JoinColumn(name = "ProductID", nullable = false, referencedColumnName = "ProductID")
     private Book book;
 
     @Column(name = "Quantity", nullable = false)

@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Book")
+@Table(name = "Product")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,10 +17,10 @@ public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "BookID")
+    @Column(name = "ProductID")
     private Long id;
 
-    @Column(name = "Title", nullable = false, length = 200)
+    @Column(name = "Name", nullable = false, length = 200)
     private String title;
 
     @Column(name = "Author", length = 100)
