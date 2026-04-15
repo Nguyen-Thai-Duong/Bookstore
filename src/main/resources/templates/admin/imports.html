@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Management - BookNest</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Base styles cho Sidebar/Header */
+        :root {
+            --color-primary: #8b5a3c;
+            --color-secondary: #d4a574;
+            --color-bg: #f8f6f1;
+            --color-surface: #ffffff;
+            --color-text: #1a1410;
+            --color-border: #e5e0d8;
+        }
+
+        html, body { height: 100%; margin: 0; }
+        body { background-color: #f4f7fe; font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif; }
+
+        .sidebar { background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%); }
+        .sidebar-item { transition: all 0.3s ease; }
+        .sidebar-item:hover, .sidebar-item.active { background-color: rgba(255, 255, 255, 0.15); }
+        .btn-primary { background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%); transition: all 0.3s ease; border: none;}
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(139, 90, 60, 0.3); color: white;}
+
+        /* Styles riêng cho phần Import Content */
+        .card-custom { background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); padding: 24px; }
+        .header-title { color: #5a80f0; font-weight: 700; font-size: 1.5rem; display: flex; align-items: center; gap: 10px; margin: 0; }
+        .count-badge { background-color: #e2e8f0; color: #5a80f0; font-size: 0.85rem; padding: 4px 12px; border-radius: 20px; font-weight: 600; margin-left: 10px; }
+        .create-btn { background-color: #10b981; color: white; border-radius: 8px; font-weight: 600; padding: 8px 20px; border: none; }
+        .create-btn:hover { background-color: #059669; color: white; }
+
+        .filter-label { font-size: 0.75rem; color: #9ca3af; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; display: block; }
+        .form-control, .form-select { border-radius: 8px; border-color: #e5e7eb; box-shadow: none !important; color: #4b5563; }
+        .form-control::placeholder { color: #9ca3af; }
+
+        .table { margin-top: 20px; }
+        .table thead th { color: #9ca3af; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; border-bottom: 2px solid #f3f4f6; border-top: none; padding-bottom: 15px; }
+        .table tbody td { vertical-align: middle; color: #374151; font-weight: 500; border-bottom: 1px solid #f3f4f6; padding: 15px 8px; }
+
+        .avatar { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-right: 10px; font-size: 0.9rem; }
+        .avatar-s { background-color: #6fb3d2; }
+        .avatar-a { background-color: #7b1fa2; }
+
+        .id-text { color: #2563eb; font-weight: 600; }
+        .amount-text { color: #2563eb; font-weight: 700; }
+
+        .badge-status { border-radius: 20px; padding: 6px 14px; font-weight: 600; font-size: 0.85rem; }
+        .bg-pending { background-color: #fef3c7; color: #d97706; }
+        .bg-delivered { background-color: #d1fae5; color: #059669; }
+        .bg-cancelled { background-color: #fee2e2; color: #dc2626; }
+        .quantity-box { border: 1px solid #e5e7eb; border-radius: 6px; padding: 4px 12px; font-size: 0.85rem; }
+
+        .action-btns form { display: inline-block; margin-right: 4px; }
+    </style>
+</head>
+<body class="h-full overflow-auto">
+
+<div class="flex min-h-full w-full">
+
+    <div th:replace="~{admin/admin_sidebar :: admin_sidebar}"></div>
+    <main class="flex-1 ml-64 flex flex-col">
+
+        <div class="p-8">
+            <div class="container-fluid p-0">
+                <div class="card-custom">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="header-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Import Management
+                            <span class="count-badge" th:text="${importPage.totalElements} + ' Imports'">24 Imports</span>
+                        </h2>
+                        <a th:href="@{/admin/imports/create}" class="btn create-btn">+ Create New Import</a>
+                    </div>
+
+                    <form th:action="@{/admin/imports}" method="get" id="filterForm" class="row gx-3 align-items-end mb-2">
+                        <div class="col-md-4">
+                            <span class="filter-label">Search</span>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted">🔍</span>
+                                <input type="text" name="search" th:value="${param.search}" class="form-control border-start-0 ps-0" placeholder="Search ID, Username..." oninput="debounceSubmit()">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <span class="filter-label">Date</span>
+                            <input type="date" name="date" th:value="${param.date}" class="form-control text-muted" onchange="this.form.submit()">
+                        </div>
+                        <div class="col-md-2">
+                            <span class="filter-label">Status</span>
+                            <select name="status" class="form-select" onchange="this.form.submit()">
+                                <option value="">--All Status--</option>
+                                <option value="PENDING" th:selected="${param.status != null and param.status[0] == 'PENDING'}">Pending</option>
+                                <option value="APPROVED" th:selected="${param.status != null and param.status[0] == 'APPROVED'}">Approved</option>
+                                <option value="CANCELLED" th:selected="${param.status != null and param.status[0] == 'CANCELLED'}">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="filter-label">Price Range</span>
+                            <div class="input-group">
+                                <input type="number" name="minPrice" th:value="${param.minPrice}" class="form-control" placeholder="Min" oninput="debounceSubmit()">
+                                <span class="input-group-text bg-white border-0 text-muted">-</span>
+                                <input type="number" name="maxPrice" th:value="${param.maxPrice}" class="form-control" placeholder="Max" oninput="debounceSubmit()">
+                            </div>
+                        </div>
+                    </form>
+
+                    <table class="table table-hover table-borderless">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Date</th>
+                            <th class="text-center">Items</th> <th class="text-center">Status</th>
+                            <th class="text-end">Total Amount</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="imp : ${importPage.content}">
+                            <td class="id-text" th:text="'#' + ${imp.id}">#2019</td>
+                            <td>
+                                    <span class="avatar"
+                                          th:classappend="${imp.username == 'admin' ? 'avatar-a' : 'avatar-s'}"
+                                          th:text="${#strings.substring(imp.username, 0, 1).toUpperCase()}">S</span>
+                                <span th:text="${imp.username}">staff</span>
+                            </td>
+                            <td th:text="${#temporals.format(imp.createdAt, 'dd/MM/yyyy (HH:mm)')}">13/04/2026 (14:35)</td>
+
+                            <td class="text-center"><span class="quantity-box" th:text="${imp.totalQuantity}">16</span></td>
+                            <td class="text-center">
+                                    <span class="badge-status"
+                                          th:classappend="${imp.status.name() == 'PENDING' ? 'bg-pending' : (imp.status.name() == 'APPROVED' ? 'bg-delivered' : 'bg-cancelled')}"
+                                          th:text="${#strings.capitalize(imp.status.name().toLowerCase())}">Pending</span>
+                            </td>
+                            <td class="text-end amount-text" th:text="${#numbers.formatDecimal(imp.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' VND'">2.530.000 VND</td>
+
+                            <td class="text-center action-btns">
+                                <th:block th:if="${imp.status.name() == 'PENDING'}">
+                                    <form th:action="@{/admin/imports/{id}/status(id=${imp.id})}" method="post"
+                                          onsubmit="return confirm('Are you sure you want to APPROVE this import? The books will be added to stock.');">
+                                        <input type="hidden" name="action" value="approve">
+                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                    </form>
+
+                                    <form th:action="@{/admin/imports/{id}/status(id=${imp.id})}" method="post"
+                                          onsubmit="return confirm('Are you sure you want to CANCEL this import?');">
+                                        <input type="hidden" name="action" value="cancel">
+                                        <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+                                    </form>
+                                </th:block>
+
+                                <a th:href="@{/admin/imports/{id}(id=${imp.id})}" class="btn btn-sm btn-outline-secondary">View</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <nav th:if="${importPage.totalPages > 1}" class="mt-4">
+                        <ul class="pagination justify-content-end">
+                            <li class="page-item" th:classappend="${importPage.first ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/imports(page=${importPage.number - 1}, search=${param.search}, date=${param.date}, status=${param.status}, minPrice=${param.minPrice}, maxPrice=${param.maxPrice})}">Previous</a>
+                            </li>
+
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, importPage.totalPages - 1)}" th:classappend="${importPage.number == i ? 'active' : ''}">
+                                <a class="page-link" th:href="@{/admin/imports(page=${i}, search=${param.search}, date=${param.date}, status=${param.status}, minPrice=${param.minPrice}, maxPrice=${param.maxPrice})}" th:text="${i + 1}">1</a>
+                            </li>
+
+                            <li class="page-item" th:classappend="${importPage.last ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/admin/imports(page=${importPage.number + 1}, search=${param.search}, date=${param.date}, status=${param.status}, minPrice=${param.minPrice}, maxPrice=${param.maxPrice})}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    let timeout = null;
+    function debounceSubmit() {
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+            document.getElementById('filterForm').submit();
+        }, 800);
+    }
+</script>
+</body>
+</html>
