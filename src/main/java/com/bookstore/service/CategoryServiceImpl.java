@@ -22,6 +22,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<Category> getCategoriesByProductType(Long typeId) {
+        return categoryRepository.findByProductType(typeId);
+    }
+
+    @Override
     public Optional<Category> getCategoryById(Long id) {
         return categoryRepository.findById(id);
     }

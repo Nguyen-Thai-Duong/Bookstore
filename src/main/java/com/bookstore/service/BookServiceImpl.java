@@ -29,6 +29,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public List<Book> getProductsByProductType(Long typeId) {
+        return bookRepository.findByProductType(typeId);
+    }
+
+    @Override
     public Optional<Book> getBookById(Long id) {
         return bookRepository.findById(id);
     }
@@ -75,7 +80,7 @@ public class BookServiceImpl implements BookService {
             String status = detail.getOrder() != null && detail.getOrder().getStatus() != null
                     ? detail.getOrder().getStatus().trim().toLowerCase()
                     : "";
-            if (status.contains("cancel") || status.contains("cancel") || status.contains("huy")) {
+            if (status.contains("cancel") || status.contains("huy")) {
                 continue;
             }
 
