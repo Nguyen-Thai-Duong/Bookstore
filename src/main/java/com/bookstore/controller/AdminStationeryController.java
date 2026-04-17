@@ -11,12 +11,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -93,13 +95,15 @@ public class AdminStationeryController {
         if (item.getId() != null) {
             bookService.getBookById(item.getId()).ifPresent(existingItem -> {
                 existingImageUrl[0] = existingItem.getImageUrl();
-                if (item.getCreatedAt() == null) {
-                    item.setCreatedAt(existingItem.getCreatedAt());
-                }
+                // Giữ lại ngày tạo cũ khi cập nhật
+                item.setCreatedAt(existingItem.getCreatedAt());
                 if (item.getImageUrl() == null || item.getImageUrl().isBlank()) {
                     item.setImageUrl(existingItem.getImageUrl());
                 }
             });
+        } else {
+            // Gán ngày tạo hiện tại cho sản phẩm mới
+            item.setCreatedAt(LocalDateTime.now());
         }
 
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -116,15 +120,20 @@ public class AdminStationeryController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteStationery(@PathVariable Long id) {
-        bookService.deleteBook(id);
+    public String deleteStationery(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            bookService.deleteBook(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Item deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Cannot delete this item because it is linked to existing orders.");
+        }
         return "redirect:/admin/stationery";
     }
 
     @GetMapping("/{id}")
     public String viewStationery(@PathVariable Long id, Model model) {
         bookService.getBookById(id).ifPresent(item -> model.addAttribute("item", BookDTO.fromEntity(item)));
-        return "admin/stationery/view";
+        return "admin/stationery/detail-stationery";
     }
 
     private String storeImage(MultipartFile imageFile, String oldImageUrl) throws IOException {
