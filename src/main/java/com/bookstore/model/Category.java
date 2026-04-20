@@ -31,7 +31,7 @@ public class Category {
     @JoinColumn(name = "ProductTypeID", referencedColumnName = "ProductTypeID")
     private ProductType productType;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Book> books;

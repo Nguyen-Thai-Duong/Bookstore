@@ -22,6 +22,8 @@ public class BookDTO {
     private String imageUrl;
     private LocalDateTime createdAt;
     private CategoryDTO category;
+    private boolean discontinued;
+    private Long cartCleanupRemainingSeconds;
 
     public static BookDTO fromEntity(Book book) {
         if (book == null) {
@@ -37,7 +39,9 @@ public class BookDTO {
                 book.getDescription(),
                 book.getImageUrl(),
                 book.getCreatedAt(),
-                CategoryDTO.fromEntity(book.getCategory()));
+                CategoryDTO.fromEntity(book.getCategory()),
+                book.isDiscontinued(),
+                book.getCartCleanupRemainingSeconds());
     }
 
     public Book toEntity() {
@@ -51,5 +55,13 @@ public class BookDTO {
                 imageUrl,
                 createdAt,
                 category == null ? null : category.toEntity());
+    }
+
+    public long getCartCleanupRemainingMinutes() {
+        if (cartCleanupRemainingSeconds == null || cartCleanupRemainingSeconds <= 0) {
+            return 0;
+        }
+
+        return (cartCleanupRemainingSeconds + 59) / 60;
     }
 }

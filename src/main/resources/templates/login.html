@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --vb-brown: #8B573C;
+            --vb-brown: #F37021;
             --bg-gray: #f5f5f5;
             --border: #ddd;
             --text: #333;
@@ -80,6 +80,43 @@
             border-radius: 0 4px 4px 0;
             cursor: pointer;
             font-weight: 700;
+        }
+
+        #global-search-suggest {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 58px;
+            z-index: 20;
+            background: #fff;
+            border: 1px solid #e6e6e6;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #global-search-suggest:not(.hidden) {
+            display: block;
+        }
+
+        .cart-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f9f9f9;
+            padding: 8px 15px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            text-decoration: none;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .cart-box:hover {
+            color: var(--text);
         }
 
         .auth-links {
@@ -318,34 +355,7 @@
 </head>
 
 <body>
-    <header>
-        <div class="container header-content">
-            <div class="logo">
-                <a th:href="@{/}" class="logo-text">BookNest</a>
-            </div>
-
-            <form class="search-container" th:action="@{/books/search}" method="get">
-                <input type="text" name="title" placeholder="Search books by Title, Author, Publisher..."
-                    autocomplete="off">
-                <button type="submit">SEARCH</button>
-            </form>
-
-            <div class="auth-links">
-                <a th:href="@{/register}">Register</a>
-                <a th:href="@{/login}" class="primary">Login</a>
-            </div>
-        </div>
-    </header>
-
-    <div class="nav-bar">
-        <div class="container">
-            <ul class="nav-links">
-                <li><a th:href="@{/}"><i data-lucide="home" size="14" style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Category</a></li>
-                <li><a th:href="@{/orders}">Order</a></li>
-            </ul>
-        </div>
-    </div>
+    <div th:replace="~{fragments/site-header :: siteHeader('login')}"></div>
 
     <main class="container">
         <section class="panel">

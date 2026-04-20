@@ -10,7 +10,7 @@
     <style>
         :root {
             --vb-green: #3ea31a;
-            --vb-brown: #8B573C;
+            --vb-brown: #F37021;
             --bg-gray: #f5f5f5;
             --border: #ddd;
             --text: #333;
@@ -432,53 +432,7 @@
 </head>
 
 <body>
-    </div>
-
-    <header>
-        <div class="container header-content">
-            <div class="logo">
-                <a th:href="@{/}" class="logo-text">BookNest</a>
-            </div>
-
-            <form class="search-container" th:action="@{/books/search}" method="get">
-                <input id="global-search-input" type="text" name="title" placeholder="Search books by title, author..."
-                    autocomplete="off">
-                <button type="submit">SEARCH</button>
-                <div id="global-search-suggest" class="hidden"></div>
-            </form>
-
-            <a th:if="${session.loggedInUser != null}" th:href="@{/cart}" class="cart-box">
-                <i data-lucide="shopping-cart" size="20"></i>
-                <div>
-                    <span style="display:block; font-size: 10px; color: #999;">Shopping Cart</span>
-                    <strong style="font-size: 12px;"
-                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) items|">(0) items</strong>
-                </div>
-            </a>
-
-            <div th:if="${session.loggedInUser == null}" class="auth-links">
-                <a th:href="@{/login}">Login</a>
-                <a th:href="@{/register}" class="primary">Register</a>
-            </div>
-
-            <div th:if="${session.loggedInUser != null}" class="auth-links">
-                <a th:href="@{/account}">Account</a>
-                <a th:href="@{/orders}">Order</a>
-                <a th:if="${session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
-                    th:href="@{/admin}">Admin</a>
-            </div>
-        </div>
-    </header>
-
-    <div class="nav-bar">
-        <div class="container">
-            <ul class="nav-links">
-                <li><a th:href="@{/}"><i data-lucide="home" size="14" style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Category</a></li>
-                <li><a th:href="@{/orders}">Order</a></li>
-            </ul>
-        </div>
-    </div>
+    <div th:replace="~{fragments/site-header :: siteHeader('books')}"></div>
 
     <main class="container page-main">
         <aside class="panel">

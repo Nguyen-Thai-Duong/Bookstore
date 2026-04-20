@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <div th:fragment="siteHeader(activePage)">
+        <header>
+            <div class="container header-content">
+                <div class="logo">
+                    <a th:href="@{/}" class="logo-text">BookNest</a>
+                </div>
+
+                <form class="search-container" th:action="@{/books/search}" method="get">
+                    <input id="global-search-input" type="text" name="title"
+                        placeholder="Search books by Title, Author, Publisher..." autocomplete="off">
+                    <button type="submit">SEARCH</button>
+                    <div id="global-search-suggest" class="hidden"></div>
+                </form>
+
+                <a th:href="@{/cart}" class="cart-box">
+                    <i data-lucide="shopping-cart" size="20"></i>
+                    <div>
+                        <span style="display:block; font-size: 10px; color: #999;">Shopping Cart</span>
+                        <strong style="font-size: 12px;"
+                            th:text="|(${session.cartCount != null ? session.cartCount : 0}) items|">(0) items</strong>
+                    </div>
+                </a>
+
+                <div class="auth-links" th:if="${session.loggedInUser == null}">
+                    <a th:href="@{/login}">Login</a>
+                    <a th:href="@{/register}" class="primary">Register</a>
+                </div>
+
+                <div class="auth-links" th:if="${session.loggedInUser != null}">
+                    <a th:href="@{/account}">Account</a>
+                    <a th:href="@{/orders}">Order</a>
+                    <a th:if="${session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
+                        th:href="@{/admin}" class="admin-link">Admin</a>
+                    <form method="post" th:action="@{/logout}" style="display:inline-flex; margin: 0;">
+                        <button type="submit"
+                            style="border: 1px solid var(--border); background: #fff; color: #444; padding: 8px 12px; border-radius: 4px; font-weight: 500; cursor: pointer; white-space: nowrap;">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </header>
+
+        <div class="nav-bar">
+            <div class="container">
+                <ul class="nav-links">
+                    <li>
+                        <a th:href="@{/}"
+                            th:style="${activePage == 'home'} ? 'background: var(--vb-brown); color: #fff;' : ''">
+                            <i data-lucide="home" size="14" style="margin-bottom: -2px;"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/books}"
+                            th:style="${activePage == 'books'} ? 'background: var(--vb-brown); color: #fff;' : ''">BOOKS</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/orders}"
+                            th:style="${activePage == 'orders'} ? 'background: var(--vb-brown); color: #fff;' : ''">Order</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

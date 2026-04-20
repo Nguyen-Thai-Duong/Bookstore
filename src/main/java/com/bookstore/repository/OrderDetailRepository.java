@@ -13,4 +13,6 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
     List<OrderDetail> findByOrder_Id(Long orderId);
 
     List<OrderDetail> findByBookId(Long bookId);
+
+    boolean existsByBook_Id(Long bookId);
 }
