@@ -41,6 +41,9 @@ public class Book {
     @Column(name = "CreatedAt")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "Status", length = 20)
+    private String status = "Active";
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CategoryID", nullable = false, referencedColumnName = "CategoryID")
     private Category category;

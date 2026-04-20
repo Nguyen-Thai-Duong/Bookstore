@@ -222,6 +222,16 @@
             font-weight: 500;
         }
 
+        .success-box {
+            margin-bottom: 12px;
+            border: 1px solid #c3f3c3;
+            background: #f3fff3;
+            color: #1fba1f;
+            border-radius: 4px;
+            padding: 10px 12px;
+            font-weight: 500;
+        }
+
         .btn-submit {
             width: 100%;
             border: none;
@@ -352,6 +362,8 @@
             <div class="panel-head">Login</div>
             <div class="panel-body">
                 <div th:if="${error}" class="error-box" th:text="${error}"></div>
+                <div th:if="${successMessage}" class="success-box" th:text="${successMessage}"></div>
+                <div th:if="${param.verified}" class="success-box">Tài khoản đã xác thực thành công. Vui lòng đăng nhập.</div>
 
                 <form method="post" th:action="@{/login}">
                     <div class="field">
@@ -369,6 +381,10 @@
                                 <i class="icon-off" data-lucide="eye-off" size="18"></i>
                             </button>
                         </div>
+                    </div>
+
+                    <div class="field" style="text-align: right; margin-bottom: 20px;">
+                        <a th:href="@{/forgot-password}" style="color: #0066cc; text-decoration: none; font-size: 12px;">Forgot password?</a>
                     </div>
 
                     <button type="submit" class="btn-submit">Login</button>

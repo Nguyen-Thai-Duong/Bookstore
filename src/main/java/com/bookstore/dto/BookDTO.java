@@ -21,6 +21,7 @@ public class BookDTO {
     private String description;
     private String imageUrl;
     private LocalDateTime createdAt;
+    private String status;
     private CategoryDTO category;
 
     public static BookDTO fromEntity(Book book) {
@@ -37,6 +38,7 @@ public class BookDTO {
                 book.getDescription(),
                 book.getImageUrl(),
                 book.getCreatedAt(),
+                book.getStatus(),
                 CategoryDTO.fromEntity(book.getCategory()));
     }
 
@@ -50,6 +52,7 @@ public class BookDTO {
                 description,
                 imageUrl,
                 createdAt,
+                status,
                 category == null ? null : category.toEntity());
     }
 }

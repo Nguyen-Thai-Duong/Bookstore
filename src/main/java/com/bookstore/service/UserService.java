@@ -16,4 +16,7 @@ public interface UserService {
     void deleteUser(Long id);
 
     boolean existsByEmail(String email);
+
+    // Thêm hàm này để gửi OTP từ Controller
+    void sendOtp(String email, String otp);
 }

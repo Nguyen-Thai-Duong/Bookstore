@@ -31,34 +31,33 @@ public class StationeryController {
                                  @RequestParam(required = false) Double maxPrice,
                                  @RequestParam(required = false) String sort,
                                  Model model) {
+        
+        // Lấy tất cả sản phẩm Stationery (ProductTypeID = 2) và chỉ lấy sản phẩm Active
+        List<Book> items = bookService.getProductsByProductType(2L).stream()
+                .filter(i -> "Active".equalsIgnoreCase(i.getStatus()))
+                .collect(Collectors.toList());
 
-        // Lấy tất cả sản phẩm Stationery (ProductTypeID = 2)
-        List<Book> items = bookService.getProductsByProductType(2L);
-
-        // Lọc theo tên hoặc hãng (author đang dùng để lưu brand cho Stationery)
+        // Filter logic
         if (name != null && !name.isEmpty()) {
             String lowerName = name.toLowerCase();
             items = items.stream()
-                    .filter(i -> (i.getTitle() != null && i.getTitle().toLowerCase().contains(lowerName)) ||
+                    .filter(i -> (i.getTitle() != null && i.getTitle().toLowerCase().contains(lowerName)) || 
                                  (i.getAuthor() != null && i.getAuthor().toLowerCase().contains(lowerName)))
                     .collect(Collectors.toList());
         }
-
-        // Lọc theo danh mục
+        
         if (categoryId != null) {
             items = items.stream()
                     .filter(i -> i.getCategory() != null && i.getCategory().getId().equals(categoryId))
                     .collect(Collectors.toList());
         }
 
-        // Lọc theo giá tối thiểu
         if (minPrice != null) {
             items = items.stream()
                     .filter(i -> i.getPrice() != null && i.getPrice().doubleValue() >= minPrice)
                     .collect(Collectors.toList());
         }
 
-        // Lọc theo giá tối đa
         if (maxPrice != null) {
             items = items.stream()
                     .filter(i -> i.getPrice() != null && i.getPrice().doubleValue() <= maxPrice)
@@ -81,9 +80,8 @@ public class StationeryController {
         }
 
         model.addAttribute("items", items);
-        // Lấy danh sách category dành riêng cho văn phòng phẩm để hiển thị trong filter
         model.addAttribute("categories", categoryService.getCategoriesByProductType(2L));
-
+        
         return "stationery-list";
     }
 }

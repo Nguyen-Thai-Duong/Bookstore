@@ -41,7 +41,10 @@ public class AdminStationeryController {
     public String listStationery(@RequestParam(required = false) String name,
                                 @RequestParam(required = false) String brand,
                                 Model model) {
-        List<Book> stationeryItems = bookService.getProductsByProductType(2L);
+        // Chỉ lấy sản phẩm có ProductTypeID = 2 và Status = 'Active'
+        List<Book> stationeryItems = bookService.getProductsByProductType(2L).stream()
+                .filter(item -> "Active".equalsIgnoreCase(item.getStatus()))
+                .collect(Collectors.toList());
 
         if (name != null && !name.isEmpty()) {
             stationeryItems = stationeryItems.stream()
@@ -93,17 +96,19 @@ public class AdminStationeryController {
         final String[] existingImageUrl = { null };
 
         if (item.getId() != null) {
-            bookService.getBookById(item.getId()).ifPresent(existingItem -> {
-                existingImageUrl[0] = existingItem.getImageUrl();
-                // Giữ lại ngày tạo cũ khi cập nhật
-                item.setCreatedAt(existingItem.getCreatedAt());
+            bookService.getBookById(item.getId()).ifPresent(existingBook -> {
+                existingImageUrl[0] = existingBook.getImageUrl();
+                item.setCreatedAt(existingBook.getCreatedAt());
+                if (item.getStatus() == null || item.getStatus().isEmpty()) {
+                    item.setStatus(existingBook.getStatus());
+                }
                 if (item.getImageUrl() == null || item.getImageUrl().isBlank()) {
-                    item.setImageUrl(existingItem.getImageUrl());
+                    item.setImageUrl(existingBook.getImageUrl());
                 }
             });
         } else {
-            // Gán ngày tạo hiện tại cho sản phẩm mới
             item.setCreatedAt(LocalDateTime.now());
+            item.setStatus("Active");
         }
 
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -121,19 +126,19 @@ public class AdminStationeryController {
 
     @GetMapping("/delete/{id}")
     public String deleteStationery(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        try {
-            bookService.deleteBook(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Item deleted successfully!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Cannot delete this item because it is linked to existing orders.");
-        }
+        bookService.getBookById(id).ifPresent(item -> {
+            // Đổi từ "Inactive" sang "Discontinued" để khớp với CHECK constraint trong Database
+            item.setStatus("Discontinued"); 
+            bookService.saveBook(item);
+            redirectAttributes.addFlashAttribute("successMessage", "Item has been discontinued.");
+        });
         return "redirect:/admin/stationery";
     }
 
     @GetMapping("/{id}")
     public String viewStationery(@PathVariable Long id, Model model) {
         bookService.getBookById(id).ifPresent(item -> model.addAttribute("item", BookDTO.fromEntity(item)));
-        return "admin/stationery/detail-stationery";
+        return "admin/stationery/details-stationery";
     }
 
     private String storeImage(MultipartFile imageFile, String oldImageUrl) throws IOException {
