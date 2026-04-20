@@ -41,7 +41,6 @@ public class AdminStationeryController {
     public String listStationery(@RequestParam(required = false) String name,
                                 @RequestParam(required = false) String brand,
                                 Model model) {
-        // Chỉ lấy sản phẩm có ProductTypeID = 2 và Status = 'Active'
         List<Book> stationeryItems = bookService.getProductsByProductType(2L).stream()
                 .filter(item -> "Active".equalsIgnoreCase(item.getStatus()))
                 .collect(Collectors.toList());
@@ -96,14 +95,14 @@ public class AdminStationeryController {
         final String[] existingImageUrl = { null };
 
         if (item.getId() != null) {
-            bookService.getBookById(item.getId()).ifPresent(existingBook -> {
-                existingImageUrl[0] = existingBook.getImageUrl();
-                item.setCreatedAt(existingBook.getCreatedAt());
+            bookService.getBookById(item.getId()).ifPresent(existingItem -> {
+                existingImageUrl[0] = existingItem.getImageUrl();
+                item.setCreatedAt(existingItem.getCreatedAt());
                 if (item.getStatus() == null || item.getStatus().isEmpty()) {
-                    item.setStatus(existingBook.getStatus());
+                    item.setStatus(existingItem.getStatus());
                 }
                 if (item.getImageUrl() == null || item.getImageUrl().isBlank()) {
-                    item.setImageUrl(existingBook.getImageUrl());
+                    item.setImageUrl(existingItem.getImageUrl());
                 }
             });
         } else {
@@ -127,7 +126,6 @@ public class AdminStationeryController {
     @GetMapping("/delete/{id}")
     public String deleteStationery(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         bookService.getBookById(id).ifPresent(item -> {
-            // Đổi từ "Inactive" sang "Discontinued" để khớp với CHECK constraint trong Database
             item.setStatus("Discontinued"); 
             bookService.saveBook(item);
             redirectAttributes.addFlashAttribute("successMessage", "Item has been discontinued.");
@@ -138,7 +136,7 @@ public class AdminStationeryController {
     @GetMapping("/{id}")
     public String viewStationery(@PathVariable Long id, Model model) {
         bookService.getBookById(id).ifPresent(item -> model.addAttribute("item", BookDTO.fromEntity(item)));
-        return "admin/stationery/details-stationery";
+        return "admin/stationery/detail-stationery";
     }
 
     private String storeImage(MultipartFile imageFile, String oldImageUrl) throws IOException {

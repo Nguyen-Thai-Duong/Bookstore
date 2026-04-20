@@ -6,6 +6,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public List<User> getCustomersOnly() {
+        // Chỉ lấy user có role là Customer (RoleID = 2 theo config của bạn)
+        return userRepository.findAll().stream()
+                .filter(u -> u.getRole() != null && (u.getRole().getId() == 2L || "Customer".equalsIgnoreCase(u.getRole().getRoleName())))
+                .toList();
     }
 
     @Override
@@ -71,7 +80,7 @@ public class UserServiceImpl implements UserService {
                         "<h1 style='color: #ffffff; margin: 0;'>BookNest</h1>" +
                     "</div>" +
                     "<div style='padding: 30px; line-height: 1.6; color: #333333;'>" +
-                        "<h2 style='color: #8b5a3c;'>Xác thực tài khoản</h2>" +
+                        "<h2 style='color: #8b5a3c;'>Xác thực đăng ký tài khoản</h2>" +
                         "<p>Chào bạn,</p>" +
                         "<p>Cảm ơn bạn đã lựa chọn <b>BookNest</b>. Để hoàn tất quá trình đăng ký, vui lòng sử dụng mã OTP dưới đây:</p>" +
                         "<div style='text-align: center; margin: 30px 0;'>" +
