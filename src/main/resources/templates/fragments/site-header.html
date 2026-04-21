@@ -3,6 +3,187 @@
 
 <body>
     <div th:fragment="siteHeader(activePage)">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+
+            :root {
+                --vb-brown: #F37021;
+                --border: #ddd;
+                --text: #333;
+            }
+
+            header,
+            .nav-bar,
+            .nav-bar * {
+                font-family: 'Roboto', sans-serif;
+            }
+
+            header {
+                background: #fff;
+                padding: 15px 0;
+                border-bottom: 2px solid var(--vb-brown);
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 10px;
+            }
+
+            .header-content {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .logo {
+                min-width: 220px;
+            }
+
+            .logo-text {
+                font-size: 32px;
+                font-weight: 900;
+                color: var(--vb-brown);
+                text-decoration: none;
+                letter-spacing: -1px;
+            }
+
+            .search-container {
+                flex: 1;
+                display: flex;
+                position: relative;
+            }
+
+            .search-container input {
+                flex: 1;
+                padding: 10px 15px;
+                border: 1px solid #ccc;
+                border-right: none;
+                border-radius: 4px 0 0 4px;
+                outline: none;
+            }
+
+            .search-container button {
+                background: var(--vb-brown);
+                color: #fff;
+                border: none;
+                padding: 0 20px;
+                border-radius: 0 4px 4px 0;
+                cursor: pointer;
+                font-weight: 700;
+            }
+
+            #global-search-suggest {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 58px;
+                z-index: 20;
+                background: #fff;
+                border: 1px solid #e6e6e6;
+                border-top: none;
+                border-radius: 0 0 6px 6px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                max-height: 300px;
+                overflow-y: auto;
+            }
+
+            #global-search-suggest:not(.hidden) {
+                display: block;
+            }
+
+            .cart-box {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                background: #f9f9f9;
+                padding: 8px 15px;
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                text-decoration: none;
+                color: var(--text);
+                white-space: nowrap;
+            }
+
+            .auth-links {
+                display: flex;
+                gap: 8px;
+                white-space: nowrap;
+            }
+
+            .auth-links a {
+                text-decoration: none;
+                border: 1px solid var(--border);
+                background: #fff;
+                color: #444;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 1.2;
+            }
+
+            .auth-links .logout-btn {
+                text-decoration: none;
+                border: 1px solid var(--border);
+                background: #fff;
+                color: #444;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 1.2;
+                font-family: 'Roboto', sans-serif;
+                cursor: pointer;
+                white-space: nowrap;
+            }
+
+            .auth-links a.primary {
+                background: var(--vb-brown);
+                color: #fff;
+                border-color: var(--vb-brown);
+            }
+
+            .nav-bar {
+                background: #fff;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                margin-bottom: 20px;
+            }
+
+            .nav-links {
+                display: flex;
+                list-style: none;
+                overflow-x: auto;
+            }
+
+            .nav-links li a {
+                display: block;
+                padding: 12px 20px;
+                text-decoration: none;
+                color: var(--text);
+                font-weight: 500;
+                text-transform: uppercase;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+
+            .nav-links li a:hover {
+                background: var(--vb-brown);
+                color: #fff;
+            }
+
+            @media (max-width: 1024px) {
+                .header-content {
+                    flex-wrap: wrap;
+                }
+
+                .logo {
+                    min-width: 170px;
+                }
+            }
+        </style>
+
         <header>
             <div class="container header-content">
                 <div class="logo">
@@ -36,8 +217,7 @@
                     <a th:if="${session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
                         th:href="@{/admin}" class="admin-link">Admin</a>
                     <form method="post" th:action="@{/logout}" style="display:inline-flex; margin: 0;">
-                        <button type="submit"
-                            style="border: 1px solid var(--border); background: #fff; color: #444; padding: 8px 12px; border-radius: 4px; font-weight: 500; cursor: pointer; white-space: nowrap;">Logout</button>
+                        <button type="submit" class="logout-btn">Logout</button>
                     </form>
                 </div>
             </div>

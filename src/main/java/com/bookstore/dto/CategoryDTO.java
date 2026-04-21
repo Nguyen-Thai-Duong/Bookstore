@@ -13,6 +13,8 @@ public class CategoryDTO {
     private Long id;
     private String name;
     private String description;
+    private Long productTypeId;
+    private String productTypeName;
     private Long bookCount;
 
     public static CategoryDTO fromEntity(Category category) {
@@ -20,7 +22,13 @@ public class CategoryDTO {
             return null;
         }
 
-        return new CategoryDTO(category.getId(), category.getName(), category.getDescription(), 0L);
+        return new CategoryDTO(
+                category.getId(),
+                category.getName(),
+                category.getDescription(),
+                category.getProductType() != null ? category.getProductType().getId() : null,
+                category.getProductType() != null ? category.getProductType().getName() : null,
+                0L);
     }
 
     public Category toEntity() {

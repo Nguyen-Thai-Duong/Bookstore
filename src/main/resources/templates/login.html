@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -289,40 +289,6 @@
             margin-top: 40px;
         }
 
-        .footer-cols {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .footer-cols h4 {
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: var(--vb-brown);
-        }
-
-        .footer-cols ul {
-            list-style: none;
-        }
-
-        .footer-cols li {
-            margin-bottom: 8px;
-        }
-
-        .footer-cols a {
-            text-decoration: none;
-            color: #666;
-        }
-
-        .bottom-footer {
-            text-align: center;
-            padding-top: 20px;
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            font-size: 11px;
-            color: #999;
-        }
-
         @media (max-width: 1024px) {
             .header-content {
                 flex-wrap: wrap;
@@ -330,10 +296,6 @@
 
             .logo {
                 min-width: 170px;
-            }
-
-            .footer-cols {
-                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -345,10 +307,6 @@
             .search-container {
                 width: 100%;
                 order: 3;
-            }
-
-            .footer-cols {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -372,7 +330,8 @@
                     <div class="field">
                         <label>Password</label>
                         <div class="password-wrap">
-                            <input type="password" id="loginPassword" name="password" required placeholder="••••••••••">
+                            <input type="password" id="loginPassword" name="password" required
+                                placeholder="Enter password">
                             <button id="toggleLoginPassword" class="password-toggle" type="button"
                                 aria-label="Show password" aria-pressed="false">
                                 <i class="icon-on" data-lucide="eye" size="18"></i>
@@ -389,45 +348,7 @@
         </section>
     </main>
 
-    <footer>
-        <div class="container footer-cols">
-            <div>
-                <h4>CUSTOMER SUPPORT</h4>
-                <ul>
-                    <li><a th:href="@{/books}">Products and orders</a></li>
-                    <li><a href="#">Return policy</a></li>
-                    <li><a href="#">Shipping method</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>About BOOKNEST</h4>
-                <ul>
-                    <li><a href="#">About BookNest</a></li>
-                    <li><a href="#">Terms of Use</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>ACCOUNT</h4>
-                <ul>
-                    <li><a th:href="@{/login}">Login</a></li>
-                    <li><a th:href="@{/register}">Create account</a></li>
-                    <li><a th:href="@{/orders}">Order history</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>CONTACT</h4>
-                <p style="font-size: 12px; color: #666;">
-                    Email: hotro@booknest.vn<br>
-                    Hotline: 1900 1234<br>
-                    Address: Tri Thuc Building, District 1, Ho Chi Minh City
-                </p>
-            </div>
-        </div>
-        <div class="bottom-footer">
-            &copy; 2026 BookNest. All rights reserved.
-        </div>
-    </footer>
+    <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
 
     <script>
         lucide.createIcons();

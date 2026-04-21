@@ -165,6 +165,42 @@
                                     </div>
                                 </div>
 
+                                <div class="flex items-start border-b border-gray-100 pb-4">
+                                    <div class="w-40 font-semibold text-gray-700">Product Type:</div>
+                                    <div class="flex-1 text-gray-600"
+                                        th:text="${book.category != null and book.category.productTypeName != null ? book.category.productTypeName : 'N/A'}">
+                                        N/A
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start border-b border-gray-100 pb-4">
+                                    <div class="w-40 font-semibold text-gray-700">Published Year:</div>
+                                    <div class="flex-1 text-gray-600"
+                                        th:text="${book.publishedYear != null ? book.publishedYear : 'N/A'}">N/A</div>
+                                </div>
+
+                                <div class="flex items-start border-b border-gray-100 pb-4">
+                                    <div class="w-40 font-semibold text-gray-700">Publisher:</div>
+                                    <div class="flex-1 text-gray-600"
+                                        th:text="${book.publisher != null and !book.publisher.isEmpty() ? book.publisher : 'N/A'}">
+                                        N/A
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start border-b border-gray-100 pb-4">
+                                    <div class="w-40 font-semibold text-gray-700">Size (W x H x T):</div>
+                                    <div class="flex-1 text-gray-600"
+                                        th:text="${book.widthCm != null and book.heightCm != null and book.thicknessCm != null ? #numbers.formatDecimal(book.widthCm, 1, 'COMMA', 2, 'POINT') + ' x ' + #numbers.formatDecimal(book.heightCm, 1, 'COMMA', 2, 'POINT') + ' x ' + #numbers.formatDecimal(book.thicknessCm, 1, 'COMMA', 2, 'POINT') + ' cm' : 'N/A'}">
+                                        N/A
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start border-b border-gray-100 pb-4">
+                                    <div class="w-40 font-semibold text-gray-700">Page Count:</div>
+                                    <div class="flex-1 text-gray-600"
+                                        th:text="${book.pageCount != null ? book.pageCount : 'N/A'}">N/A</div>
+                                </div>
+
                                 <div class="flex items-start pt-2">
                                     <div class="w-40 font-semibold text-gray-700">Description:</div>
                                     <div class="flex-1 text-gray-600 whitespace-pre-wrap"

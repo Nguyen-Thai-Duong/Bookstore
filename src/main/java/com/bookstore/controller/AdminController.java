@@ -14,6 +14,7 @@ import com.bookstore.model.Voucher;
 import com.bookstore.repository.BookRepository;
 import com.bookstore.repository.CartItemRepository;
 import com.bookstore.repository.OrderDetailRepository;
+import com.bookstore.repository.ProductTypeRepository;
 import com.bookstore.repository.ReviewRepository;
 import com.bookstore.service.BookService;
 import com.bookstore.service.CategoryService;
@@ -78,6 +79,9 @@ public class AdminController {
 
     @Autowired
     private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private ProductTypeRepository productTypeRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -145,6 +149,7 @@ public class AdminController {
         model.addAttribute("book", new BookDTO());
         model.addAttribute("categories",
                 categoryService.getAllCategories().stream().map(CategoryDTO::fromEntity).toList());
+        model.addAttribute("productTypes", productTypeRepository.findAll());
         return "admin/books/form";
     }
 
@@ -154,7 +159,11 @@ public class AdminController {
             model.addAttribute("book", BookDTO.fromEntity(book));
             model.addAttribute("categories",
                     categoryService.getAllCategories().stream().map(CategoryDTO::fromEntity).toList());
+            model.addAttribute("productTypes", productTypeRepository.findAll());
         });
+        if (!model.containsAttribute("productTypes")) {
+            model.addAttribute("productTypes", productTypeRepository.findAll());
+        }
         return "admin/books/form";
     }
 

@@ -48,6 +48,24 @@ public class Book {
     @Column(name = "CreatedAt")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "PublishedYear")
+    private Integer publishedYear;
+
+    @Column(name = "Publisher", length = 150)
+    private String publisher;
+
+    @Column(name = "WidthCm", precision = 5, scale = 2)
+    private BigDecimal widthCm;
+
+    @Column(name = "HeightCm", precision = 5, scale = 2)
+    private BigDecimal heightCm;
+
+    @Column(name = "ThicknessCm", precision = 5, scale = 2)
+    private BigDecimal thicknessCm;
+
+    @Column(name = "PageCount")
+    private Integer pageCount;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CategoryID", nullable = false, referencedColumnName = "CategoryID")
     private Category category;

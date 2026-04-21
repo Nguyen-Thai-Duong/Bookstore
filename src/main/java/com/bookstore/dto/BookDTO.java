@@ -21,7 +21,14 @@ public class BookDTO {
     private String description;
     private String imageUrl;
     private LocalDateTime createdAt;
+    private Integer publishedYear;
+    private String publisher;
+    private BigDecimal widthCm;
+    private BigDecimal heightCm;
+    private BigDecimal thicknessCm;
+    private Integer pageCount;
     private CategoryDTO category;
+    private Long productTypeId;
     private boolean discontinued;
     private Long cartCleanupRemainingSeconds;
 
@@ -39,7 +46,16 @@ public class BookDTO {
                 book.getDescription(),
                 book.getImageUrl(),
                 book.getCreatedAt(),
+                book.getPublishedYear(),
+                book.getPublisher(),
+                book.getWidthCm(),
+                book.getHeightCm(),
+                book.getThicknessCm(),
+                book.getPageCount(),
                 CategoryDTO.fromEntity(book.getCategory()),
+                book.getCategory() != null && book.getCategory().getProductType() != null
+                        ? book.getCategory().getProductType().getId()
+                        : null,
                 book.isDiscontinued(),
                 book.getCartCleanupRemainingSeconds());
     }
@@ -54,6 +70,12 @@ public class BookDTO {
                 description,
                 imageUrl,
                 createdAt,
+                publishedYear,
+                publisher,
+                widthCm,
+                heightCm,
+                thicknessCm,
+                pageCount,
                 category == null ? null : category.toEntity());
     }
 
