@@ -6,6 +6,8 @@ import java.util.Optional;
 
 public interface UserService {
     List<User> getAllUsers();
+    
+    List<User> getCustomersOnly();
 
     Optional<User> getUserById(Long id);
 
@@ -16,4 +18,6 @@ public interface UserService {
     void deleteUser(Long id);
 
     boolean existsByEmail(String email);
+
+    void sendOtp(String email, String otp);
 }

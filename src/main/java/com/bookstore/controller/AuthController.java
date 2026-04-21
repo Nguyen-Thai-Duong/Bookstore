@@ -2,6 +2,7 @@ package com.bookstore.controller;
 
 import com.bookstore.model.User;
 import com.bookstore.service.AuthService;
+import com.bookstore.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Random;
 import java.util.regex.Pattern;
 
 @Controller
@@ -20,6 +22,7 @@ public class AuthController {
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
 
     private final AuthService authService;
+    private final UserService userService;
 
     @GetMapping("/login")
     public String loginForm(@RequestParam(required = false) String error,
@@ -42,26 +45,7 @@ public class AuthController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
         String normalizedEmail = email == null ? "" : email.trim();
-        String normalizedPassword = password == null ? "" : password;
-
-        if (normalizedEmail.length() > 150) {
-            redirectAttributes.addAttribute("error", "Email too long");
-            return "redirect:/login";
-        }
-        if (normalizedPassword.length() > 72) {
-            redirectAttributes.addAttribute("error", "Password too long");
-            return "redirect:/login";
-        }
-        if (normalizedEmail.isEmpty() || normalizedPassword.isBlank()) {
-            redirectAttributes.addAttribute("error", "Please enter email and password");
-            return "redirect:/login";
-        }
-        if (!EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
-            redirectAttributes.addAttribute("error", "Invalid email");
-            return "redirect:/login";
-        }
-
-        User user = authService.authenticate(normalizedEmail, normalizedPassword);
+        User user = authService.authenticate(normalizedEmail, password);
         if (user == null) {
             redirectAttributes.addAttribute("error", "Invalid email or password");
             return "redirect:/login";
@@ -72,17 +56,8 @@ public class AuthController {
     }
 
     @GetMapping("/register")
-    public String registerForm(@RequestParam(required = false) String error,
-            HttpSession session,
-            Model model) {
-        User user = (User) session.getAttribute("loggedInUser");
-        if (user != null) {
-            return authService.isAdmin(user) ? "redirect:/admin" : "redirect:/";
-        }
-
-        if (error != null) {
-            model.addAttribute("error", error);
-        }
+    public String registerForm(@RequestParam(required = false) String error, HttpSession session, Model model) {
+        if (error != null) model.addAttribute("error", error);
         return "register";
     }
 
@@ -92,58 +67,124 @@ public class AuthController {
             @RequestParam String password,
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String address,
+            HttpSession session,
             RedirectAttributes redirectAttributes) {
-        String normalizedName = fullName == null ? "" : fullName.trim();
-        String normalizedEmail = email == null ? "" : email.trim();
-        String normalizedPassword = password == null ? "" : password;
-        String normalizedPhone = phone == null ? "" : phone.trim();
-        String normalizedAddress = address == null ? "" : address.trim();
-
-        if (normalizedName.length() > 100) {
-            redirectAttributes.addAttribute("error", "Full name too long");
-            return "redirect:/register";
-        }
-        if (normalizedEmail.length() > 150) {
-            redirectAttributes.addAttribute("error", "Email too long");
-            return "redirect:/register";
-        }
-        if (normalizedPassword.length() > 72) {
-            redirectAttributes.addAttribute("error", "Password too long");
-            return "redirect:/register";
-        }
-        if (!normalizedAddress.isEmpty() && normalizedAddress.length() > 255) {
-            redirectAttributes.addAttribute("error", "Address too long");
-            return "redirect:/register";
-        }
-
-        if (normalizedName.isEmpty()) {
-            redirectAttributes.addAttribute("error", "Full name is required");
-            return "redirect:/register";
-        }
-        if (normalizedEmail.isEmpty() || !EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
-            redirectAttributes.addAttribute("error", "Invalid email");
-            return "redirect:/register";
-        }
-        if (normalizedPassword.length() < 6) {
-            redirectAttributes.addAttribute("error", "Password must be at least 6 characters");
-            return "redirect:/register";
-        }
-        if (!normalizedPhone.isEmpty() && !normalizedPhone.matches("\\d{8,15}")) {
-            redirectAttributes.addAttribute("error", "Phone number must be 10-11 digits");
-            return "redirect:/register";
-        }
-        if (authService.findByEmail(normalizedEmail).isPresent()) {
+        
+        if (authService.findByEmail(email).isPresent()) {
             redirectAttributes.addAttribute("error", "Email already exists");
             return "redirect:/register";
         }
 
-        authService.register(
-                normalizedName,
-                normalizedEmail,
-                normalizedPassword,
-                normalizedPhone.isEmpty() ? null : normalizedPhone,
-                normalizedAddress.isEmpty() ? null : normalizedAddress);
+        String otp = String.format("%06d", new Random().nextInt(999999));
+        
+        session.setAttribute("regFullName", fullName);
+        session.setAttribute("regEmail", email);
+        session.setAttribute("regPassword", password);
+        session.setAttribute("regPhone", phone);
+        session.setAttribute("regAddress", address);
+        session.setAttribute("otp", otp);
+        session.setAttribute("otpExpiry", System.currentTimeMillis() + 180000); 
+
+        userService.sendOtp(email, otp);
+
+        return "redirect:/otp";
+    }
+
+    @GetMapping("/forgot-password")
+    public String showConfirmMailPage() {
+        return "confirmmail";
+    }
+
+    @PostMapping("/forgot-password")
+    public String handleForgotPassword(@RequestParam String email, HttpSession session, RedirectAttributes redirectAttributes) {
+        if (authService.findByEmail(email).isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Email không tồn tại trong hệ thống!");
+            return "redirect:/forgot-password";
+        }
+
+        String otp = String.format("%06d", new Random().nextInt(999999));
+        
+        session.setAttribute("forgotEmail", email);
+        session.setAttribute("otp", otp);
+        session.setAttribute("otpExpiry", System.currentTimeMillis() + 180000);
+
+        userService.sendOtp(email, otp);
+
+        return "redirect:/otp";
+    }
+
+    @GetMapping("/reset-password")
+    public String showResetPasswordPage(HttpSession session) {
+        if (session.getAttribute("forgotEmail") == null || session.getAttribute("otpVerified") == null) {
+            return "redirect:/forgot-password";
+        }
+        return "forgotpass";
+    }
+
+    @PostMapping("/reset-password")
+    public String handleResetPassword(@RequestParam String newPassword, 
+                                    @RequestParam String confirmPassword, 
+                                    HttpSession session, 
+                                    RedirectAttributes redirectAttributes) {
+        String email = (String) session.getAttribute("forgotEmail");
+        
+        if (email == null || session.getAttribute("otpVerified") == null) {
+            return "redirect:/forgot-password";
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("error", "Mật khẩu xác nhận không khớp!");
+            return "redirect:/reset-password";
+        }
+
+        authService.resetPassword(email, newPassword);
+        
+        // Clear session
+        session.removeAttribute("forgotEmail");
+        session.removeAttribute("otpVerified");
+        
+        redirectAttributes.addFlashAttribute("successMessage", "Đổi mật khẩu thành công! Vui lòng đăng nhập.");
         return "redirect:/login";
+    }
+
+    @GetMapping("/otp")
+    public String showOtpPage(HttpSession session) {
+        if (session.getAttribute("otp") == null) return "redirect:/login";
+        return "otp";
+    }
+
+    @PostMapping("/verify-otp")
+    public String verifyOtp(@RequestParam String userOtp, HttpSession session, RedirectAttributes redirectAttributes) {
+        String serverOtp = (String) session.getAttribute("otp");
+        Long expiry = (Long) session.getAttribute("otpExpiry");
+
+        if (serverOtp == null || expiry == null || System.currentTimeMillis() > expiry) {
+            redirectAttributes.addFlashAttribute("error", "Mã OTP đã hết hạn!");
+            return "redirect:/otp";
+        }
+
+        if (serverOtp.equals(userOtp)) {
+            if (session.getAttribute("regEmail") != null) {
+                authService.register(
+                    (String) session.getAttribute("regFullName"),
+                    (String) session.getAttribute("regEmail"),
+                    (String) session.getAttribute("regPassword"),
+                    (String) session.getAttribute("regPhone"),
+                    (String) session.getAttribute("regAddress")
+                );
+                session.removeAttribute("otp");
+                session.removeAttribute("regEmail");
+                return "redirect:/login?verified=true";
+            } else if (session.getAttribute("forgotEmail") != null) {
+                session.setAttribute("otpVerified", true);
+                session.removeAttribute("otp");
+                return "redirect:/reset-password";
+            }
+            return "redirect:/login";
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Mã OTP không chính xác!");
+            return "redirect:/otp";
+        }
     }
 
     @GetMapping("/logout")

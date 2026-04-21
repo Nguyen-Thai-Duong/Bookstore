@@ -48,6 +48,9 @@ public class Book {
     @Column(name = "CreatedAt")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "Status", length = 20)
+    private String status = "Active";
+
     @Column(name = "PublishedYear")
     private Integer publishedYear;
 

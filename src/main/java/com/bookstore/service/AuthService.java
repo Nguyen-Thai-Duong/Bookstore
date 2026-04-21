@@ -68,11 +68,18 @@ public class AuthService {
             return null;
         }
 
-        if ("Inactive".equalsIgnoreCase(user.getStatus())) {
+        if ("Inactive".equalsIgnoreCase(user.getStatus()) || "Discontinued".equalsIgnoreCase(user.getStatus())) {
             return null;
         }
 
         return user;
+    }
+
+    public void resetPassword(String email, String newPassword) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+        });
     }
 
     public User updateProfile(Long userId, String fullName, String phone, String address) {

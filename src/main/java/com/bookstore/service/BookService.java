@@ -7,6 +7,8 @@ import java.util.Optional;
 public interface BookService {
     List<Book> getAllBooks();
 
+    List<Book> getProductsByProductType(Long typeId);
+
     Optional<Book> getBookById(Long id);
 
     List<Book> searchBooksByTitle(String title);

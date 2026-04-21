@@ -21,12 +21,16 @@ public class BookDTO {
     private String description;
     private String imageUrl;
     private LocalDateTime createdAt;
+
+    private String status;
+
     private Integer publishedYear;
     private String publisher;
     private BigDecimal widthCm;
     private BigDecimal heightCm;
     private BigDecimal thicknessCm;
     private Integer pageCount;
+
     private CategoryDTO category;
     private Long productTypeId;
     private boolean discontinued;
@@ -46,18 +50,23 @@ public class BookDTO {
                 book.getDescription(),
                 book.getImageUrl(),
                 book.getCreatedAt(),
+
+                book.getStatus(),
+
                 book.getPublishedYear(),
                 book.getPublisher(),
                 book.getWidthCm(),
                 book.getHeightCm(),
                 book.getThicknessCm(),
                 book.getPageCount(),
+
                 CategoryDTO.fromEntity(book.getCategory()),
                 book.getCategory() != null && book.getCategory().getProductType() != null
                         ? book.getCategory().getProductType().getId()
                         : null,
                 book.isDiscontinued(),
-                book.getCartCleanupRemainingSeconds());
+                book.getCartCleanupRemainingSeconds()
+        );
     }
 
     public Book toEntity() {
@@ -70,13 +79,18 @@ public class BookDTO {
                 description,
                 imageUrl,
                 createdAt,
+
+                status,
+
                 publishedYear,
                 publisher,
                 widthCm,
                 heightCm,
                 thicknessCm,
                 pageCount,
-                category == null ? null : category.toEntity());
+
+                category == null ? null : category.toEntity()
+        );
     }
 
     public long getCartCleanupRemainingMinutes() {

@@ -188,35 +188,35 @@
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     ID
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Voucher Code
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Discount (%)
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Quantity
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Start Date
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     End Date
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Status
                                 </th>
                                 <th
-                                    class="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                    class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                     Actions
                                 </th>
                             </tr>
@@ -273,6 +273,14 @@
                                 </td>
                                 <td class="px-6 py-4 text-right text-sm font-medium">
                                     <div class="flex justify-end gap-2">
+                                        <!-- ✅ Added Send Voucher button -->
+                                        <a th:if="${voucher.status == 'Active'}" 
+                                           th:href="@{/admin/sendmail/select-user(voucherId=${voucher.id})}"
+                                           class="text-green-600 hover:text-green-800 transition" title="Send to Customer">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                            </svg>
+                                        </a>
                                         <a th:href="@{/admin/vouchers/{id}(id=${voucher.id})}"
                                             class="text-blue-600 hover:text-blue-800 transition" title="View Details">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
