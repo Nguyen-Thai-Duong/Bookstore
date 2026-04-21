@@ -21,8 +21,20 @@ public class BookDTO {
     private String description;
     private String imageUrl;
     private LocalDateTime createdAt;
+
     private String status;
+
+    private Integer publishedYear;
+    private String publisher;
+    private BigDecimal widthCm;
+    private BigDecimal heightCm;
+    private BigDecimal thicknessCm;
+    private Integer pageCount;
+
     private CategoryDTO category;
+    private Long productTypeId;
+    private boolean discontinued;
+    private Long cartCleanupRemainingSeconds;
 
     public static BookDTO fromEntity(Book book) {
         if (book == null) {
@@ -38,8 +50,23 @@ public class BookDTO {
                 book.getDescription(),
                 book.getImageUrl(),
                 book.getCreatedAt(),
+
                 book.getStatus(),
-                CategoryDTO.fromEntity(book.getCategory()));
+
+                book.getPublishedYear(),
+                book.getPublisher(),
+                book.getWidthCm(),
+                book.getHeightCm(),
+                book.getThicknessCm(),
+                book.getPageCount(),
+
+                CategoryDTO.fromEntity(book.getCategory()),
+                book.getCategory() != null && book.getCategory().getProductType() != null
+                        ? book.getCategory().getProductType().getId()
+                        : null,
+                book.isDiscontinued(),
+                book.getCartCleanupRemainingSeconds()
+        );
     }
 
     public Book toEntity() {
@@ -52,7 +79,25 @@ public class BookDTO {
                 description,
                 imageUrl,
                 createdAt,
+
                 status,
-                category == null ? null : category.toEntity());
+
+                publishedYear,
+                publisher,
+                widthCm,
+                heightCm,
+                thicknessCm,
+                pageCount,
+
+                category == null ? null : category.toEntity()
+        );
+    }
+
+    public long getCartCleanupRemainingMinutes() {
+        if (cartCleanupRemainingSeconds == null || cartCleanupRemainingSeconds <= 0) {
+            return 0;
+        }
+
+        return (cartCleanupRemainingSeconds + 59) / 60;
     }
 }

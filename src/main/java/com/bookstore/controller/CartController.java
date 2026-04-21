@@ -93,6 +93,11 @@ public class CartController {
         }
 
         Book book = bookOpt.get();
+        if (isDiscontinuedBook(book)) {
+            redirectAttributes.addFlashAttribute("cartError", "This product has been discontinued");
+            return "redirect:/books/" + bookId;
+        }
+
         int stock = normalizeStock(book.getStock());
         if (stock <= 0) {
             redirectAttributes.addFlashAttribute("cartError", "Book is out of stock");
@@ -160,6 +165,11 @@ public class CartController {
 
         Optional<Book> bookOpt = bookService.getBookById(bookId);
         if (bookOpt.isPresent()) {
+            if (isDiscontinuedBook(bookOpt.get())) {
+                redirectAttributes.addFlashAttribute("cartError", "This product has been discontinued");
+                return "redirect:/cart";
+            }
+
             int stock = normalizeStock(bookOpt.get().getStock());
             if (stock <= 0) {
                 redirectAttributes.addFlashAttribute("cartError", "Book is out of stock");
@@ -257,6 +267,12 @@ public class CartController {
             return "redirect:/cart";
         }
 
+        if (containsDiscontinuedItems(selectedItems)) {
+            redirectAttributes.addFlashAttribute("cartError",
+                    "Your cart contains discontinued products. Please remove them before checkout");
+            return "redirect:/cart";
+        }
+
         BigDecimal subtotal = calculateSubtotal(selectedItems);
         Voucher voucher = getVoucherFromSession(session);
         BigDecimal discount = calculateDiscount(subtotal, voucher);
@@ -298,6 +314,12 @@ public class CartController {
         List<CartItem> items = filterSelectedItems(allItems, selectedBookIds);
         if (items.isEmpty()) {
             redirectAttributes.addFlashAttribute("cartError", "Please select at least 1 item to checkout");
+            return "redirect:/cart";
+        }
+
+        if (containsDiscontinuedItems(items)) {
+            redirectAttributes.addFlashAttribute("cartError",
+                    "Your cart contains discontinued products. Please remove them before checkout");
             return "redirect:/cart";
         }
 
@@ -489,6 +511,14 @@ public class CartController {
 
     private int normalizeStock(Integer stock) {
         return stock == null ? 0 : Math.max(stock, 0);
+    }
+
+    private boolean isDiscontinuedBook(Book book) {
+        return book != null && book.isDiscontinued();
+    }
+
+    private boolean containsDiscontinuedItems(List<CartItem> items) {
+        return items != null && items.stream().anyMatch(item -> isDiscontinuedBook(item.getBook()));
     }
 
     private void updateCartCount(HttpSession session, List<CartItem> items) {

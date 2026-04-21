@@ -90,8 +90,6 @@ public class AuthController {
         return "redirect:/otp";
     }
 
-    // --- Forgot Password Flow ---
-
     @GetMapping("/forgot-password")
     public String showConfirmMailPage() {
         return "confirmmail";
@@ -106,7 +104,6 @@ public class AuthController {
 
         String otp = String.format("%06d", new Random().nextInt(999999));
         
-        // Lưu vào session, đánh dấu đây là luồng Forgot Password
         session.setAttribute("forgotEmail", email);
         session.setAttribute("otp", otp);
         session.setAttribute("otpExpiry", System.currentTimeMillis() + 180000);
@@ -150,8 +147,6 @@ public class AuthController {
         return "redirect:/login";
     }
 
-    // --- Common OTP Verification ---
-
     @GetMapping("/otp")
     public String showOtpPage(HttpSession session) {
         if (session.getAttribute("otp") == null) return "redirect:/login";
@@ -169,9 +164,7 @@ public class AuthController {
         }
 
         if (serverOtp.equals(userOtp)) {
-            // Xác định luồng nào đang chạy
             if (session.getAttribute("regEmail") != null) {
-                // Luồng Đăng ký
                 authService.register(
                     (String) session.getAttribute("regFullName"),
                     (String) session.getAttribute("regEmail"),
@@ -183,7 +176,6 @@ public class AuthController {
                 session.removeAttribute("regEmail");
                 return "redirect:/login?verified=true";
             } else if (session.getAttribute("forgotEmail") != null) {
-                // Luồng Quên mật khẩu
                 session.setAttribute("otpVerified", true);
                 session.removeAttribute("otp");
                 return "redirect:/reset-password";
@@ -195,8 +187,14 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/logout")
+    @GetMapping("/logout")
     public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
+    }
+
+    @PostMapping("/logout")
+    public String logoutPost(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
     }

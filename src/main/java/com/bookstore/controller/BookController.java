@@ -54,6 +54,10 @@ public class BookController {
         }
 
         var book = bookOpt.get();
+        if (book.isDiscontinued()) {
+            return "redirect:/books";
+        }
+
         var reviews = reviewRepository.findByBook_IdOrderByCreatedAtDesc(book.getId()).stream()
                 .map(ReviewDTO::fromEntity)
                 .toList();

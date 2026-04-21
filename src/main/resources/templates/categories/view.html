@@ -16,7 +16,7 @@
             --color-bg: #f8f6f1;
             --color-surface: #ffffff;
             --color-text: #1a1410;
-            --color-primary: #8b5a3c;
+            --color-primary: #F37021;
             --color-secondary: #d4a574;
         }
 
@@ -53,6 +53,44 @@
 
         .book-card:hover {
             transform: translateY(-6px);
+        }
+
+        /* fpt-theme-overrides */
+        a {
+            transition: color 0.2s ease;
+        }
+
+        main a,
+        .sidebar-list a,
+        .footer-col a,
+        .info,
+        .text-info {
+            color: #0072BC;
+        }
+
+        button,
+        input[type="submit"],
+        .btn,
+        .btn-primary,
+        .checkout-btn {
+            border-radius: 8px;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+        }
+
+        button:hover,
+        input[type="submit"]:hover,
+        .btn:hover,
+        .btn-primary:hover,
+        .checkout-btn:hover {
+            filter: brightness(0.95);
+            transform: translateY(-1px);
+        }
+
+        .alert.success,
+        .message.success {
+            background: #e8f7ef;
+            border-color: #00A859;
+            color: #00A859;
         }
     </style>
 </head>

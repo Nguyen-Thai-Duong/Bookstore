@@ -19,4 +19,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByStatus(String status);
 
     List<Order> findByOrderDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+
+    boolean existsByVoucher_Id(Long voucherId);
 }

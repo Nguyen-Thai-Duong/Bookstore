@@ -25,7 +25,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+        return bookRepository.findAll().stream()
+                .filter(book -> book != null && !book.isDiscontinued())
+                .toList();
     }
 
     @Override
@@ -40,27 +42,37 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> searchBooksByTitle(String title) {
-        return bookRepository.findByTitleContainingIgnoreCase(title);
+        return bookRepository.findByTitleContainingIgnoreCase(title).stream()
+                .filter(book -> !book.isDiscontinued())
+                .toList();
     }
 
     @Override
     public List<Book> searchBooksByAuthor(String author) {
-        return bookRepository.findByAuthorContainingIgnoreCase(author);
+        return bookRepository.findByAuthorContainingIgnoreCase(author).stream()
+                .filter(book -> !book.isDiscontinued())
+                .toList();
     }
 
     @Override
     public List<Book> getBooksByCategory(Long categoryId) {
-        return bookRepository.findByCategoryId(categoryId);
+        return bookRepository.findByCategoryId(categoryId).stream()
+                .filter(book -> !book.isDiscontinued())
+                .toList();
     }
 
     @Override
     public List<Book> getAvailableBooks() {
-        return bookRepository.findByStockGreaterThan(0);
+        return bookRepository.findByStockGreaterThan(0).stream()
+                .filter(book -> !book.isDiscontinued())
+                .toList();
     }
 
     @Override
     public List<Book> getTopSellingBooksByCategory() {
-        List<Book> allBooks = bookRepository.findAll();
+        List<Book> allBooks = bookRepository.findAll().stream()
+                .filter(book -> book != null && !book.isDiscontinued())
+                .toList();
         if (allBooks.isEmpty()) {
             return List.of();
         }

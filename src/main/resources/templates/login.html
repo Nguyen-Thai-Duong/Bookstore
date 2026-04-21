@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --vb-brown: #8B573C;
+            --vb-brown: #F37021;
             --bg-gray: #f5f5f5;
             --border: #ddd;
             --text: #333;
@@ -80,6 +80,43 @@
             border-radius: 0 4px 4px 0;
             cursor: pointer;
             font-weight: 700;
+        }
+
+        #global-search-suggest {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 58px;
+            z-index: 20;
+            background: #fff;
+            border: 1px solid #e6e6e6;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #global-search-suggest:not(.hidden) {
+            display: block;
+        }
+
+        .cart-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f9f9f9;
+            padding: 8px 15px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            text-decoration: none;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .cart-box:hover {
+            color: var(--text);
         }
 
         .auth-links {
@@ -262,40 +299,6 @@
             margin-top: 40px;
         }
 
-        .footer-cols {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .footer-cols h4 {
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: var(--vb-brown);
-        }
-
-        .footer-cols ul {
-            list-style: none;
-        }
-
-        .footer-cols li {
-            margin-bottom: 8px;
-        }
-
-        .footer-cols a {
-            text-decoration: none;
-            color: #666;
-        }
-
-        .bottom-footer {
-            text-align: center;
-            padding-top: 20px;
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            font-size: 11px;
-            color: #999;
-        }
-
         @media (max-width: 1024px) {
             .header-content {
                 flex-wrap: wrap;
@@ -303,10 +306,6 @@
 
             .logo {
                 min-width: 170px;
-            }
-
-            .footer-cols {
-                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -319,43 +318,12 @@
                 width: 100%;
                 order: 3;
             }
-
-            .footer-cols {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <div class="container header-content">
-            <div class="logo">
-                <a th:href="@{/}" class="logo-text">BookNest</a>
-            </div>
-
-            <form class="search-container" th:action="@{/books/search}" method="get">
-                <input type="text" name="title" placeholder="Search books by Title, Author, Publisher..."
-                    autocomplete="off">
-                <button type="submit">SEARCH</button>
-            </form>
-
-            <div class="auth-links">
-                <a th:href="@{/register}">Register</a>
-                <a th:href="@{/login}" class="primary">Login</a>
-            </div>
-        </div>
-    </header>
-
-    <div class="nav-bar">
-        <div class="container">
-            <ul class="nav-links">
-                <li><a th:href="@{/}"><i data-lucide="home" size="14" style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Category</a></li>
-                <li><a th:href="@{/orders}">Order</a></li>
-            </ul>
-        </div>
-    </div>
+    <div th:replace="~{fragments/site-header :: siteHeader('login')}"></div>
 
     <main class="container">
         <section class="panel">
@@ -374,7 +342,8 @@
                     <div class="field">
                         <label>Password</label>
                         <div class="password-wrap">
-                            <input type="password" id="loginPassword" name="password" required placeholder="••••••••••">
+                            <input type="password" id="loginPassword" name="password" required
+                                placeholder="Enter password">
                             <button id="toggleLoginPassword" class="password-toggle" type="button"
                                 aria-label="Show password" aria-pressed="false">
                                 <i class="icon-on" data-lucide="eye" size="18"></i>
@@ -395,45 +364,7 @@
         </section>
     </main>
 
-    <footer>
-        <div class="container footer-cols">
-            <div>
-                <h4>CUSTOMER SUPPORT</h4>
-                <ul>
-                    <li><a th:href="@{/books}">Products and orders</a></li>
-                    <li><a href="#">Return policy</a></li>
-                    <li><a href="#">Shipping method</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>About BOOKNEST</h4>
-                <ul>
-                    <li><a href="#">About BookNest</a></li>
-                    <li><a href="#">Terms of Use</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>ACCOUNT</h4>
-                <ul>
-                    <li><a th:href="@{/login}">Login</a></li>
-                    <li><a th:href="@{/register}">Create account</a></li>
-                    <li><a th:href="@{/orders}">Order history</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>CONTACT</h4>
-                <p style="font-size: 12px; color: #666;">
-                    Email: hotro@booknest.vn<br>
-                    Hotline: 1900 1234<br>
-                    Address: Tri Thuc Building, District 1, Ho Chi Minh City
-                </p>
-            </div>
-        </div>
-        <div class="bottom-footer">
-            &copy; 2026 BookNest. All rights reserved.
-        </div>
-    </footer>
+    <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
 
     <script>
         lucide.createIcons();
