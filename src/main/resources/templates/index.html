@@ -4,21 +4,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest | Online Bookstore</title>
+    <title>BookNest | Online Bookstore - Buy Books Online</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        body {
+        :root {
+            --vb-green: #3ea31a;
+            --vb-brown: #F37021;
+            --bg-gray: #f5f5f5;
+            --border: #ddd;
+            --text: #333;
+            --price: #d0021b;
+        }
+
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: 'Roboto', sans-serif;
-            background: #f5f5f5;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            color: var(--text);
+            font-size: 13px;
         }
 
         .container {
             max-width: 1200px;
-            margin: auto;
+            margin: 0 auto;
             padding: 0 10px;
         }
 
@@ -30,26 +46,71 @@
 
         .sidebar-box {
             background: #fff;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border);
             margin-bottom: 20px;
         }
 
         .sidebar-box h3 {
-            padding: 10px;
             background: #f3f3f3;
-            color: #F37021;
+            padding: 10px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--vb-brown);
+            text-transform: uppercase;
+        }
+
+        .sidebar-list {
+            list-style: none;
+        }
+
+        .sidebar-list li a,
+        .sidebar-list li span {
+            display: block;
+            padding: 8px 10px;
+            color: #444;
+            border-bottom: 1px dotted #eee;
+            text-decoration: none;
+        }
+
+        .sidebar-list li a:hover {
+            background: #fafafa;
+            color: var(--vb-brown);
+        }
+
+        .promo-banner {
+            width: 100%;
+            height: 300px;
+            background: #eee;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
         }
 
         .promo-banner img {
             width: 100%;
-            height: 300px;
+            height: 100%;
             object-fit: cover;
         }
 
         .content-section {
             background: #fff;
+            border: 1px solid var(--border);
             padding: 15px;
-            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--vb-brown);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+
+        .section-header h2 {
+            font-size: 16px;
+            color: var(--vb-brown);
+            text-transform: uppercase;
         }
 
         .book-item-grid {
@@ -58,14 +119,55 @@
             gap: 15px;
         }
 
+        .book-card {
+            text-align: center;
+            padding: 10px;
+            border: 1px solid transparent;
+            transition: border 0.2s;
+            position: relative;
+        }
+
+        .book-card:hover {
+            border: 1px solid #eee;
+        }
+
         .book-card img {
             width: 110px;
             height: 160px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .book-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #0066cc;
+            margin-bottom: 5px;
+            height: 36px;
+            overflow: hidden;
+            text-decoration: none;
+            display: block;
+        }
+
+        .author {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 8px;
         }
 
         .price {
-            color: red;
+            color: var(--price);
             font-weight: bold;
+        }
+
+        .sale-off {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: red;
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 4px;
         }
 
         .hidden {
@@ -76,44 +178,50 @@
 
 <body>
 
-    <!-- ✅ HEADER -->
     <div th:replace="~{fragments/site-header :: siteHeader('home')}"></div>
 
     <main class="container main-grid">
 
-        <!-- LEFT -->
         <aside>
             <div class="sidebar-box">
                 <h3>Product</h3>
-                <ul>
+                <ul class="sidebar-list">
                     <li><a th:href="@{/books}">Book</a></li>
-                    <li>Stationery</li>
+                    <li><span>Stationery</span></li>
                 </ul>
             </div>
         </aside>
 
-        <!-- CENTER -->
         <section>
 
             <div class="promo-banner">
-                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794" alt="">
+                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794">
             </div>
 
             <div class="content-section">
-                <h2>Featured new books</h2>
+                <div class="section-header">
+                    <h2>Featured new books</h2>
+                    <a th:href="@{/books}" style="font-size:11px;">View more</a>
+                </div>
 
                 <div class="book-item-grid" th:if="${!books.empty}">
                     <div class="book-card" th:each="book,iter : ${books}" th:if="${iter.index < 8}">
 
+                        <span th:if="${iter.index == 0}" class="sale-off">Hot</span>
+
                         <a th:href="@{/books/{id}(id=${book.id})}">
-                            <img th:src="${book.imageUrl != null ? book.imageUrl : 'https://via.placeholder.com/110x160'}">
+                            <img th:src="${book.imageUrl != null && !book.imageUrl.isEmpty() ? book.imageUrl : 'https://via.placeholder.com/110x160'}">
                         </a>
 
-                        <a th:text="${book.title}"></a>
-                        <p th:text="${book.author}"></p>
+                        <a class="book-title"
+                           th:href="@{/books/{id}(id=${book.id})}"
+                           th:text="${book.title}">
+                        </a>
+
+                        <p class="author" th:text="${book.author}"></p>
 
                         <p class="price"
-                           th:text="${#numbers.formatDecimal(book.price,0,'COMMA',0,'POINT')} + ' VND'">
+                           th:text="${book.price != null ? #numbers.formatDecimal(book.price,0,'COMMA',0,'POINT') + ' VND' : '0 VND'}">
                         </p>
 
                     </div>
@@ -129,7 +237,7 @@
             <div class="sidebar-box">
                 <h3>Best-selling Books</h3>
 
-                <div th:each="book,iter : ${books}" th:if="${iter.index < 3}">
+                <div class="rank-item" th:each="book,iter : ${books}" th:if="${iter.index < 3}">
                     <strong th:text="${book.title}"></strong>
                     <p th:text="${book.author}"></p>
                 </div>
@@ -138,11 +246,11 @@
 
     </main>
 
-    <!-- FOOTER -->
     <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
 
-    <!-- JS SEARCH -->
     <script>
+        lucide.createIcons();
+
         const searchInput = document.getElementById("global-search-input");
         const suggestBox = document.getElementById("global-search-suggest");
 
@@ -158,7 +266,7 @@
                 if (!items.length) return hideSuggestions();
 
                 suggestBox.innerHTML = items.map(item =>
-                    `<a href="/books/${item.id}" style="display:block;padding:8px">${item.title}</a>`
+                    `<a href="/books/${item.id}" style="display:block;padding:10px">${item.title}</a>`
                 ).join("");
 
                 suggestBox.classList.remove("hidden");
