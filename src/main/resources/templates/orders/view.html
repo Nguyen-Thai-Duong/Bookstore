@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --vb-brown: #8B573C;
+            --vb-brown: #F37021;
             --bg-gray: #f5f5f5;
             --border: #ddd;
             --text: #333;
@@ -375,40 +375,6 @@
             margin-top: 40px;
         }
 
-        .footer-cols {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .footer-cols h4 {
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: var(--vb-brown);
-        }
-
-        .footer-cols ul {
-            list-style: none;
-        }
-
-        .footer-cols li {
-            margin-bottom: 8px;
-        }
-
-        .footer-cols a {
-            text-decoration: none;
-            color: #666;
-        }
-
-        .bottom-footer {
-            text-align: center;
-            padding-top: 20px;
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            font-size: 11px;
-            color: #999;
-        }
-
         @media (max-width: 1024px) {
             .header-content {
                 flex-wrap: wrap;
@@ -420,10 +386,6 @@
 
             .layout {
                 grid-template-columns: 1fr;
-            }
-
-            .footer-cols {
-                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -440,62 +402,12 @@
             .meta-grid {
                 grid-template-columns: 1fr;
             }
-
-            .footer-cols {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <div class="container header-content">
-            <div class="logo">
-                <a th:href="@{/}" class="logo-text">BookNest</a>
-            </div>
-
-            <form class="search-container" th:action="@{/books/search}" method="get">
-                <input type="text" name="title" placeholder="Search books by Title, Author, Publisher..."
-                    autocomplete="off">
-                <button type="submit">SEARCH</button>
-            </form>
-
-            <a th:href="@{/cart}" class="cart-box">
-                <i data-lucide="shopping-cart" size="20"></i>
-                <div>
-                    <span style="display:block; font-size: 10px; color: #999;">Shopping Cart</span>
-                    <strong style="font-size: 12px;"
-                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) items|">(0) items</strong>
-                </div>
-            </a>
-
-            <div class="auth-links" th:if="${session.loggedInUser != null}">
-                <a th:href="@{/account}">Account</a>
-                <a th:href="@{/orders}">Order</a>
-                <a th:if="${session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
-                    th:href="@{/admin}">Admin</a>
-                <form method="post" th:action="@{/logout}" style="display:inline;">
-                    <button type="submit">Logout</button>
-                </form>
-            </div>
-
-            <div class="auth-links" th:if="${session.loggedInUser == null}">
-                <a th:href="@{/login}">Login</a>
-                <a th:href="@{/register}">Register</a>
-            </div>
-        </div>
-    </header>
-
-    <div class="nav-bar">
-        <div class="container">
-            <ul class="nav-links">
-                <li><a th:href="@{/}"><i data-lucide="home" size="14" style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Category</a></li>
-                <li><a th:href="@{/orders}" style="background: var(--vb-brown); color: #fff;">Order</a></li>
-            </ul>
-        </div>
-    </div>
+    <div th:replace="~{fragments/site-header :: siteHeader('orders')}"></div>
 
     <main class="container layout">
         <section class="panel">
@@ -606,45 +518,7 @@
         </aside>
     </main>
 
-    <footer>
-        <div class="container footer-cols">
-            <div>
-                <h4>CUSTOMER SUPPORT</h4>
-                <ul>
-                    <li><a th:href="@{/books}">Products and orders</a></li>
-                    <li><a href="#">Return policy</a></li>
-                    <li><a href="#">Shipping method</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>ABOUT BOOKNEST</h4>
-                <ul>
-                    <li><a href="#">About BookNest</a></li>
-                    <li><a href="#">Terms of use</a></li>
-                    <li><a href="#">Privacy policy</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>ACCOUNT</h4>
-                <ul>
-                    <li><a th:href="@{/login}">Login</a></li>
-                    <li><a th:href="@{/register}">Create account</a></li>
-                    <li><a th:href="@{/orders}">Order history</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>CONTACT</h4>
-                <p style="font-size: 12px; color: #666;">
-                    Email: hotro@booknest.vn<br>
-                    Hotline: 1900 1234<br>
-                    Address: Tri Thuc Building, District 1, Ho Chi Minh City
-                </p>
-            </div>
-        </div>
-        <div class="bottom-footer">
-            &copy; 2026 BookNest. All rights reserved.
-        </div>
-    </footer>
+        <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
 
     <script>
         lucide.createIcons();

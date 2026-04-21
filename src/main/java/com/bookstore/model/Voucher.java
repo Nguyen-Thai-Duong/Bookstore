@@ -40,7 +40,7 @@ public class Voucher {
     @Column(name = "Status", length = 20)
     private String status;
 
-    @OneToMany(mappedBy = "voucher", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "voucher")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Order> orders;

@@ -8,12 +8,13 @@ import com.bookstore.dto.UserDTO;
 import com.bookstore.dto.UserFormDTO;
 import com.bookstore.dto.VoucherDTO;
 import com.bookstore.model.Book;
-import com.bookstore.model.Category;
 import com.bookstore.model.Order;
-import com.bookstore.model.Role;
 import com.bookstore.model.User;
 import com.bookstore.model.Voucher;
 import com.bookstore.repository.BookRepository;
+import com.bookstore.repository.CartItemRepository;
+import com.bookstore.repository.OrderDetailRepository;
+import com.bookstore.repository.ProductTypeRepository;
 import com.bookstore.repository.ReviewRepository;
 import com.bookstore.service.BookService;
 import com.bookstore.service.CategoryService;
@@ -73,6 +74,15 @@ public class AdminController {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private ProductTypeRepository productTypeRepository;
+
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @GetMapping
@@ -130,7 +140,7 @@ public class AdminController {
 
     @GetMapping("/books")
     public String listBooks(Model model) {
-        model.addAttribute("books", bookService.getAllBooks().stream().map(BookDTO::fromEntity).toList());
+        model.addAttribute("books", bookRepository.findAll().stream().map(BookDTO::fromEntity).toList());
         return "admin/books";
     }
 
@@ -139,6 +149,7 @@ public class AdminController {
         model.addAttribute("book", new BookDTO());
         model.addAttribute("categories",
                 categoryService.getAllCategories().stream().map(CategoryDTO::fromEntity).toList());
+        model.addAttribute("productTypes", productTypeRepository.findAll());
         return "admin/books/form";
     }
 
@@ -148,7 +159,11 @@ public class AdminController {
             model.addAttribute("book", BookDTO.fromEntity(book));
             model.addAttribute("categories",
                     categoryService.getAllCategories().stream().map(CategoryDTO::fromEntity).toList());
+            model.addAttribute("productTypes", productTypeRepository.findAll());
         });
+        if (!model.containsAttribute("productTypes")) {
+            model.addAttribute("productTypes", productTypeRepository.findAll());
+        }
         return "admin/books/form";
     }
 
@@ -233,8 +248,42 @@ public class AdminController {
     }
 
     @GetMapping("/books/delete/{id}")
-    public String deleteBook(@PathVariable Long id) {
+    public String deleteBook(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        var bookOptional = bookService.getBookById(id);
+        if (bookOptional.isEmpty()) {
+            redirectAttributes.addFlashAttribute("bookError", "Book not found");
+            return "redirect:/admin/books";
+        }
+
+        Book book = bookOptional.get();
+        if (!book.isDiscontinued()) {
+            book.markDiscontinued();
+            bookService.saveBook(book);
+            redirectAttributes.addFlashAttribute("bookSuccess",
+                    "Book hidden successfully. Customers cannot search or buy it now. This item will be removed from carts after 2 minutes.");
+            return "redirect:/admin/books";
+        }
+
+        if (book.isCartCleanupWindowActive()) {
+            redirectAttributes.addFlashAttribute("bookError",
+                    "This hidden book is still in the 2-minute cart cleanup window. Please try deleting again after the timer ends.");
+            return "redirect:/admin/books";
+        }
+
+        if (orderDetailRepository.existsByBook_Id(id)) {
+            redirectAttributes.addFlashAttribute("bookError",
+                    "Cannot hard-delete this book because it is referenced by order history.");
+            return "redirect:/admin/books";
+        }
+
+        if (cartItemRepository.existsByBook_Id(id)) {
+            redirectAttributes.addFlashAttribute("bookError",
+                    "Book is still present in some carts. Please wait for cleanup to finish and try again.");
+            return "redirect:/admin/books";
+        }
+
         bookService.deleteBook(id);
+        redirectAttributes.addFlashAttribute("bookSuccess", "Book deleted successfully");
         return "redirect:/admin/books";
     }
 
@@ -242,7 +291,7 @@ public class AdminController {
     public String searchBooks(@RequestParam(required = false) String title,
             @RequestParam(required = false) String author,
             Model model) {
-        var books = bookService.getAllBooks();
+        var books = bookRepository.findAll();
 
         if (title != null && !title.isEmpty()) {
             books = books.stream()
@@ -310,8 +359,16 @@ public class AdminController {
     }
 
     @GetMapping("/categories/delete/{id}")
-    public String deleteCategory(@PathVariable Long id) {
+    public String deleteCategory(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        long bookCount = bookRepository.countByCategory_Id(id);
+        if (bookCount > 0) {
+            redirectAttributes.addFlashAttribute("categoryError",
+                    "Cannot delete category because it still contains products");
+            return "redirect:/admin/categories";
+        }
+
         categoryService.deleteCategory(id);
+        redirectAttributes.addFlashAttribute("categorySuccess", "Category deleted successfully");
         return "redirect:/admin/categories";
     }
 
@@ -332,6 +389,7 @@ public class AdminController {
     @GetMapping("/users/{id}")
     public String viewUser(@PathVariable Long id, Model model) {
         userService.getUserById(id).ifPresent(user -> model.addAttribute("user", UserDTO.fromEntity(user)));
+        model.addAttribute("orders", orderService.getOrdersByUserId(id));
         return "admin/users/view";
     }
 
@@ -639,8 +697,27 @@ public class AdminController {
     }
 
     @GetMapping("/vouchers/delete/{id}")
-    public String deleteVoucher(@PathVariable Long id) {
+    public String deleteVoucher(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        var voucherOptional = voucherService.getVoucherById(id);
+        if (voucherOptional.isEmpty()) {
+            redirectAttributes.addFlashAttribute("voucherError", "Voucher not found");
+            return "redirect:/admin/vouchers";
+        }
+
+        boolean voucherUsed = orderService.getAllOrders().stream()
+                .anyMatch(order -> order.getVoucher() != null && id.equals(order.getVoucher().getId()));
+        if (voucherUsed) {
+            Voucher voucher = voucherOptional.get();
+            voucher.setStatus("Inactive");
+            voucher.setQuantity(0);
+            voucherService.saveVoucher(voucher);
+            redirectAttributes.addFlashAttribute("voucherSuccess",
+                    "Voucher has been used in orders, so it was set to Inactive instead of being deleted");
+            return "redirect:/admin/vouchers";
+        }
+
         voucherService.deleteVoucher(id);
+        redirectAttributes.addFlashAttribute("voucherSuccess", "Voucher deleted successfully");
         return "redirect:/admin/vouchers";
     }
 

@@ -1,171 +1,25 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest | Online Bookstore - Buy Books Online</title>
+    <title>BookNest | Online Bookstore</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
-        :root {
-            --vb-green: #3ea31a;
-            --vb-brown: #8B573C;
-            --bg-gray: #f5f5f5;
-            --border: #ddd;
-            --text: #333;
-            --price: #d0021b;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
-        }
-
         body {
-            background-color: var(--bg-gray);
-            color: var(--text);
-            font-size: 13px;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: #f5f5f5;
         }
 
         .container {
             max-width: 1200px;
-            margin: 0 auto;
+            margin: auto;
             padding: 0 10px;
-        }
-
-        header {
-            background: #fff;
-            padding: 15px 0;
-            border-bottom: 2px solid var(--vb-brown);
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .logo {
-            min-width: 220px;
-        }
-
-        .logo-text {
-            font-size: 32px;
-            font-weight: 900;
-            color: var(--vb-brown);
-            text-decoration: none;
-            letter-spacing: -1px;
-        }
-
-        .search-container {
-            flex: 1;
-            display: flex;
-            position: relative;
-        }
-
-        .search-container input {
-            flex: 1;
-            padding: 10px 15px;
-            border: 1px solid #ccc;
-            border-right: none;
-            border-radius: 4px 0 0 4px;
-            outline: none;
-        }
-
-        .search-container button {
-            background: var(--vb-brown);
-            color: white;
-            border: none;
-            padding: 0 20px;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        #search-suggest {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 58px;
-            z-index: 20;
-            background: #fff;
-            border: 1px solid #e6e6e6;
-            border-top: none;
-            border-radius: 0 0 6px 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        #search-suggest:not(.hidden) {
-            display: block;
-        }
-
-        .cart-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #f9f9f9;
-            padding: 8px 15px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            text-decoration: none;
-            color: var(--text);
-            white-space: nowrap;
-        }
-
-        .auth-links {
-            display: flex;
-            gap: 8px;
-            white-space: nowrap;
-        }
-
-        .auth-links a {
-            text-decoration: none;
-            border: 1px solid var(--border);
-            background: #fff;
-            color: #444;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-weight: 500;
-        }
-
-        .auth-links a.primary {
-            background: var(--vb-brown);
-            color: #fff;
-            border-color: var(--vb-brown);
-        }
-
-        .nav-bar {
-            background: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            overflow-x: auto;
-        }
-
-        .nav-links li a {
-            display: block;
-            padding: 12px 20px;
-            text-decoration: none;
-            color: var(--text);
-            font-weight: 500;
-            text-transform: uppercase;
-            font-size: 12px;
-            white-space: nowrap;
-        }
-
-        .nav-links li a:hover {
-            background: var(--vb-brown);
-            color: white;
         }
 
         .main-grid {
@@ -176,78 +30,26 @@
 
         .sidebar-box {
             background: #fff;
-            border: 1px solid var(--border);
+            border: 1px solid #ddd;
             margin-bottom: 20px;
         }
 
         .sidebar-box h3 {
-            background: #f3f3f3;
             padding: 10px;
-            font-size: 14px;
-            border-bottom: 1px solid var(--border);
-            color: var(--vb-brown);
-            text-transform: uppercase;
-        }
-
-        .sidebar-list {
-            list-style: none;
-        }
-
-        .sidebar-list li a {
-            display: block;
-            padding: 8px 10px;
-            text-decoration: none;
-            color: #444;
-            border-bottom: 1px dotted #eee;
-        }
-
-        .sidebar-list li span {
-            display: block;
-            padding: 8px 10px;
-            color: #444;
-            border-bottom: 1px dotted #eee;
-        }
-
-        .sidebar-list li a:hover {
-            background: #fafafa;
-            color: var(--vb-brown);
-        }
-
-        .promo-banner {
-            width: 100%;
-            height: 300px;
-            background: #eee;
-            margin-bottom: 20px;
-            border: 1px solid var(--border);
+            background: #f3f3f3;
+            color: #F37021;
         }
 
         .promo-banner img {
             width: 100%;
-            height: 100%;
+            height: 300px;
             object-fit: cover;
         }
 
         .content-section {
             background: #fff;
-            border: 1px solid var(--border);
             padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--vb-brown);
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-            gap: 10px;
-        }
-
-        .section-header h2 {
-            font-size: 16px;
-            color: var(--vb-brown);
-            text-transform: uppercase;
+            border: 1px solid #ddd;
         }
 
         .book-item-grid {
@@ -256,331 +58,93 @@
             gap: 15px;
         }
 
-        .book-card {
-            text-align: center;
-            padding: 10px;
-            border: 1px solid transparent;
-            transition: border 0.2s;
-            position: relative;
-        }
-
-        .book-card:hover {
-            border: 1px solid #eee;
-        }
-
         .book-card img {
             width: 110px;
             height: 160px;
-            object-fit: cover;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
-            background: #f4f4f4;
         }
 
-        .book-title {
-            font-size: 13px;
-            font-weight: 500;
-            color: #0066cc;
-            margin-bottom: 5px;
-            height: 36px;
-            overflow: hidden;
-            line-height: 1.4;
-            text-decoration: none;
-            display: block;
-        }
-
-        .book-card p.author {
-            font-size: 11px;
-            color: #888;
-            margin-bottom: 8px;
-            height: 16px;
-            overflow: hidden;
-        }
-
-        .book-card .price {
-            color: var(--price);
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .rank-item {
-            display: flex;
-            gap: 10px;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .rank-num {
-            font-size: 20px;
-            font-weight: bold;
-            color: #ccc;
-        }
-
-        footer {
-            background: #fff;
-            border-top: 3px solid var(--vb-brown);
-            padding: 30px 0;
-            margin-top: 40px;
-        }
-
-        .footer-cols {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .footer-cols h4 {
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: var(--vb-brown);
-        }
-
-        .footer-cols ul {
-            list-style: none;
-        }
-
-        .footer-cols li {
-            margin-bottom: 8px;
-        }
-
-        .footer-cols a {
-            text-decoration: none;
-            color: #666;
-        }
-
-        .bottom-footer {
-            text-align: center;
-            padding-top: 20px;
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            font-size: 11px;
-            color: #999;
-        }
-
-        .sale-off {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: #ff0000;
-            color: #fff;
-            font-size: 10px;
-            padding: 2px 4px;
-            border-radius: 2px;
+        .price {
+            color: red;
             font-weight: bold;
         }
 
         .hidden {
             display: none;
         }
-
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header-content {
-                flex-wrap: wrap;
-            }
-
-            .logo {
-                min-width: 170px;
-            }
-
-            .footer-cols {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 640px) {
-            .logo-text {
-                font-size: 28px;
-            }
-
-            .search-container {
-                width: 100%;
-                order: 3;
-            }
-
-            .book-item-grid {
-                grid-template-columns: repeat(2, minmax(130px, 1fr));
-            }
-
-            .footer-cols {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 
 <body>
-    </div>
 
-    <header>
-        <div class="container header-content">
-            <div class="logo">
-                <a th:href="@{/}" class="logo-text">BookNest</a>
-            </div>
-
-            <form class="search-container" th:action="@{/books/search}" method="get">
-                <input id="search-input" type="text" name="title"
-                    placeholder="Search books by Title, Author, Publisher..." autocomplete="off">
-                <button type="submit">SEARCH</button>
-                <div id="search-suggest" class="hidden"></div>
-            </form>
-
-            <a th:if="${session.loggedInUser != null}" th:href="@{/cart}" class="cart-box">
-                <i data-lucide="shopping-cart" size="20"></i>
-                <div>
-                    <span style="display:block; font-size: 10px; color: #999;">Shopping Cart</span>
-                    <strong style="font-size: 12px;"
-                        th:text="|(${session.cartCount != null ? session.cartCount : 0}) items|">(0) san
-                        pham</strong>
-                </div>
-            </a>
-            
-            <div th:if="${session.loggedInUser == null}" class="auth-links">
-                <a th:href="@{/login}">Login</a>
-                <a th:href="@{/register}" class="primary">Register</a>
-            </div>
-
-            <div th:if="${session.loggedInUser != null}" class="auth-links">
-                <a th:href="@{/account}">Account</a>
-                <a th:href="@{/orders}">Order</a>
-                <a th:href="@{/logout}">Logout</a>
-                <a th:if="${session.loggedInUser.role != null and (#strings.equalsIgnoreCase(session.loggedInUser.role.roleName, 'admin') or session.loggedInUser.role.id == 1)}"
-                    th:href="@{/admin}">Admin</a>
-            </div>
-    </header>
-
-    <div class="nav-bar">
-        <div class="container">
-            <ul class="nav-links">
-                <li><a th:href="@{/}" style="background: var(--vb-brown); color: #fff;"><i data-lucide="home" size="14"
-                            style="margin-bottom: -2px;"></i></a></li>
-                <li><a th:href="@{/books}">Books</a></li>
-                <li><a th:href="@{/orders}">Order</a></li>
-            </ul>
-        </div>
-    </div>
+    <!-- ✅ HEADER -->
+    <div th:replace="~{fragments/site-header :: siteHeader('home')}"></div>
 
     <main class="container main-grid">
+
+        <!-- LEFT -->
         <aside>
             <div class="sidebar-box">
                 <h3>Product</h3>
-                <ul class="sidebar-list">
+                <ul>
                     <li><a th:href="@{/books}">Book</a></li>
-                    <li><span>Stationery</span></li>
+                    <li>Stationery</li>
                 </ul>
             </div>
-
         </aside>
 
+        <!-- CENTER -->
         <section>
+
             <div class="promo-banner">
-                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=1000" alt="Banner">
+                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794" alt="">
             </div>
 
             <div class="content-section">
-                <div class="section-header">
-                    <h2>Featured new books</h2>
-                    <a th:href="@{/books}" style="font-size: 11px; text-decoration: none; color: #0066cc;">View more</a>
-                </div>
+                <h2>Featured new books</h2>
+
                 <div class="book-item-grid" th:if="${!books.empty}">
                     <div class="book-card" th:each="book,iter : ${books}" th:if="${iter.index < 8}">
-                        <span th:if="${iter.index == 0}" class="sale-off">Hot</span>
+
                         <a th:href="@{/books/{id}(id=${book.id})}">
-                            <img th:if="${book.imageUrl != null and !book.imageUrl.isEmpty()}" th:src="${book.imageUrl}"
-                                th:alt="${book.title}">
-                            <img th:if="${book.imageUrl == null or book.imageUrl.isEmpty()}"
-                                src="https://via.placeholder.com/110x160?text=No+Image" alt="No Image">
+                            <img th:src="${book.imageUrl != null ? book.imageUrl : 'https://via.placeholder.com/110x160'}">
                         </a>
-                        <a class="book-title" th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}">Book
-                            title</a>
-                        <p class="author" th:text="${book.author}">Author</p>
+
+                        <a th:text="${book.title}"></a>
+                        <p th:text="${book.author}"></p>
+
                         <p class="price"
-                            th:text="${book.price != null ? #numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
-                            0 VND</p>
+                           th:text="${#numbers.formatDecimal(book.price,0,'COMMA',0,'POINT')} + ' VND'">
+                        </p>
+
                     </div>
                 </div>
-                <p th:if="${books.empty}" style="color:#777; font-size: 12px;">No books available in the system.</p>
+
+                <p th:if="${books.empty}">No books available.</p>
             </div>
 
         </section>
 
+        <!-- RIGHT -->
         <aside>
             <div class="sidebar-box">
                 <h3>Best-selling Books</h3>
-                <div class="rank-item" th:each="book,iter : ${books}" th:if="${iter.index < 3}">
-                    <span class="rank-num"
-                        th:text="${iter.index + 1 < 10 ? '0' + (iter.index + 1) : (iter.index + 1)}">01</span>
-                    <div>
-                        <a th:href="@{/books/{id}(id=${book.id})}"
-                            style="text-decoration: none; color: #333; font-weight: 500;" th:text="${book.title}">Book
-                            title</a>
-                        <p style="font-size: 11px; color: #999;" th:text="${book.author}">Author</p>
-                    </div>
-                </div>
-                <p th:if="${books.empty}" style="padding:10px; color:#777; font-size:12px;">No ranking data available.
-                </p>
-            </div>
 
-            <div class="sidebar-box">
-                <h3>Book News</h3>
-                <div style="padding: 10px; font-size: 12px;">
-                    <p style="margin-bottom: 10px;"><a href="#" style="color: #666; text-decoration: none;">5 books
-                            to inspire your daily reading habit.</a></p>
-                    <p style="margin-bottom: 10px;"><a href="#" style="color: #666; text-decoration: none;">Suggested
-                            classic titles everyone should read at least once.</a></p>
+                <div th:each="book,iter : ${books}" th:if="${iter.index < 3}">
+                    <strong th:text="${book.title}"></strong>
+                    <p th:text="${book.author}"></p>
                 </div>
             </div>
         </aside>
+
     </main>
 
-    <footer>
-        <div class="container footer-cols">
-            <div>
-                <h4>CUSTOMER SUPPORT</h4>
-                <ul>
-                    <li><a th:href="@{/books}">Products and orders</a></li>
-                    <li><a href="#">Return policy</a></li>
-                    <li><a href="#">Shipping method</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>ABOUT BOOKNEST</h4>
-                <ul>
-                    <li><a href="#">About BookNest</a></li>
-                    <li><a href="#">Terms of use</a></li>
-                    <li><a href="#">Privacy policy</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>ACCOUNT</h4>
-                <ul>
-                    <li><a th:href="@{/login}">Login</a></li>
-                    <li><a th:href="@{/register}">Create account</a></li>
-                    <li><a th:href="@{/orders}">Order history</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>CONTACT</h4>
-                <p style="font-size: 12px; color: #666;">
-                    Email: hotro@booknest.vn<br>
-                    Hotline: 1900 1234<br>
-                    Address: Tri Thuc Building, District 1, Ho Chi Minh City
-                </p>
-            </div>
-        </div>
-        <div class="bottom-footer">
-            &copy; 2026 BookNest. All rights reserved.
-        </div>
-    </footer>
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
 
+    <!-- JS SEARCH -->
     <script>
-        lucide.createIcons();
-
-        const searchInput = document.getElementById("search-input");
-        const suggestBox = document.getElementById("search-suggest");
+        const searchInput = document.getElementById("global-search-input");
+        const suggestBox = document.getElementById("global-search-suggest");
 
         if (searchInput && suggestBox) {
             let debounceTimer;
@@ -590,27 +154,12 @@
                 suggestBox.innerHTML = "";
             };
 
-            const escapeHtml = (text) =>
-                text
-                    .replaceAll("&", "&amp;")
-                    .replaceAll("<", "&lt;")
-                    .replaceAll(">", "&gt;")
-                    .replaceAll('"', "&quot;")
-                    .replaceAll("'", "&#39;");
-
             const renderSuggestions = (items) => {
-                if (!items.length) {
-                    hideSuggestions();
-                    return;
-                }
+                if (!items.length) return hideSuggestions();
 
-                suggestBox.innerHTML = items
-                    .map((item) => {
-                        const title = escapeHtml(item.title || "");
-                        const author = escapeHtml(item.author || "");
-                        return `<a href="/books/${item.id}" style="display:block;padding:10px 12px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#333;"><div style="font-weight:600;font-size:12px;">${title}</div><div style="font-size:11px;color:#777;">${author}</div></a>`;
-                    })
-                    .join("");
+                suggestBox.innerHTML = items.map(item =>
+                    `<a href="/books/${item.id}" style="display:block;padding:8px">${item.title}</a>`
+                ).join("");
 
                 suggestBox.classList.remove("hidden");
             };
@@ -619,49 +168,16 @@
                 const keyword = searchInput.value.trim();
                 clearTimeout(debounceTimer);
 
-                if (!keyword) {
-                    hideSuggestions();
-                    return;
-                }
+                if (!keyword) return hideSuggestions();
 
                 debounceTimer = setTimeout(async () => {
-                    try {
-                        const response = await fetch(`/books/suggest?q=${encodeURIComponent(keyword)}`);
-                        if (!response.ok) {
-                            hideSuggestions();
-                            return;
-                        }
-
-                        const items = await response.json();
-                        if (!Array.isArray(items)) {
-                            hideSuggestions();
-                            return;
-                        }
-
-                        renderSuggestions(items);
-                    } catch (_error) {
-                        hideSuggestions();
-                    }
-                }, 180);
-            });
-
-            searchInput.addEventListener("keydown", (event) => {
-                if (event.key === "Escape") {
-                    hideSuggestions();
-                }
-            });
-
-            document.addEventListener("click", (event) => {
-                if (event.target !== searchInput && !suggestBox.contains(event.target)) {
-                    hideSuggestions();
-                }
-            });
-
-            searchInput.form?.addEventListener("submit", () => {
-                hideSuggestions();
+                    const res = await fetch(`/books/suggest?q=${keyword}`);
+                    const data = await res.json();
+                    renderSuggestions(data);
+                }, 200);
             });
         }
     </script>
-</body>
 
+</body>
 </html>

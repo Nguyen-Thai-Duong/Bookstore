@@ -12,13 +12,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-primary: #8b5a3c;
-            --color-secondary: #d4a574;
-            --color-bg: #f8f6f1;
+            --color-primary: #F37021;
+            --color-secondary: #00A859;
+            --color-bg: #f5f5f5;
             --color-surface: #ffffff;
-            --color-text: #1a1410;
+            --color-text: #333333;
             --color-border: #e5e0d8;
-            --color-success: #10b981;
+            --color-success: #00A859;
             --color-warning: #f59e0b;
             --color-error: #ef4444;
         }
@@ -39,7 +39,7 @@
         }
 
         .sidebar {
-            background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%);
+            background: linear-gradient(135deg, var(--color-primary) 0%, #D95F14 100%);
         }
 
         .sidebar-item {
@@ -52,13 +52,13 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%);
+            background: linear-gradient(135deg, var(--color-primary) 0%, #D95F14 100%);
             transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(139, 90, 60, 0.3);
+            box-shadow: 0 8px 16px rgba(243, 112, 33, 0.32);
         }
 
         .review-card {
@@ -158,7 +158,7 @@
             gap: 8px;
             font-size: 13px;
             font-weight: 700;
-            color: #8b5a3c;
+            color: #F37021;
             margin-bottom: 10px;
             text-transform: uppercase;
         }
@@ -189,7 +189,7 @@
         }
 
         .reply-input:focus {
-            border-color: #8b5a3c;
+            border-color: #F37021;
         }
 
         .reply-actions {
@@ -215,7 +215,7 @@
         }
 
         .btn-save {
-            background: #8b5a3c;
+            background: #F37021;
             color: #fff;
         }
 
@@ -231,6 +231,43 @@
 
         .btn-cancel:hover {
             background: #f9fafb;
+        }
+            /* fpt-theme-overrides */
+        a {
+            transition: color 0.2s ease;
+        }
+
+        main a,
+        .sidebar-list a,
+        .footer-col a,
+        .info,
+        .text-info {
+            color: #0072BC;
+        }
+
+        button,
+        input[type="submit"],
+        .btn,
+        .btn-primary,
+        .checkout-btn {
+            border-radius: 8px;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+        }
+
+        button:hover,
+        input[type="submit"]:hover,
+        .btn:hover,
+        .btn-primary:hover,
+        .checkout-btn:hover {
+            filter: brightness(0.95);
+            transform: translateY(-1px);
+        }
+
+        .alert.success,
+        .message.success {
+            background: #e8f7ef;
+            border-color: #00A859;
+            color: #00A859;
         }
     </style>
 </head>
