@@ -260,6 +260,7 @@ public class BookController {
                     item.put("id", book.getId());
                     item.put("title", book.getTitle() == null ? "" : book.getTitle());
                     item.put("author", book.getAuthor() == null ? "" : book.getAuthor());
+                    item.put("imageUrl", (book.getImageUrl() == null || book.getImageUrl().equals("Noimage")) ? "" : book.getImageUrl());
                     return item;
                 })
                 .toList();

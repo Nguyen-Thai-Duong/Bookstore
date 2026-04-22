@@ -1,104 +1,97 @@
-<!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="siteFooter" xmlns:th="http://www.thymeleaf.org">
+    <style>
+        .site-footer {
+            background: #fff;
+            border-top: 3px solid #F37021;
+            padding: 30px 0;
+            margin-top: 40px;
+        }
 
-<body>
-    <div th:fragment="siteFooter">
-        <style>
-            .site-footer {
-                background: #fff;
-                border-top: 3px solid #F37021;
-                padding: 30px 0;
-                margin-top: 40px;
-            }
+        .site-footer .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
 
-            .site-footer .container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 0 10px;
-            }
+        .site-footer .sf-cols {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
 
+        .site-footer .sf-cols h4 {
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #F37021;
+            text-transform: uppercase;
+        }
+
+        .site-footer .sf-cols ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .site-footer .sf-cols li {
+            margin-bottom: 8px;
+        }
+
+        .site-footer .sf-cols a {
+            text-decoration: none;
+            color: #666;
+        }
+
+        .site-footer .sf-bottom {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 11px;
+            color: #999;
+        }
+
+        @media (max-width: 1024px) {
             .site-footer .sf-cols {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                gap: 20px;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
+        }
 
-            .site-footer .sf-cols h4 {
-                margin-bottom: 15px;
-                font-size: 14px;
-                color: #F37021;
-                text-transform: uppercase;
+        @media (max-width: 640px) {
+            .site-footer .sf-cols {
+                grid-template-columns: 1fr;
             }
+        }
+    </style>
 
-            .site-footer .sf-cols ul {
-                list-style: none;
-                margin: 0;
-                padding: 0;
-            }
-
-            .site-footer .sf-cols li {
-                margin-bottom: 8px;
-            }
-
-            .site-footer .sf-cols a {
-                text-decoration: none;
-                color: #666;
-            }
-
-            .site-footer .sf-bottom {
-                text-align: center;
-                padding-top: 20px;
-                margin-top: 20px;
-                border-top: 1px solid #eee;
-                font-size: 11px;
-                color: #999;
-            }
-
-            @media (max-width: 1024px) {
-                .site-footer .sf-cols {
-                    grid-template-columns: repeat(2, minmax(0, 1fr));
-                }
-            }
-
-            @media (max-width: 640px) {
-                .site-footer .sf-cols {
-                    grid-template-columns: 1fr;
-                }
-            }
-        </style>
-
-        <footer class="site-footer">
-            <div class="container sf-cols">
-                <div>
-                    <h4>Customer Support</h4>
-                    <ul>
-                        <li><a th:href="@{/books}">Products and orders</a></li>
-                        <li><a href="#">Return policy</a></li>
-                        <li><a href="#">Shipping method</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4>About BookNest</h4>
-                    <ul>
-                        <li><a href="#">About BookNest</a></li>
-                        <li><a href="#">Terms of use</a></li>
-                        <li><a href="#">Privacy policy</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4>Account</h4>
-                    <ul>
-                        <li><a th:href="@{/login}">Login</a></li>
-                        <li><a th:href="@{/register}">Create account</a></li>
-                        <li><a th:href="@{/orders}">Order history</a></li>
-                    </ul>
-                </div>
+    <footer class="site-footer">
+        <div class="container sf-cols">
+            <div>
+                <h4>Customer Support</h4>
+                <ul>
+                    <li><a th:href="@{/books}">Products and orders</a></li>
+                    <li><a href="#">Return policy</a></li>
+                    <li><a href="#">Shipping method</a></li>
+                </ul>
             </div>
-            <div class="sf-bottom">
-                &copy; 2026 BookNest. All rights reserved.
+            <div>
+                <h4>About BookNest</h4>
+                <ul>
+                    <li><a href="#">About BookNest</a></li>
+                    <li><a href="#">Terms of use</a></li>
+                    <li><a href="#">Privacy policy</a></li>
+                </ul>
             </div>
-        </footer>
-    </div>
-</body>
-
-</html>
+            <div>
+                <h4>Account</h4>
+                <ul>
+                    <li><a th:href="@{/login}">Login</a></li>
+                    <li><a th:href="@{/register}">Create account</a></li>
+                    <li><a th:href="@{/orders}">Order history</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="sf-bottom">
+            &copy; 2026 BookNest. All rights reserved.
+        </div>
+    </footer>
+</div>

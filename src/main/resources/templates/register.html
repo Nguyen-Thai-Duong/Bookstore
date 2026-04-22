@@ -202,7 +202,8 @@
             color: #444;
         }
 
-        .field input {
+        .field input,
+        .field select {
             width: 100%;
             border: 1px solid #d8d8d8;
             border-radius: 4px;
@@ -210,7 +211,8 @@
             outline: none;
         }
 
-        .field input:focus {
+        .field input:focus,
+        .field select:focus {
             border-color: var(--vb-brown);
         }
 
@@ -357,8 +359,49 @@
 
                     <div class="field">
                         <label>Phone number</label>
-                        <input type="text" id="phone" name="phone" placeholder="Example: 0912345678">
+                        <input type="text" id="phone" name="phone" placeholder="Example: 0912345678" required>
                         <div id="phoneError" class="error-message"></div>
+                    </div>
+
+                    <div class="field">
+                        <label>Gender</label>
+                        <select name="gender" required>
+                            <option value="">Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div id="genderError" class="error-message"></div>
+                    </div>
+
+                    <div class="field">
+                        <label>Date of birth</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select name="birthDay" style="flex: 1;" id="birthDay" required>
+                                <option value="">Day</option>
+                                <option th:each="i : ${#numbers.sequence(1,31)}" th:value="${i}" th:text="${i}">1</option>
+                            </select>
+                            <select name="birthMonth" style="flex: 1;" id="birthMonth" required>
+                                <option value="">Month</option>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <select name="birthYear" style="flex: 1;" id="birthYear" required>
+                                <option value="">Year</option>
+                                <option th:each="i : ${#numbers.sequence(1900, 2024)}" th:value="${i}" th:text="${i}">2000</option>
+                            </select>
+                        </div>
+                        <div id="dateOfBirthError" class="error-message"></div>
                     </div>
 
                     <div class="field">
@@ -427,11 +470,44 @@
             return setError('password', 'passwordError', '');
         }
 
+        function validateGender() {
+            const gender = document.querySelector('select[name="gender"]').value;
+            if (gender === '') {
+                return setError('gender', 'genderError', 'Gender: Please select your gender');
+            }
+            return setError('gender', 'genderError', '');
+        }
+
+        function validateDateOfBirth() {
+            const birthDay = document.getElementById('birthDay').value;
+            const birthMonth = document.getElementById('birthMonth').value;
+            const birthYear = document.getElementById('birthYear').value;
+            
+            if (birthDay === '' || birthMonth === '' || birthYear === '') {
+                return setError('birthDay', 'dateOfBirthError', 'Date of birth: Please select your complete date of birth');
+            }
+            
+            const selectedDate = new Date(birthYear, birthMonth - 1, birthDay);
+            const today = new Date();
+            const age = today.getFullYear() - selectedDate.getFullYear();
+            const monthDiff = today.getMonth() - selectedDate.getMonth();
+            const dayDiff = today.getDate() - selectedDate.getDate();
+            const actualAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
+            
+            if (actualAge < 13) {
+                return setError('birthDay', 'dateOfBirthError', 'Date of birth: You must be at least 13 years old');
+            }
+            if (actualAge > 120) {
+                return setError('birthDay', 'dateOfBirthError', 'Date of birth: Please enter a valid date of birth');
+            }
+            return setError('birthDay', 'dateOfBirthError', '');
+        }
+
         function validatePhone() {
             const phone = document.getElementById('phone').value.trim();
             const phoneRegex = /^[0-9]{10,11}$/;
             if (phone === '') {
-                return setError('phone', 'phoneError', '');
+                return setError('phone', 'phoneError', 'Phone number: Please enter your phone number');
             }
             if (!phoneRegex.test(phone)) {
                 return setError('phone', 'phoneError', 'Phone number: Must be 10-11 digits');
@@ -442,15 +518,21 @@
         document.getElementById('fullName').addEventListener('input', validateFullName);
         document.getElementById('email').addEventListener('input', validateEmail);
         document.getElementById('password').addEventListener('input', validatePassword);
+        document.querySelector('select[name="gender"]').addEventListener('change', validateGender);
+        document.getElementById('birthDay').addEventListener('change', validateDateOfBirth);
+        document.getElementById('birthMonth').addEventListener('change', validateDateOfBirth);
+        document.getElementById('birthYear').addEventListener('change', validateDateOfBirth);
         document.getElementById('phone').addEventListener('input', validatePhone);
 
         document.getElementById('registerForm').addEventListener('submit', function (e) {
             const isFullNameValid = validateFullName();
             const isEmailValid = validateEmail();
             const isPasswordValid = validatePassword();
+            const isGenderValid = validateGender();
+            const isDateOfBirthValid = validateDateOfBirth();
             const isPhoneValid = validatePhone();
 
-            if (!isFullNameValid || !isEmailValid || !isPasswordValid || !isPhoneValid) {
+            if (!isFullNameValid || !isEmailValid || !isPasswordValid || !isGenderValid || !isDateOfBirthValid || !isPhoneValid) {
                 e.preventDefault();
             }
         });

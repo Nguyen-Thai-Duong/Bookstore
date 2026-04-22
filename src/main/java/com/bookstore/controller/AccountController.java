@@ -92,6 +92,8 @@ public class AccountController {
     public String updateProfile(@RequestParam String fullName,
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String address,
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) String dateOfBirth,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("loggedInUser");
@@ -102,6 +104,8 @@ public class AccountController {
         String normalizedName = fullName == null ? "" : fullName.trim();
         String normalizedPhone = phone == null ? "" : phone.trim();
         String normalizedAddress = address == null ? "" : address.trim();
+        String normalizedGender = gender == null ? "" : gender.trim();
+        String normalizedDateOfBirth = dateOfBirth == null ? "" : dateOfBirth.trim();
 
         if (normalizedName.length() > 100) {
             redirectAttributes.addFlashAttribute("profileError", "Full name too long");
@@ -124,7 +128,9 @@ public class AccountController {
                 user.getId(),
                 normalizedName,
                 normalizedPhone.isEmpty() ? null : normalizedPhone,
-                normalizedAddress.isEmpty() ? null : normalizedAddress);
+                normalizedAddress.isEmpty() ? null : normalizedAddress,
+                normalizedGender.isEmpty() ? null : normalizedGender,
+                normalizedDateOfBirth.isEmpty() ? null : normalizedDateOfBirth);
 
         if (updated == null) {
             redirectAttributes.addFlashAttribute("profileError", "Unable to update profile");

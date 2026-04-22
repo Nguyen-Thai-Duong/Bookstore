@@ -213,7 +213,8 @@
         }
 
         .field input,
-        .field textarea {
+        .field textarea,
+        .field select {
             border: 1px solid #d8d8d8;
             border-radius: 4px;
             padding: 10px;
@@ -227,7 +228,8 @@
         }
 
         .field input:focus,
-        .field textarea:focus {
+        .field textarea:focus,
+        .field select:focus {
             border-color: var(--vb-brown);
         }
 
@@ -398,6 +400,21 @@
                         <div class="field">
                             <label>Email (invoice)</label>
                             <input type="email" name="email" th:value="${user != null ? user.email : ''}">
+                        </div>
+
+                        <div class="field">
+                            <label>Gender</label>
+                            <select name="gender">
+                                <option value="">Select gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label>Date of birth</label>
+                            <input type="date" name="dateOfBirth">
                         </div>
 
                         <div class="field full">

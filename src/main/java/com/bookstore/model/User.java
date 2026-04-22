@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,6 +37,12 @@ public class User {
 
     @Column(name = "Address", length = 255)
     private String address;
+
+    @Column(name = "Gender", length = 10)
+    private String gender;
+
+    @Column(name = "DateOfBirth")
+    private LocalDate dateOfBirth;
 
     @Column(name = "Status", length = 20)
     private String status = "Active";
