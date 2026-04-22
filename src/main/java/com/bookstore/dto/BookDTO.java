@@ -1,6 +1,9 @@
 package com.bookstore.dto;
 
 import com.bookstore.model.Book;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,9 +17,17 @@ import java.time.LocalDateTime;
 public class BookDTO {
 
     private Long id;
+
+    @NotBlank(message = "Item name is required")
     private String title;
+
+    @NotBlank(message = "Brand is required")
     private String author;
+
+    @NotNull(message = "Price is required")
+    @Min(value = 0, message = "Price must be greater than or equal to 0")
     private BigDecimal price;
+
     private Integer stock;
     private String description;
     private String imageUrl;
@@ -31,7 +42,9 @@ public class BookDTO {
     private BigDecimal thicknessCm;
     private Integer pageCount;
 
+    @NotNull(message = "Please select a category")
     private CategoryDTO category;
+    
     private Long productTypeId;
     private boolean discontinued;
     private Long cartCleanupRemainingSeconds;

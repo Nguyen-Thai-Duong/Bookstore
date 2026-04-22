@@ -237,6 +237,10 @@
                             th:style="${activePage == 'books'} ? 'background: var(--vb-brown); color: #fff;' : ''">BOOKS</a>
                     </li>
                     <li>
+                        <a th:href="@{/stationery}"
+                           th:style="${activePage == 'stationery'} ? 'background: var(--vb-brown); color: #fff;' : ''">STATIONERY</a>
+                    </li>
+                    <li>
                         <a th:href="@{/orders}"
                             th:style="${activePage == 'orders'} ? 'background: var(--vb-brown); color: #fff;' : ''">Order</a>
                     </li>

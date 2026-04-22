@@ -4,6 +4,18 @@
 <body>
     <aside th:fragment="adminSidebar(activePage)"
         class="sidebar w-64 text-white flex flex-col fixed left-0 top-0 h-full">
+        <style>
+            .sidebar {
+                background: linear-gradient(135deg, #F37021 0%, #D95F14 100%) !important;
+            }
+            .sidebar-item {
+                transition: all 0.3s ease;
+            }
+            .sidebar-item:hover,
+            .sidebar-item.active {
+                background-color: rgba(255, 255, 255, 0.15) !important;
+            }
+        </style>
         <div class="p-6 border-b border-white/20">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
@@ -36,6 +48,15 @@
                         d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
                 <span>Book Management</span>
+            </a>
+
+            <a href="/admin/stationery"
+                th:class="${activePage == 'stationery'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+                <span>Stationery</span>
             </a>
 
             <a href="/admin/categories"
