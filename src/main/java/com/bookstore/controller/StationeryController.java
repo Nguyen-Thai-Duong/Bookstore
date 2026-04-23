@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -85,8 +86,26 @@ public class StationeryController {
 
         model.addAttribute("items", items);
         model.addAttribute("categories", categoryService.getCategoriesByProductType(2L));
-
+        model.addAttribute("activePage", "stationery");
         return "stationery-list";
+    }
+
+    @GetMapping("/detail/{id}")
+    public String viewStationeryDetail(@PathVariable Long id, Model model) {
+        bookService.getBookById(id).ifPresent(item -> {
+            model.addAttribute("item", item);
+            // Lấy các sản phẩm liên quan (cùng category)
+            List<Book> relatedItems = bookService.getProductsByProductType(2L).stream()
+                    .filter(i -> i.getCategory() != null && 
+                                 i.getCategory().getId().equals(item.getCategory().getId()) && 
+                                 !i.getId().equals(item.getId()) &&
+                                 "Active".equalsIgnoreCase(i.getStatus()))
+                    .limit(4)
+                    .collect(Collectors.toList());
+            model.addAttribute("relatedItems", relatedItems);
+        });
+        model.addAttribute("activePage", "stationery");
+        return "stationery-detail";
     }
 
     @GetMapping("/suggest")
@@ -114,5 +133,6 @@ public class StationeryController {
                     return result;
                 })
                 .toList();
+  
     }
 }

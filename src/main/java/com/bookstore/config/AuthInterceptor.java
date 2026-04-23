@@ -27,9 +27,9 @@ public class AuthInterceptor implements HandlerInterceptor {
         User user = session == null ? null : (User) session.getAttribute("loggedInUser");
         boolean isAdminPath = path.startsWith("/admin");
 
-        // Keep admin and user areas separated: if admin leaves /admin area,
+        // Keep admin/staff and user areas separated: if they leave /admin area,
         // force logout to guest before allowing access.
-        if (user != null && authService.isAdmin(user) && !isAdminPath) {
+        if (user != null && authService.canAccessAdminPanel(user) && !isAdminPath) {
             session.removeAttribute("loggedInUser");
             session.removeAttribute("cart");
             session.removeAttribute("cartCount");
@@ -41,7 +41,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                 response.sendRedirect("/login?error=Please%20sign%20in");
                 return false;
             }
-            if (!authService.isAdmin(user)) {
+            if (!authService.canAccessAdminPanel(user)) {
                 response.sendRedirect("/");
                 return false;
             }
@@ -58,7 +58,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             }
         }
 
-        if (session != null && user != null && !authService.isAdmin(user)) {
+        if (session != null && user != null && !authService.canAccessAdminPanel(user)) {
             refreshCartCount(session, user.getId());
         }
 

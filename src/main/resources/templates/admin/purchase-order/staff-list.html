@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Import Management - Staff</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div th:replace="~{admin/fragments/sidebar :: adminSidebar('purchase-orders')}"></div>
+
+    <main class="ml-64 p-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">My Purchase Requests</h1>
+            <a href="/admin/purchase-orders/new" class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition">
+                + Create New Request
+            </a>
+        </div>
+
+        <div th:if="${successMessage}" class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="mb-4 p-4 bg-red-100 text-red-700 rounded-lg" th:text="${errorMessage}"></div>
+
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-100 border-b">
+                    <tr>
+                        <th class="px-6 py-4 font-semibold text-gray-700">ID</th>
+                        <th class="px-6 py-4 font-semibold text-gray-700">Supplier</th>
+                        <th class="px-6 py-4 font-semibold text-gray-700">Date</th>
+                        <th class="px-6 py-4 font-semibold text-gray-700 text-right">Total Amount</th>
+                        <th class="px-6 py-4 font-semibold text-gray-700 text-center">Status</th>
+                        <th class="px-6 py-4 font-semibold text-gray-700 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    <tr th:each="order : ${orders}" class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 text-gray-600 font-mono" th:text="'PO-' + ${order.id}"></td>
+                        <td class="px-6 py-4 font-medium text-gray-800" th:text="${order.supplier.supplierName}"></td>
+                        <td class="px-6 py-4 text-gray-600 text-sm" th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td class="px-6 py-4 font-bold text-orange-600 text-right" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + ' đ'}"></td>
+                        <td class="px-6 py-4 text-center">
+                            <span th:class="${'px-3 py-1 rounded-full text-xs font-bold ' + 
+                                (order.status == 'Requested' ? 'bg-yellow-100 text-yellow-700' : 
+                                 order.status == 'Pending' ? 'bg-blue-100 text-blue-700' : 
+                                 order.status == 'Received' ? 'bg-purple-100 text-purple-700' : 
+                                 order.status == 'Finalized' ? 'bg-indigo-100 text-indigo-700' : 
+                                 order.status == 'Completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')}"
+                                  th:text="${order.status}"></span>
+                        </td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            <!-- Nút Xem chi tiết -->
+                            <a th:href="@{'/admin/purchase-orders/view/' + ${order.id}}" class="text-blue-600 hover:underline text-sm font-medium">View</a>
+
+                            <!-- Bước 3: Hàng về, Staff báo cáo số lượng thực nhận -->
+                            <a th:if="${order.status == 'Pending'}" 
+                               th:href="@{'/admin/purchase-orders/receive/' + ${order.id}}" 
+                               class="text-sm bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600">
+                                Report Goods
+                            </a>
+
+                            <!-- Bước 5: Sau khi Admin chốt (Finalized), Staff nhấn nhập kho thực tế -->
+                            <form th:if="${order.status == 'Finalized'}" 
+                                  th:action="@{'/admin/purchase-orders/stock-in/' + ${order.id}}" method="post" class="inline">
+                                <button type="submit" class="text-sm bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                                        onclick="return confirm('Confirm updating stock in database?')">
+                                    Stock-in
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

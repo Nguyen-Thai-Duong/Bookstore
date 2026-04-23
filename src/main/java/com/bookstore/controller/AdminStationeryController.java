@@ -3,12 +3,15 @@ package com.bookstore.controller;
 import com.bookstore.dto.BookDTO;
 import com.bookstore.dto.CategoryDTO;
 import com.bookstore.model.Book;
+import com.bookstore.model.Category;
 import com.bookstore.repository.BookRepository;
 import com.bookstore.service.BookService;
 import com.bookstore.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -62,17 +65,23 @@ public class AdminStationeryController {
                 .toList();
                 
         model.addAttribute("stationeryList", stationeryList);
+        model.addAttribute("activePage", "stationery");
         return "admin/stationery/list";
     }
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         BookDTO dto = new BookDTO();
+        List<Category> stationeryCategories = categoryService.getCategoriesByProductType(2L);
+        
+        // Mặc định chọn category đầu tiên nếu chỉ có 1 category thuộc loại Stationery (ID 2)
+        if (!stationeryCategories.isEmpty()) {
+            dto.setCategory(CategoryDTO.fromEntity(stationeryCategories.get(0)));
+        }
+
         model.addAttribute("item", dto);
-        model.addAttribute("categories", 
-            categoryService.getCategoriesByProductType(2L).stream()
-                .map(CategoryDTO::fromEntity)
-                .toList());
+        model.addAttribute("categories", stationeryCategories.stream().map(CategoryDTO::fromEntity).toList());
+        model.addAttribute("activePage", "stationery");
         return "admin/stationery/form";
     }
 
@@ -80,17 +89,30 @@ public class AdminStationeryController {
     public String showEditForm(@PathVariable Long id, Model model) {
         bookService.getBookById(id).ifPresent(item -> {
             model.addAttribute("item", BookDTO.fromEntity(item));
-            model.addAttribute("categories", 
-                categoryService.getCategoriesByProductType(2L).stream()
-                    .map(CategoryDTO::fromEntity)
-                    .toList());
         });
+        model.addAttribute("categories", 
+            categoryService.getCategoriesByProductType(2L).stream()
+                .map(CategoryDTO::fromEntity)
+                .toList());
+        model.addAttribute("activePage", "stationery");
         return "admin/stationery/form";
     }
 
     @PostMapping("/save")
-    public String saveStationery(@ModelAttribute("item") BookDTO itemDto,
-                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+    public String saveStationery(@Valid @ModelAttribute("item") BookDTO itemDto,
+                                BindingResult bindingResult,
+                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                                Model model) {
+        
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", 
+                categoryService.getCategoriesByProductType(2L).stream()
+                    .map(CategoryDTO::fromEntity)
+                    .toList());
+            model.addAttribute("activePage", "stationery");
+            return "admin/stationery/form";
+        }
+
         Book item = itemDto.toEntity();
         final String[] existingImageUrl = { null };
 
@@ -136,6 +158,7 @@ public class AdminStationeryController {
     @GetMapping("/{id}")
     public String viewStationery(@PathVariable Long id, Model model) {
         bookService.getBookById(id).ifPresent(item -> model.addAttribute("item", BookDTO.fromEntity(item)));
+        model.addAttribute("activePage", "stationery");
         return "admin/stationery/detail-stationery";
     }
 

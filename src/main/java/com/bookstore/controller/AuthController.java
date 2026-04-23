@@ -30,7 +30,8 @@ public class AuthController {
             Model model) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user != null) {
-            return authService.isAdmin(user) ? "redirect:/admin" : "redirect:/";
+            // Sửa ở đây: Nếu là Admin hoặc Staff thì vào /admin
+            return authService.canAccessAdminPanel(user) ? "redirect:/admin" : "redirect:/";
         }
 
         if (error != null) {
@@ -52,7 +53,8 @@ public class AuthController {
         }
 
         session.setAttribute("loggedInUser", user);
-        return authService.isAdmin(user) ? "redirect:/admin" : "redirect:/";
+        // Sửa ở đây: Nếu là Admin hoặc Staff thì vào /admin
+        return authService.canAccessAdminPanel(user) ? "redirect:/admin" : "redirect:/";
     }
 
     @GetMapping("/register")
