@@ -10,10 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/stationery")
@@ -27,12 +31,12 @@ public class StationeryController {
 
     @GetMapping
     public String listStationery(@RequestParam(required = false) String name,
-                                 @RequestParam(required = false) Long categoryId,
-                                 @RequestParam(required = false) Double minPrice,
-                                 @RequestParam(required = false) Double maxPrice,
-                                 @RequestParam(required = false) String sort,
-                                 Model model) {
-        
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String sort,
+            Model model) {
+
         // Lấy tất cả sản phẩm Stationery (ProductTypeID = 2) và chỉ lấy sản phẩm Active
         List<Book> items = bookService.getProductsByProductType(2L).stream()
                 .filter(i -> "Active".equalsIgnoreCase(i.getStatus()))
@@ -42,11 +46,11 @@ public class StationeryController {
         if (name != null && !name.isEmpty()) {
             String lowerName = name.toLowerCase();
             items = items.stream()
-                    .filter(i -> (i.getTitle() != null && i.getTitle().toLowerCase().contains(lowerName)) || 
-                                 (i.getAuthor() != null && i.getAuthor().toLowerCase().contains(lowerName)))
+                    .filter(i -> (i.getTitle() != null && i.getTitle().toLowerCase().contains(lowerName)) ||
+                            (i.getAuthor() != null && i.getAuthor().toLowerCase().contains(lowerName)))
                     .collect(Collectors.toList());
         }
-        
+
         if (categoryId != null) {
             items = items.stream()
                     .filter(i -> i.getCategory() != null && i.getCategory().getId().equals(categoryId))
@@ -83,7 +87,6 @@ public class StationeryController {
         model.addAttribute("items", items);
         model.addAttribute("categories", categoryService.getCategoriesByProductType(2L));
         model.addAttribute("activePage", "stationery");
-        
         return "stationery-list";
     }
 
@@ -103,5 +106,33 @@ public class StationeryController {
         });
         model.addAttribute("activePage", "stationery");
         return "stationery-detail";
+    }
+
+    @GetMapping("/suggest")
+    @ResponseBody
+    public List<Map<String, Object>> suggestStationery(@RequestParam(name = "q", required = false) String q) {
+        String keyword = q == null ? "" : q.trim();
+        if (keyword.isEmpty()) {
+            return List.of();
+        }
+
+        String lowerKeyword = keyword.toLowerCase();
+        List<Book> items = bookService.getProductsByProductType(2L).stream()
+                .filter(i -> "Active".equalsIgnoreCase(i.getStatus()))
+                .filter(i -> (i.getTitle() != null && i.getTitle().toLowerCase().contains(lowerKeyword)) ||
+                        (i.getAuthor() != null && i.getAuthor().toLowerCase().contains(lowerKeyword)))
+                .limit(8)
+                .collect(Collectors.toList());
+
+        return items.stream()
+                .map(item -> {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    result.put("id", item.getId());
+                    result.put("title", item.getTitle() == null ? "" : item.getTitle());
+                    result.put("author", item.getAuthor() == null ? "" : item.getAuthor());
+                    return result;
+                })
+                .toList();
+  
     }
 }

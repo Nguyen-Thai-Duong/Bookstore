@@ -100,12 +100,14 @@ public class OrderServiceImpl implements OrderService {
 
         LinkedHashMap<String, BigDecimal> revenueByPeriod = new LinkedHashMap<>();
         LinkedHashMap<String, Integer> booksSoldByPeriod = new LinkedHashMap<>();
+        LinkedHashMap<String, Integer> stationerySoldByPeriod = new LinkedHashMap<>();
 
         LocalDateTime cursor = safeStart;
         while (!cursor.isAfter(safeEnd)) {
             String label = formatLabel(cursor, normalizedPeriod);
             revenueByPeriod.putIfAbsent(label, BigDecimal.ZERO);
             booksSoldByPeriod.putIfAbsent(label, 0);
+            stationerySoldByPeriod.putIfAbsent(label, 0);
             cursor = incrementPeriod(cursor, normalizedPeriod);
         }
 
@@ -130,12 +132,38 @@ public class OrderServiceImpl implements OrderService {
             revenueByPeriod.put(label, currentRevenue.add(orderRevenue));
 
             int currentBooksSold = booksSoldByPeriod.get(label);
-            int booksFromOrder = order.getOrderDetails() == null
-                    ? 0
-                    : order.getOrderDetails().stream()
-                            .mapToInt(detail -> detail.getQuantity() != null ? detail.getQuantity() : 0)
-                            .sum();
+            int currentStationerySold = stationerySoldByPeriod.get(label);
+
+            int booksFromOrder = 0;
+            int stationeryFromOrder = 0;
+            if (order.getOrderDetails() != null) {
+                for (OrderDetail detail : order.getOrderDetails()) {
+                    if (detail == null || detail.getQuantity() == null) {
+                        continue;
+                    }
+                    int qty = detail.getQuantity();
+                    if (qty <= 0) {
+                        continue;
+                    }
+
+                    Book product = detail.getBook();
+                    Long typeId = product != null
+                            && product.getCategory() != null
+                            && product.getCategory().getProductType() != null
+                            ? product.getCategory().getProductType().getId()
+                            : null;
+
+                    if (typeId != null && typeId == 2L) {
+                        stationeryFromOrder += qty;
+                    } else {
+                        // Default to Book when missing type info (backward compatible data)
+                        booksFromOrder += qty;
+                    }
+                }
+            }
+
             booksSoldByPeriod.put(label, currentBooksSold + booksFromOrder);
+            stationerySoldByPeriod.put(label, currentStationerySold + stationeryFromOrder);
         }
 
         List<String> labels = new ArrayList<>(revenueByPeriod.keySet());
@@ -145,11 +173,19 @@ public class OrderServiceImpl implements OrderService {
         List<Integer> booksSold = labels.stream()
                 .map(label -> booksSoldByPeriod.getOrDefault(label, 0))
                 .toList();
+        List<Integer> stationerySold = labels.stream()
+                .map(label -> stationerySoldByPeriod.getOrDefault(label, 0))
+                .toList();
+        List<Integer> productsSold = labels.stream()
+                .map(l -> booksSoldByPeriod.getOrDefault(l, 0) + stationerySoldByPeriod.getOrDefault(l, 0))
+                .toList();
 
         Map<String, Object> result = new HashMap<>();
         result.put("labels", labels);
         result.put("revenue", revenues);
         result.put("booksSold", booksSold);
+        result.put("stationerySold", stationerySold);
+        result.put("productsSold", productsSold);
         return result;
     }
 

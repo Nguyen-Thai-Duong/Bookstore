@@ -11,8 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -111,6 +113,67 @@ public class BookServiceImpl implements BookService {
                         .orElse(null))
                 .filter(book -> book != null)
                 .sorted(Comparator.comparing(book -> book.getCategory().getId()))
+                .toList();
+    }
+
+    @Override
+    public List<Book> getTopSellingProductsByProductType(Long productTypeId, int limit) {
+        if (productTypeId == null || limit <= 0) {
+            return List.of();
+        }
+
+        List<Book> productsOfType = bookRepository.findByProductType(productTypeId).stream()
+                .filter(p -> p != null && !p.isDiscontinued() && "Active".equalsIgnoreCase(p.getStatus()))
+                .toList();
+        if (productsOfType.isEmpty()) {
+            return List.of();
+        }
+
+        Set<Long> productIds = productsOfType.stream()
+                .map(Book::getId)
+                .filter(id -> id != null)
+                .collect(Collectors.toSet());
+        if (productIds.isEmpty()) {
+            return List.of();
+        }
+
+        Map<Long, Integer> soldQtyByProductId = new HashMap<>();
+        for (OrderDetail detail : orderDetailRepository.findAll()) {
+            if (detail == null || detail.getBook() == null || detail.getBook().getId() == null) {
+                continue;
+            }
+
+            Long pid = detail.getBook().getId();
+            if (!productIds.contains(pid)) {
+                continue;
+            }
+
+            Integer quantity = detail.getQuantity();
+            if (quantity == null || quantity <= 0) {
+                continue;
+            }
+
+            String status = detail.getOrder() != null && detail.getOrder().getStatus() != null
+                    ? detail.getOrder().getStatus()
+                    : "";
+            String normalized = status.trim().toLowerCase(Locale.ROOT);
+            boolean completed = normalized.contains("completed")
+                    || normalized.contains("hoan thanh")
+                    || normalized.contains("da giao")
+                    || normalized.contains("delivered");
+            if (!completed) {
+                continue;
+            }
+
+            soldQtyByProductId.merge(pid, quantity, Integer::sum);
+        }
+
+        return productsOfType.stream()
+                .sorted(Comparator
+                        .comparingInt((Book p) -> soldQtyByProductId.getOrDefault(p.getId(), 0))
+                        .reversed()
+                        .thenComparing(Book::getId, Comparator.nullsLast(Comparator.naturalOrder())))
+                .limit(limit)
                 .toList();
     }
 

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -49,6 +50,8 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+
+    private static final Long BOOK_PRODUCT_TYPE_ID = 1L;
 
     @Autowired
     private BookService bookService;
@@ -88,8 +91,18 @@ public class AdminController {
     @GetMapping
     public String dashboard(Model model) {
         // Get statistics
-        var allBooks = bookService.getAllBooks();
-        var allCategories = categoryService.getAllCategories().stream()
+        var allBooks = bookService.getProductsByProductType(BOOK_PRODUCT_TYPE_ID).stream()
+                .filter(book -> book != null && !book.isDiscontinued() && "Active".equalsIgnoreCase(book.getStatus()))
+                .toList();
+        var allStationery = bookService.getProductsByProductType(2L).stream()
+                .filter(item -> item != null && !item.isDiscontinued() && "Active".equalsIgnoreCase(item.getStatus()))
+                .toList();
+
+        var allActiveProducts = bookRepository.findAll().stream()
+                .filter(product -> product != null && !product.isDiscontinued() && "Active".equalsIgnoreCase(product.getStatus()))
+                .toList();
+
+        var allProductTypes = productTypeRepository.findAll().stream()
                 .sorted((left, right) -> {
                     if (left.getId() == null && right.getId() == null) {
                         return 0;
@@ -106,12 +119,17 @@ public class AdminController {
         var allUsers = userService.getAllUsers();
 
         // Calculate total stock
-        int totalStock = allBooks.stream()
-                .mapToInt(book -> book.getStock() != null ? book.getStock() : 0)
+        int totalStock = allActiveProducts.stream()
+                .mapToInt(product -> product.getStock() != null ? product.getStock() : 0)
                 .sum();
 
         // Get recent books (last 5)
         var recentBooks = allBooks.stream()
+                .limit(5)
+                .map(BookDTO::fromEntity)
+                .toList();
+
+        var recentStationery = allStationery.stream()
                 .limit(5)
                 .map(BookDTO::fromEntity)
                 .toList();
@@ -121,16 +139,27 @@ public class AdminController {
                 .toList();
 
         // Add attributes to model
-        model.addAttribute("totalBooks", allBooks.size());
-        model.addAttribute("totalCategories", allCategories.size());
+        model.addAttribute("totalProducts", allBooks.size() + allStationery.size());
+        model.addAttribute("totalProductTypes", allProductTypes.size());
         model.addAttribute("totalStock", totalStock);
         model.addAttribute("totalUsers", allUsers.size());
         model.addAttribute("recentBooks", recentBooks);
-        model.addAttribute("categories", allCategories.stream()
-                .map(category -> {
-                    CategoryDTO dto = CategoryDTO.fromEntity(category);
-                    dto.setBookCount(bookRepository.countByCategory_Id(category.getId()));
-                    return dto;
+        model.addAttribute("recentStationery", recentStationery);
+        model.addAttribute("productTypes", allProductTypes.stream()
+                .map(type -> {
+                    var row = new LinkedHashMap<String, Object>();
+                    row.put("id", type.getId());
+                    row.put("name", type.getName());
+                    long count = 0;
+                    if (type.getId() != null) {
+                        count = allActiveProducts.stream()
+                                .filter(p -> p.getCategory() != null
+                                        && p.getCategory().getProductType() != null
+                                        && type.getId().equals(p.getCategory().getProductType().getId()))
+                                .count();
+                    }
+                    row.put("productCount", count);
+                    return row;
                 })
                 .toList());
         model.addAttribute("latestReviews", latestReviews);
@@ -140,16 +169,19 @@ public class AdminController {
 
     @GetMapping("/books")
     public String listBooks(Model model) {
-        model.addAttribute("books", bookRepository.findAll().stream().map(BookDTO::fromEntity).toList());
+        model.addAttribute("books", bookRepository.findByProductType(BOOK_PRODUCT_TYPE_ID).stream()
+                .map(BookDTO::fromEntity)
+                .toList());
         return "admin/books";
     }
 
     @GetMapping("/books/new")
     public String showCreateBookForm(Model model) {
-        model.addAttribute("book", new BookDTO());
+        BookDTO dto = new BookDTO();
+        dto.setProductTypeId(BOOK_PRODUCT_TYPE_ID);
+        model.addAttribute("book", dto);
         model.addAttribute("categories",
-                categoryService.getAllCategories().stream().map(CategoryDTO::fromEntity).toList());
-        model.addAttribute("productTypes", productTypeRepository.findAll());
+                categoryService.getCategoriesByProductType(BOOK_PRODUCT_TYPE_ID).stream().map(CategoryDTO::fromEntity).toList());
         return "admin/books/form";
     }
 
@@ -158,20 +190,37 @@ public class AdminController {
         bookService.getBookById(id).ifPresent(book -> {
             model.addAttribute("book", BookDTO.fromEntity(book));
             model.addAttribute("categories",
-                    categoryService.getAllCategories().stream().map(CategoryDTO::fromEntity).toList());
-            model.addAttribute("productTypes", productTypeRepository.findAll());
+                    categoryService.getCategoriesByProductType(BOOK_PRODUCT_TYPE_ID).stream().map(CategoryDTO::fromEntity).toList());
         });
-        if (!model.containsAttribute("productTypes")) {
-            model.addAttribute("productTypes", productTypeRepository.findAll());
-        }
         return "admin/books/form";
     }
 
     @PostMapping("/books/save")
     public String saveBook(@ModelAttribute("book") BookDTO bookDto,
-            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            RedirectAttributes redirectAttributes) {
         Book book = bookDto.toEntity();
         final String[] existingImageUrl = { null };
+
+        if (book.getStock() == null) {
+            book.setStock(0);
+        }
+
+        Long categoryId = bookDto.getCategory() != null ? bookDto.getCategory().getId() : null;
+        if (categoryId == null) {
+            redirectAttributes.addFlashAttribute("bookError", "Category is required.");
+            return "redirect:/admin/books/new";
+        }
+
+        var categoryOpt = categoryService.getCategoryById(categoryId);
+        if (categoryOpt.isEmpty()
+                || categoryOpt.get().getProductType() == null
+                || categoryOpt.get().getProductType().getId() == null
+                || !BOOK_PRODUCT_TYPE_ID.equals(categoryOpt.get().getProductType().getId())) {
+            redirectAttributes.addFlashAttribute("bookError", "Invalid category for Book product type.");
+            return "redirect:/admin/books/new";
+        }
+        book.setCategory(categoryOpt.get());
 
         if (book.getId() != null) {
             bookService.getBookById(book.getId()).ifPresent(existingBook -> {
@@ -291,7 +340,7 @@ public class AdminController {
     public String searchBooks(@RequestParam(required = false) String title,
             @RequestParam(required = false) String author,
             Model model) {
-        var books = bookRepository.findAll();
+        var books = bookRepository.findByProductType(BOOK_PRODUCT_TYPE_ID);
 
         if (title != null && !title.isEmpty()) {
             books = books.stream()
@@ -342,6 +391,7 @@ public class AdminController {
     @GetMapping("/categories/new")
     public String showCreateCategoryForm(Model model) {
         model.addAttribute("category", new CategoryDTO());
+        model.addAttribute("productTypes", productTypeRepository.findAll());
         return "admin/categories/form";
     }
 
@@ -349,12 +399,18 @@ public class AdminController {
     public String showEditCategoryForm(@PathVariable Long id, Model model) {
         categoryService.getCategoryById(id)
                 .ifPresent(category -> model.addAttribute("category", CategoryDTO.fromEntity(category)));
+        model.addAttribute("productTypes", productTypeRepository.findAll());
         return "admin/categories/form";
     }
 
     @PostMapping("/categories/save")
     public String saveCategory(@ModelAttribute("category") CategoryDTO categoryDto) {
-        categoryService.saveCategory(categoryDto.toEntity());
+        var category = categoryDto.toEntity();
+        if (categoryDto.getProductTypeId() != null) {
+            productTypeRepository.findById(categoryDto.getProductTypeId())
+                    .ifPresent(category::setProductType);
+        }
+        categoryService.saveCategory(category);
         return "redirect:/admin/categories";
     }
 
@@ -440,15 +496,39 @@ public class AdminController {
     }
 
     @GetMapping("/users/toggle-status/{id}")
-    public String toggleUserStatus(@PathVariable Long id) {
-        userService.getUserById(id).ifPresent(user -> {
+    public String toggleUserStatus(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        User currentUser = session == null ? null : (User) session.getAttribute("loggedInUser");
+
+        if (currentUser == null || currentUser.getId() == null) {
+            redirectAttributes.addFlashAttribute("userError", "You must be logged in to change user status.");
+            return "redirect:/admin/users";
+        }
+
+        userService.getUserById(id).ifPresentOrElse(user -> {
+            boolean isSelf = currentUser.getId().equals(user.getId());
+            boolean isTargetAdmin = user.getRole() != null
+                    && user.getRole().getRoleName() != null
+                    && "admin".equalsIgnoreCase(user.getRole().getRoleName());
+
+            if (isSelf) {
+                redirectAttributes.addFlashAttribute("userError", "You cannot lock or unlock your own admin account.");
+                return;
+            }
+
+            if (isTargetAdmin) {
+                redirectAttributes.addFlashAttribute("userError",
+                        "Admin accounts cannot be locked or unlocked from here.");
+                return;
+            }
+
             if ("Active".equals(user.getStatus())) {
                 user.setStatus("Inactive");
             } else {
                 user.setStatus("Active");
             }
             userService.saveUser(user);
-        });
+        }, () -> redirectAttributes.addFlashAttribute("userError", "User not found."));
+
         return "redirect:/admin/users";
     }
 
