@@ -3,20 +3,18 @@
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
 
         :root {
-            --vb-brown: #F37021;
+            --vb-brown: #f37120;
             --border: #ddd;
             --text: #333;
         }
 
-        header,
-        .nav-bar,
         .nav-bar * {
             font-family: 'Roboto', sans-serif;
         }
 
         header {
             background: #fff;
-            padding: 15px 0;
+            padding: 0 0;
             border-bottom: 2px solid var(--vb-brown);
         }
 
@@ -29,7 +27,7 @@
         .header-content {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
 
         .logo {
@@ -149,6 +147,7 @@
 
         .nav-links {
             display: flex;
+            align-items: center;
             list-style: none;
             overflow-x: auto;
         }
@@ -291,6 +290,7 @@
 
             .nav-links {
                 display: flex;
+                align-items: center;
                 list-style: none;
                 overflow-x: auto;
             }
@@ -325,7 +325,13 @@
         <header>
             <div class="container header-content">
                 <div class="logo">
-                    <a th:href="@{/}" class="logo-text">BookNest</a>
+                    <a th:href="@{/}" style="display: flex; align-items: center; gap: 0px; text-decoration: none; padding: 5px 0;">
+                        <img src="/logo/Logo2.png" alt="BookNest" style="height: 100px; object-fit: contain; flex-shrink: 0;">
+                        <div style="display: flex; flex-direction: column; justify-content: center;">
+                            <span class="logo-text" style="font-size: 32px; font-weight: 900; color: #f37120; margin: 0; line-height: 1;">BookNest</span>
+                            <span style="font-size: 11px; color: #999; margin-top: 2px;">Online Bookstore</span>
+                        </div>
+                    </a>
                 </div>
 
                 <form class="search-container" th:action="@{/books/search}" method="get">
@@ -373,6 +379,10 @@
                     <li>
                         <a th:href="@{/books}"
                             th:style="${activePage == 'books'} ? 'background: var(--vb-brown); color: #fff;' : ''">BOOKS</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/stationery}"
+                            th:style="${activePage == 'stationery'} ? 'background: var(--vb-brown); color: #fff;' : ''">STATIONERY</a>
                     </li>
                     <li>
                         <a th:href="@{/orders}"
