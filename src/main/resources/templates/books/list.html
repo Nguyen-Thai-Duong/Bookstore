@@ -479,7 +479,7 @@
         </section>
     </main>
 
-        <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
+    <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
 
     <script>
         lucide.createIcons();
@@ -520,7 +520,9 @@
             globalSuggestBox.innerHTML = items.map((item) => {
                 const title = escapeHtml(item.title);
                 const author = escapeHtml(item.author);
-                return `<a href="/books/${item.id}" style="display:block;padding:10px 12px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#333;"><div style="font-size:12px;font-weight:600;">${title}</div><div style="font-size:11px;color:#777;">${author}</div></a>`;
+                const typeName = escapeHtml(item.typeName || 'Book');
+                const url = item.url || `/books/${item.id}`;
+                return `<a href="${url}" style="display:block;padding:10px 12px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#333;"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;"><div style="font-size:12px;font-weight:600;">${title}</div><span style="font-size:10px;font-weight:700;color:#F37021;text-transform:uppercase;">${typeName}</span></div><div style="font-size:11px;color:#777;">${author}</div></a>`;
             }).join('');
 
             globalSuggestBox.classList.remove('hidden');
@@ -574,13 +576,13 @@
             });
         };
 
-        const fetchSuggest = async (query, type, box, input, onDone) => {
+        const fetchSuggest = async (query, endpoint, type, box, input, onDone) => {
             if (suggestAbortController) {
                 suggestAbortController.abort();
             }
 
             suggestAbortController = new AbortController();
-            const response = await fetch(`/books/suggest?q=${encodeURIComponent(query)}`, {
+            const response = await fetch(`${endpoint}?q=${encodeURIComponent(query)}`, {
                 signal: suggestAbortController.signal
             });
 
@@ -607,7 +609,7 @@
                 }
 
                 try {
-                    await fetchSuggest(q, 'title', globalSuggestBox, globalSearchInput, renderGlobalSuggest);
+                    await fetchSuggest(q, '/search/suggest', 'title', globalSuggestBox, globalSearchInput, renderGlobalSuggest);
                 } catch {
                     hideSuggest(globalSuggestBox);
                 }
@@ -623,7 +625,7 @@
                 }
 
                 try {
-                    await fetchSuggest(q, 'title', titleSuggestBox, titleInput);
+                    await fetchSuggest(q, '/books/suggest', 'title', titleSuggestBox, titleInput);
                 } catch {
                     hideSuggest(titleSuggestBox);
                 }
@@ -639,7 +641,7 @@
                 }
 
                 try {
-                    await fetchSuggest(q, 'author', authorSuggestBox, authorInput);
+                    await fetchSuggest(q, '/books/suggest', 'author', authorSuggestBox, authorInput);
                 } catch {
                     hideSuggest(authorSuggestBox);
                 }

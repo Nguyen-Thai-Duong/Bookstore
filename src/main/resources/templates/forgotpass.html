@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --vb-brown: #8B573C;
+            --vb-orange: #F37021;
             --bg-gray: #f5f5f5;
             --border: #ddd;
         }
@@ -19,10 +19,13 @@
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            color: #333;
+        }
+
+        .page-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 10px 40px;
         }
 
         .panel {
@@ -31,12 +34,13 @@
             border-radius: 4px;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin: 0 auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
         .panel-head {
             background: #f3f3f3;
-            color: var(--vb-brown);
+            color: var(--vb-orange);
             border-bottom: 1px solid var(--border);
             font-size: 15px;
             font-weight: 700;
@@ -69,13 +73,13 @@
         }
 
         .field input:focus {
-            border-color: var(--vb-brown);
+            border-color: var(--vb-orange);
         }
 
         .btn-submit {
             width: 100%;
             border: none;
-            background: var(--vb-brown);
+            background: var(--vb-orange);
             color: #fff;
             font-weight: 700;
             border-radius: 4px;
@@ -94,7 +98,7 @@
             text-align: center;
             font-size: 12px;
         }
-        
+
         .success-box {
             margin-bottom: 12px;
             border: 1px solid #c3f3c3;
@@ -109,24 +113,31 @@
 </head>
 
 <body>
-    <div class="panel">
-        <div class="panel-head">Reset Password</div>
-        <div class="panel-body">
-            <div th:if="${error}" class="error-box" th:text="${error}"></div>
-            <div th:if="${successMessage}" class="success-box" th:text="${successMessage}"></div>
+    <div th:replace="~{fragments/site-header :: siteHeader('home')}"></div>
 
-            <form method="post" th:action="@{/reset-password}">
-                <div class="field">
-                    <label>New Password</label>
-                    <input type="password" name="newPassword" required minlength="6" placeholder="••••••••">
-                </div>
-                <div class="field">
-                    <label>Confirm Password</label>
-                    <input type="password" name="confirmPassword" required minlength="6" placeholder="••••••••">
-                </div>
-                <button type="submit" class="btn-submit">Update Password</button>
-            </form>
+    <main class="page-wrap">
+        <div class="panel">
+            <div class="panel-head">Reset Password</div>
+            <div class="panel-body">
+                <div th:if="${error}" class="error-box" th:text="${error}"></div>
+                <div th:if="${successMessage}" class="success-box" th:text="${successMessage}"></div>
+
+                <form method="post" th:action="@{/reset-password}">
+                    <div class="field">
+                        <label>New Password</label>
+                        <input type="password" name="newPassword" required minlength="6" placeholder="••••••••">
+                    </div>
+                    <div class="field">
+                        <label>Confirm Password</label>
+                        <input type="password" name="confirmPassword" required minlength="6" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-submit">Update Password</button>
+                </form>
+            </div>
         </div>
-    </div>
+    </main>
+
+    <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
 </body>
+
 </html>

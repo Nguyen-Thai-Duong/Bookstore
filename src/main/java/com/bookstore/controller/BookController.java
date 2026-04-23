@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class BookController {
 
+    private static final long BOOK_PRODUCT_TYPE_ID = 1L;
     private final BookService bookService;
     private final CategoryService categoryService;
     private final ReviewRepository reviewRepository;
@@ -54,7 +55,7 @@ public class BookController {
         }
 
         var book = bookOpt.get();
-        if (book.isDiscontinued()) {
+        if (book.isDiscontinued() || !isBookProduct(book)) {
             return "redirect:/books";
         }
 
@@ -184,6 +185,8 @@ public class BookController {
         String normalizedAuthor = author == null ? "" : author.trim().toLowerCase();
 
         return bookService.getAllBooks().stream()
+                .filter(this::isBookProduct)
+                .filter(book -> !book.isDiscontinued())
                 .filter(book -> normalizedTitle.isBlank() || (book.getTitle() != null
                         && book.getTitle().toLowerCase().contains(normalizedTitle)))
                 .filter(book -> normalizedAuthor.isBlank() || (book.getAuthor() != null
@@ -253,6 +256,8 @@ public class BookController {
                 .values();
 
         return uniqueBooks.stream()
+                .filter(this::isBookProduct)
+                .filter(book -> !book.isDiscontinued())
                 .limit(8)
                 .map(BookDTO::fromEntity)
                 .map(book -> {
@@ -263,5 +268,12 @@ public class BookController {
                     return item;
                 })
                 .toList();
+    }
+
+    private boolean isBookProduct(Book book) {
+        return book != null
+                && book.getCategory() != null
+                && book.getCategory().getProductType() != null
+                && Long.valueOf(BOOK_PRODUCT_TYPE_ID).equals(book.getCategory().getProductType().getId());
     }
 }

@@ -6,36 +6,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookNest | Forgot Password</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --vb-brown: #8B573C;
+            --vb-orange: #F37021;
             --bg-gray: #f5f5f5;
             --border: #ddd;
+            --text: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
         }
 
         body {
             background: var(--bg-gray);
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
         }
 
         .panel {
             background: #fff;
             border: 1px solid var(--border);
             border-radius: 4px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            max-width: 470px;
+            margin: 16px auto 30px;
         }
 
         .panel-head {
             background: #f3f3f3;
-            color: var(--vb-brown);
+            color: var(--vb-orange);
             border-bottom: 1px solid var(--border);
             font-size: 15px;
             font-weight: 700;
@@ -45,24 +54,26 @@
         }
 
         .panel-body {
-            padding: 24px;
+            padding: 16px;
         }
 
         .instructions {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             color: #666;
             text-align: center;
             font-size: 13px;
+            line-height: 1.6;
         }
 
         .field {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .field label {
             display: block;
             margin-bottom: 6px;
             font-weight: 600;
+            color: #444;
         }
 
         .field input {
@@ -74,10 +85,14 @@
             box-sizing: border-box;
         }
 
+        .field input:focus {
+            border-color: var(--vb-orange);
+        }
+
         .btn-submit {
             width: 100%;
             border: none;
-            background: var(--vb-brown);
+            background: var(--vb-orange);
             color: #fff;
             font-weight: 700;
             border-radius: 4px;
@@ -96,29 +111,50 @@
             text-align: center;
             font-size: 12px;
         }
+
+        .sub-row {
+            margin-top: 12px;
+            color: #777;
+            text-align: center;
+        }
+
+        .sub-row a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 600;
+        }
     </style>
 </head>
 
 <body>
-    <div class="panel">
-        <div class="panel-head">Forgot Password</div>
-        <div class="panel-body">
-            <p class="instructions">Please enter your registered email to receive an OTP verification code.</p>
-            
-            <div th:if="${error}" class="error-box" th:text="${error}"></div>
+    <div th:replace="~{fragments/site-header :: siteHeader('login')}"></div>
 
-            <form method="post" th:action="@{/forgot-password}">
-                <div class="field">
-                    <label>Registered Email</label>
-                    <input type="email" name="email" required placeholder="example@gmail.com">
-                </div>
-                <button type="submit" class="btn-submit">Send OTP Code</button>
-            </form>
-            
-            <div style="text-align: center; margin-top: 15px;">
-                <a th:href="@{/login}" style="color: #666; font-size: 12px; text-decoration: none;">Back to Login</a>
+    <main class="container">
+        <section class="panel">
+            <div class="panel-head">Forgot Password</div>
+            <div class="panel-body">
+                <p class="instructions">Please enter your registered email to receive an OTP verification code.</p>
+
+                <div th:if="${error}" class="error-box" th:text="${error}"></div>
+
+                <form method="post" th:action="@{/forgot-password}">
+                    <div class="field">
+                        <label>Registered Email</label>
+                        <input type="email" name="email" required placeholder="example@gmail.com">
+                    </div>
+                    <button type="submit" class="btn-submit">Send OTP Code</button>
+                </form>
+
+                <p class="sub-row"><a th:href="@{/login}">Back to Login</a></p>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
+
+    <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
+
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
+
 </html>

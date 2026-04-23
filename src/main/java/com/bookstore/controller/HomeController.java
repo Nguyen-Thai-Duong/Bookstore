@@ -18,15 +18,28 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HomeController {
 
+        private static final long BOOK_PRODUCT_TYPE_ID = 1L;
+        private static final long STATIONERY_PRODUCT_TYPE_ID = 2L;
         private final BookService bookService;
         private final CategoryService categoryService;
 
         @GetMapping("/")
         public String home(Model model) {
-                List<BookDTO> allBooks = bookService.getAllBooks().stream()
+                List<BookDTO> featuredBooks = bookService.getTopSellingProductsByProductType(BOOK_PRODUCT_TYPE_ID, 4)
+                                .stream()
                                 .map(BookDTO::fromEntity)
                                 .toList();
-                List<BookDTO> books = bookService.getTopSellingBooksByCategory().stream()
+                List<BookDTO> featuredStationery = bookService
+                                .getTopSellingProductsByProductType(STATIONERY_PRODUCT_TYPE_ID, 4)
+                                .stream()
+                                .map(BookDTO::fromEntity)
+                                .toList();
+                List<BookDTO> featuredProducts = java.util.stream.Stream.concat(featuredBooks.stream(),
+                                featuredStationery.stream())
+                                .toList();
+
+                List<BookDTO> allBooks = bookService.getProductsByProductType(BOOK_PRODUCT_TYPE_ID).stream()
+                                .filter(book -> book != null && !book.isDiscontinued())
                                 .map(BookDTO::fromEntity)
                                 .toList();
 
@@ -43,7 +56,9 @@ public class HomeController {
                                                 && categoryIdsWithBooks.contains(category.getId()))
                                 .toList();
 
-                model.addAttribute("books", books);
+                model.addAttribute("featuredProducts", featuredProducts);
+                model.addAttribute("featuredBooks", featuredBooks);
+                model.addAttribute("featuredStationery", featuredStationery);
                 model.addAttribute("allBooksCount", allBooks.size());
                 model.addAttribute("categories", categories);
                 return "index";

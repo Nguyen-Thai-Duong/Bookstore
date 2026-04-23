@@ -1,7 +1,9 @@
 package com.bookstore.repository;
 
 import com.bookstore.model.Order;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -21,4 +23,16 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByOrderDateBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     boolean existsByVoucher_Id(Long voucherId);
+
+    long countByUser_IdAndStatusIgnoreCase(Long userId, String status);
+
+    @Query("""
+            select o.user.id, count(o)
+            from Order o
+            where lower(o.status) = lower(:status)
+              and o.user.id in :userIds
+            group by o.user.id
+            """)
+    List<Object[]> countOrdersByUserIdsAndStatusIgnoreCase(@Param("userIds") List<Long> userIds,
+                                                          @Param("status") String status);
 }

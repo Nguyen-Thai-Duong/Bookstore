@@ -77,6 +77,53 @@
             color: var(--vb-brown);
         }
 
+        .rank-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            border-bottom: 1px dotted #eee;
+        }
+
+        .rank-item:last-child {
+            border-bottom: none;
+        }
+
+        .rank-badge {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--vb-brown);
+            flex: 0 0 auto;
+            margin-top: 2px;
+        }
+
+        .rank-title {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #0066cc;
+            text-decoration: none;
+            line-height: 1.25;
+        }
+
+        .rank-title:hover {
+            color: var(--vb-brown);
+            text-decoration: underline;
+        }
+
+        .rank-author {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+            line-height: 1.25;
+        }
+
         .promo-banner {
             width: 100%;
             height: 300px;
@@ -170,6 +217,28 @@
             padding: 2px 4px;
         }
 
+        .type-pill {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            color: #fff;
+            text-transform: uppercase;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .type-pill.book {
+            background: #F37021;
+        }
+
+        .type-pill.stationery {
+            background: #3b82f6;
+        }
+
         .hidden {
             display: none;
         }
@@ -200,34 +269,42 @@
 
             <div class="content-section">
                 <div class="section-header">
-                    <h2>Featured new books</h2>
+                    <h2>Featured Products</h2>
                     <a th:href="@{/books}" style="font-size:11px;">View more</a>
                 </div>
 
-                <div class="book-item-grid" th:if="${!books.empty}">
-                    <div class="book-card" th:each="book,iter : ${books}" th:if="${iter.index < 8}">
+                <div class="book-item-grid" th:if="${featuredProducts != null && !featuredProducts.empty}">
+                    <div class="book-card" th:each="p,iter : ${featuredProducts}" th:if="${iter.index < 8}">
 
                         <span th:if="${iter.index == 0}" class="sale-off">Hot</span>
 
-                        <a th:href="@{/books/{id}(id=${book.id})}">
-                            <img th:src="${book.imageUrl != null && !book.imageUrl.isEmpty() ? book.imageUrl : 'https://via.placeholder.com/110x160'}">
+                        <span class="type-pill"
+                            th:text="${p.productTypeId != null && p.productTypeId == 2 ? 'STATIONERY' : 'BOOK'}"
+                            th:classappend="${p.productTypeId != null && p.productTypeId == 2 ? ' stationery' : ' book'}">
+                            BOOK
+                        </span>
+
+                        <a
+                            th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery' : '/books/' + p.id}">
+                            <img
+                                th:src="${p.imageUrl != null && !p.imageUrl.isEmpty() ? p.imageUrl : 'https://via.placeholder.com/110x160'}">
                         </a>
 
                         <a class="book-title"
-                           th:href="@{/books/{id}(id=${book.id})}"
-                           th:text="${book.title}">
+                            th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery' : '/books/' + p.id}"
+                            th:text="${p.title}">
                         </a>
 
-                        <p class="author" th:text="${book.author}"></p>
+                        <p class="author" th:text="${p.author}"></p>
 
                         <p class="price"
-                           th:text="${book.price != null ? #numbers.formatDecimal(book.price,0,'COMMA',0,'POINT') + ' VND' : '0 VND'}">
+                            th:text="${p.price != null ? #numbers.formatDecimal(p.price,0,'COMMA',0,'POINT') + ' VND' : '0 VND'}">
                         </p>
 
                     </div>
                 </div>
 
-                <p th:if="${books.empty}">No books available.</p>
+                <p th:if="${featuredProducts == null || featuredProducts.empty}">No products available.</p>
             </div>
 
         </section>
@@ -235,12 +312,19 @@
         <!-- RIGHT -->
         <aside>
             <div class="sidebar-box">
-                <h3>Best-selling Books</h3>
+                <h3>Best-selling Products</h3>
 
-                <div class="rank-item" th:each="book,iter : ${books}" th:if="${iter.index < 3}">
-                    <strong th:text="${book.title}"></strong>
-                    <p th:text="${book.author}"></p>
+                <div class="rank-item" th:each="p,iter : ${featuredProducts}" th:if="${iter.index < 3}">
+                    <span class="rank-badge" th:text="${iter.index + 1}">1</span>
+                    <div style="min-width:0;">
+                        <a class="rank-title"
+                            th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery' : '/books/' + p.id}"
+                            th:text="${p.title}">Title</a>
+                        <div class="rank-author" th:text="${p.author}">Author</div>
+                    </div>
                 </div>
+                <p th:if="${featuredProducts == null || featuredProducts.empty}" class="rank-author">No products
+                    available.</p>
             </div>
         </aside>
 
@@ -257,6 +341,13 @@
         if (searchInput && suggestBox) {
             let debounceTimer;
 
+            const escapeHtml = (text) => (text || "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#39;");
+
             const hideSuggestions = () => {
                 suggestBox.classList.add("hidden");
                 suggestBox.innerHTML = "";
@@ -265,9 +356,13 @@
             const renderSuggestions = (items) => {
                 if (!items.length) return hideSuggestions();
 
-                suggestBox.innerHTML = items.map(item =>
-                    `<a href="/books/${item.id}" style="display:block;padding:10px">${item.title}</a>`
-                ).join("");
+                suggestBox.innerHTML = items.map(item => {
+                    const title = escapeHtml(item.title || "");
+                    const author = escapeHtml(item.author || "");
+                    const typeName = escapeHtml(item.typeName || 'Book');
+                    const url = item.url || `/books/${item.id}`;
+                    return `<a href="${url}" style="display:block;padding:10px 12px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#333;"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;"><div style="font-weight:600;font-size:12px;">${title}</div><span style="font-size:10px;font-weight:700;color:#F37021;text-transform:uppercase;">${typeName}</span></div><div style="font-size:11px;color:#777;">${author}</div></a>`;
+                }).join("");
 
                 suggestBox.classList.remove("hidden");
             };
@@ -279,7 +374,7 @@
                 if (!keyword) return hideSuggestions();
 
                 debounceTimer = setTimeout(async () => {
-                    const res = await fetch(`/books/suggest?q=${keyword}`);
+                    const res = await fetch(`/search/suggest?q=${encodeURIComponent(keyword)}`);
                     const data = await res.json();
                     renderSuggestions(data);
                 }, 200);
@@ -288,4 +383,5 @@
     </script>
 
 </body>
+
 </html>
