@@ -9,7 +9,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --vb-brown: #8B573C;
+            --vb-orange: #F37021;
+
             --bg-gray: #f5f5f5;
             --border: #ddd;
             --text: #333;
@@ -34,38 +35,17 @@
             padding: 0 10px;
         }
 
-        header {
-            background: #fff;
-            padding: 15px 0;
-            border-bottom: 2px solid var(--vb-brown);
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .logo-text {
-            font-size: 32px;
-            font-weight: 900;
-            color: var(--vb-brown);
-            text-decoration: none;
-            letter-spacing: -1px;
-        }
-
         .panel {
             background: #fff;
             border: 1px solid var(--border);
             border-radius: 4px;
             max-width: 470px;
-            margin: 60px auto;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin: 16px auto 30px;
         }
 
         .panel-head {
             background: #f3f3f3;
-            color: var(--vb-brown);
+            color: var(--vb-orange);
             border-bottom: 1px solid var(--border);
             font-size: 15px;
             font-weight: 700;
@@ -75,18 +55,18 @@
         }
 
         .panel-body {
-            padding: 24px;
+            padding: 16px;
         }
 
         .instructions {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             color: #666;
             line-height: 1.6;
         }
 
         .otp-input-group {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .otp-input-group label {
@@ -98,7 +78,7 @@
 
         .otp-input-group input {
             width: 100%;
-            border: 2px solid var(--vb-brown);
+            border: 2px solid var(--vb-orange);
             border-radius: 4px;
             padding: 12px;
             font-size: 24px;
@@ -108,9 +88,13 @@
             outline: none;
         }
 
+        .otp-input-group input:focus {
+            border-color: var(--vb-orange);
+        }
+
         .timer-box {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             font-weight: 500;
             color: #e53e3e;
         }
@@ -118,7 +102,7 @@
         .btn-submit {
             width: 100%;
             border: none;
-            background: var(--vb-brown);
+            background: var(--vb-orange);
             color: #fff;
             font-weight: 700;
             border-radius: 4px;
@@ -155,17 +139,23 @@
             text-decoration: none;
             font-weight: 600;
         }
+
+        .sub-row {
+            margin-top: 12px;
+            color: #777;
+            text-align: center;
+        }
+
+        .sub-row a {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 600;
+        }
     </style>
 </head>
 
 <body>
-    <header>
-        <div class="container header-content">
-            <div class="logo">
-                <a th:href="@{/}" class="logo-text">BookNest</a>
-            </div>
-        </div>
-    </header>
+    <div th:replace="~{fragments/site-header :: siteHeader('login')}"></div>
 
     <main class="container">
         <section class="panel">
@@ -173,7 +163,7 @@
             <div class="panel-body">
                 <div class="instructions">
                     The OTP code has been sent to your email:<br>
-                    <strong th:text="${session.regEmail != null ? session.regEmail : session.forgotEmail}">example@gmail.com</strong>
+                 <strong th:text="${session.regEmail != null ? session.regEmail : (session.forgotEmail != null ? session.forgotEmail : 'your email')}">example@gmail.com</strong>
                 </div>
 
                 <div th:if="${error}" class="error-box" th:text="${error}"></div>
@@ -181,7 +171,8 @@
                 <form method="post" th:action="@{/verify-otp}">
                     <div class="otp-input-group">
                         <label>Enter 6-digit code</label>
-                        <input type="text" name="userOtp" maxlength="6" pattern="\d{6}" required autofocus placeholder="000000">
+                        <input type="text" name="userOtp" maxlength="6" pattern="\d{6}" required autofocus
+                            placeholder="000000">
                     </div>
 
                     <div class="timer-box" id="timer-box">
@@ -194,25 +185,33 @@
                 <div class="resend-box">
                     Didn't receive the code? <a th:href="@{/register/resend-otp}">Resend OTP</a>
                 </div>
+
+                <p class="sub-row"><a th:href="@{/forgot-password}">Back to Forgot Password</a></p>
             </div>
         </section>
     </main>
 
+    <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
+
     <script>
+        lucide.createIcons();
+
         let timeLeft = 180;
         const timerDisplay = document.getElementById('timer');
         const submitBtn = document.getElementById('submit-btn');
 
         const countdown = setInterval(() => {
             timeLeft--;
-            timerDisplay.innerText = timeLeft;
+            if(timerDisplay) timerDisplay.innerText = timeLeft;
 
             if (timeLeft <= 0) {
                 clearInterval(countdown);
-                document.getElementById('timer-box').innerHTML = "OTP has expired!";
-                submitBtn.disabled = true;
-                submitBtn.style.opacity = "0.5";
-                submitBtn.style.cursor = "not-allowed";
+                if(document.getElementById('timer-box')) document.getElementById('timer-box').innerHTML = "OTP has expired!";
+                if(submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = "0.5";
+                    submitBtn.style.cursor = "not-allowed";
+                }
             }
         }, 1000);
     </script>

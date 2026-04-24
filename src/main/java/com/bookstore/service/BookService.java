@@ -21,6 +21,8 @@ public interface BookService {
 
     List<Book> getTopSellingBooksByCategory();
 
+    List<Book> getTopSellingProductsByProductType(Long productTypeId, int limit);
+
     Book saveBook(Book book);
 
     void deleteBook(Long id);

@@ -77,6 +77,53 @@
             color: var(--vb-brown);
         }
 
+        .rank-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            border-bottom: 1px dotted #eee;
+        }
+
+        .rank-item:last-child {
+            border-bottom: none;
+        }
+
+        .rank-badge {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #fff;
+            background: var(--vb-brown);
+            flex: 0 0 auto;
+            margin-top: 2px;
+        }
+
+        .rank-title {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #0066cc;
+            text-decoration: none;
+            line-height: 1.25;
+        }
+
+        .rank-title:hover {
+            color: var(--vb-brown);
+            text-decoration: underline;
+        }
+
+        .rank-author {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+            line-height: 1.25;
+        }
+
         .promo-banner {
             width: 100%;
             height: 300px;
@@ -168,6 +215,28 @@
             color: #fff;
             font-size: 10px;
             padding: 2px 4px;
+        }
+
+        .type-pill {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            color: #fff;
+            text-transform: uppercase;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .type-pill.book {
+            background: #F37021;
+        }
+
+        .type-pill.stationery {
+            background: #3b82f6;
         }
 
         .hidden {
@@ -274,33 +343,42 @@
 
             <div class="content-section">
                 <div class="section-header">
-                    <h2>Featured new books</h2>
+                    <h2>Featured Products</h2>
                     <a th:href="@{/books}" style="font-size:11px;">View more</a>
                 </div>
 
-                <div class="book-item-grid" th:if="${!books.empty}">
-                    <div class="book-card" th:each="book,iter : ${books}" th:if="${iter.index < 8}">
+                <div class="book-item-grid" th:if="${featuredProducts != null && !featuredProducts.empty}">
+                    <div class="book-card" th:each="p,iter : ${featuredProducts}" th:if="${iter.index < 8}">
 
                         <span th:if="${iter.index == 0}" class="sale-off">Hot</span>
 
-                        <a th:href="@{/books/{id}(id=${book.id})}">
+                        <span class="type-pill"
+                            th:text="${p.productTypeId != null && p.productTypeId == 2 ? 'STATIONERY' : 'BOOK'}"
+                            th:classappend="${p.productTypeId != null && p.productTypeId == 2 ? ' stationery' : ' book'}">
+                            BOOK
+                        </span>
+
+                        <a
+                            th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery' : '/books/' + p.id}">
                             <img
-                                th:src="${book.imageUrl != null && !book.imageUrl.isEmpty() ? book.imageUrl : 'https://via.placeholder.com/110x160'}">
+                                th:src="${p.imageUrl != null && !p.imageUrl.isEmpty() ? p.imageUrl : 'https://via.placeholder.com/110x160'}">
                         </a>
 
-                        <a class="book-title" th:href="@{/books/{id}(id=${book.id})}" th:text="${book.title}">
+                        <a class="book-title"
+                            th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery' : '/books/' + p.id}"
+                            th:text="${p.title}">
                         </a>
 
-                        <p class="author" th:text="${book.author}"></p>
+                        <p class="author" th:text="${p.author}"></p>
 
                         <p class="price"
-                            th:text="${book.price != null ? #numbers.formatDecimal(book.price,0,'COMMA',0,'POINT') + ' VND' : '0 VND'}">
+                            th:text="${p.price != null ? #numbers.formatDecimal(p.price,0,'COMMA',0,'POINT') + ' VND' : '0 VND'}">
                         </p>
 
                     </div>
                 </div>
 
-                <p th:if="${books.empty}">No books available.</p>
+                <p th:if="${featuredProducts == null || featuredProducts.empty}">No products available.</p>
             </div>
 
         </section>
@@ -308,16 +386,19 @@
         <!-- RIGHT -->
         <aside>
             <div class="sidebar-box">
-                <h3>Best-selling Books</h3>
+                <h3>Best-selling Products</h3>
 
-                <a th:href="@{/books/{id}(id=${book.id})}" class="rank-item" th:each="book,iter : ${books}"
-                    th:if="${iter.index < 3}" style="text-decoration: none; color: inherit;">
-                    <div class="rank-number" th:text="${iter.index + 1}">1</div>
-                    <div class="rank-info">
-                        <div class="rank-title" th:text="${book.title}">Book Title</div>
-                        <div class="rank-author" th:text="${book.author}">Author Name</div>
+                <div class="rank-item" th:each="p,iter : ${featuredProducts}" th:if="${iter.index < 3}">
+                    <span class="rank-badge" th:text="${iter.index + 1}">1</span>
+                    <div style="min-width:0;">
+                        <a class="rank-title"
+                            th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery' : '/books/' + p.id}"
+                            th:text="${p.title}">Title</a>
+                        <div class="rank-author" th:text="${p.author}">Author</div>
                     </div>
-                </a>
+                </div>
+                <p th:if="${featuredProducts == null || featuredProducts.empty}" class="rank-author">No products
+                    available.</p>
             </div>
         </aside>
 
@@ -328,155 +409,50 @@
     <script>
         lucide.createIcons();
 
-        // Wait for DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function () {
-            setTimeout(() => {
-                initializeSearchSuggest();
-            }, 100);
-        });
+        const searchInput = document.getElementById("global-search-input");
+        const suggestBox = document.getElementById("global-search-suggest");
 
-        function initializeSearchSuggest() {
-            const searchInput = document.getElementById("global-search-input");
-            const suggestBox = document.getElementById("global-search-suggest");
+        if (searchInput && suggestBox) {
+            let debounceTimer;
 
-            console.log('Search elements found:', searchInput, suggestBox);
+            const escapeHtml = (text) => (text || "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#39;");
 
-            if (searchInput && suggestBox) {
-                let debounceTimer;
+            const hideSuggestions = () => {
+                suggestBox.classList.add("hidden");
+                suggestBox.innerHTML = "";
+            };
 
-                const hideSuggestions = () => {
-                    suggestBox.classList.add("hidden");
-                    suggestBox.innerHTML = "";
-                };
+            const renderSuggestions = (items) => {
+                if (!items.length) return hideSuggestions();
 
-                const renderSuggestions = (items) => {
-                    if (!items.length) return hideSuggestions();
+                suggestBox.innerHTML = items.map(item => {
+                    const title = escapeHtml(item.title || "");
+                    const author = escapeHtml(item.author || "");
+                    const typeName = escapeHtml(item.typeName || 'Book');
+                    const url = item.url || `/books/${item.id}`;
+                    return `<a href="${url}" style="display:block;padding:10px 12px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#333;"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;"><div style="font-weight:600;font-size:12px;">${title}</div><span style="font-size:10px;font-weight:700;color:#F37021;text-transform:uppercase;">${typeName}</span></div><div style="font-size:11px;color:#777;">${author}</div></a>`;
+                }).join("");
 
-                    console.log('API Response items:', items);
+                suggestBox.classList.remove("hidden");
+            };
 
-                    suggestBox.innerHTML = items.map((item, index) => {
-                        console.log(`Processing item ${index}:`, item);
+            searchInput.addEventListener("input", () => {
+                const keyword = searchInput.value.trim();
+                clearTimeout(debounceTimer);
 
-                        // Simple image handling - only use trusted URLs
-                        let imageUrl = null;
-                        let showPlaceholder = true;
+                if (!keyword) return hideSuggestions();
 
-                        if (item.imageUrl) {
-                            const trimmedUrl = item.imageUrl.trim();
-
-                            if (
-                                trimmedUrl.startsWith("http") ||
-                                trimmedUrl.startsWith("/") ||
-                                trimmedUrl.startsWith("images/")
-                            ) {
-                                imageUrl = trimmedUrl;
-                                showPlaceholder = false;
-                            }
-                        }
-
-                        console.log(`Item ${index} - Image URL:`, imageUrl, 'Show placeholder:', showPlaceholder);
-
-                        const safeTitle = (item.title || 'Untitled').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-                        const safeAuthor = (item.author || 'Unknown Author').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-
-                        let imageHtml = '';
-                        if (imageUrl && !showPlaceholder) {
-                            imageHtml = `<img src="${imageUrl}" style="width:100%;height:100%;object-fit:cover;" alt="${safeTitle}">`;
-                        } else {
-                            imageHtml = `<img src="https://via.placeholder.com/50x70" style="width:100%;height:100%;object-fit:cover;" alt="No Image">`;
-                        }
-
-                        return `<a href="/books/${item.id}" style="display:flex;align-items:center;gap:12px;padding:12px;text-decoration:none;color:inherit;border-bottom:1px solid #eee;transition:background 0.2s;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='white'">
-                            <div style="width:50px;height:70px;flex-shrink:0;border:1px solid #ddd;border-radius:4px;overflow:hidden;background:#f5f5f5;display:flex;align-items:center;justify-content:center;">
-                                ${imageHtml}
-                            </div>
-                            <div style="flex:1;min-width:0;">
-                                <div style="font-size:13px;font-weight:600;color:#444;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${safeTitle}</div>
-                                <div style="font-size:11px;color:#888;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${safeAuthor}</div>
-                            </div>
-                        </a>`;
-                    }).join("");
-
-                    suggestBox.classList.remove("hidden");
-                };
-
-                searchInput.addEventListener("input", () => {
-                    const keyword = searchInput.value.trim();
-                    clearTimeout(debounceTimer);
-
-                    if (!keyword) return hideSuggestions();
-
-                    debounceTimer = setTimeout(async () => {
-                        try {
-                            console.log('Searching for:', keyword);
-                            const res = await fetch(`/books/suggest?q=${keyword}`);
-                            console.log('API Response status:', res.status);
-
-                            if (!res.ok) {
-                                throw new Error(`HTTP error! status: ${res.status}`);
-                            }
-
-                            const data = await res.json();
-                            console.log('API Response data:', data);
-
-                            // If API returns empty or error, use mock data for testing
-                            if (!data || data.length === 0) {
-                                console.log('Using mock data for testing');
-                                const mockData = [
-                                    {
-                                        id: 1,
-                                        title: "Sample Book 1",
-                                        author: "Sample Author 1",
-                                        imageUrl: "/images/book1.jpg"
-                                    },
-                                    {
-                                        id: 2,
-                                        title: "Sample Book 2",
-                                        author: "Sample Author 2",
-                                        imageUrl: "https://via.placeholder.com/50x70/ff6b6b/ffffff?text=Book2"
-                                    },
-                                    {
-                                        id: 3,
-                                        title: "Sample Book 3",
-                                        author: "Sample Author 3",
-                                        imageUrl: null
-                                    }
-                                ];
-                                renderSuggestions(mockData);
-                            } else {
-                                renderSuggestions(data);
-                            }
-                        } catch (error) {
-                            console.error('Search error:', error);
-                            console.log('API might not exist, using mock data');
-
-                            // Use mock data when API fails
-                            const mockData = [
-                                {
-                                    id: 1,
-                                    title: "Mock Book 1",
-                                    author: "Mock Author 1",
-                                    imageUrl: "https://via.placeholder.com/50x70/4ecdc4/ffffff?text=Mock1"
-                                },
-                                {
-                                    id: 2,
-                                    title: "Mock Book 2",
-                                    author: "Mock Author 2",
-                                    imageUrl: "https://picsum.photos/50/70?random=2"
-                                }
-                            ];
-                            renderSuggestions(mockData);
-                        }
-                    }, 200);
-                });
-
-                // Hide suggestions when clicking outside
-                document.addEventListener('click', function (e) {
-                    if (!searchInput.contains(e.target) && !suggestBox.contains(e.target)) {
-                        hideSuggestions();
-                    }
-                });
-            }
+                debounceTimer = setTimeout(async () => {
+                    const res = await fetch(`/search/suggest?q=${encodeURIComponent(keyword)}`);
+                    const data = await res.json();
+                    renderSuggestions(data);
+                }, 200);
+            });
         }
     </script>
 

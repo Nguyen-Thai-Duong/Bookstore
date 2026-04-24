@@ -9,9 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-primary: #8b5a3c;
-            --color-secondary: #d4a574;
-            --color-bg: #f8f6f1;
+            --color-primary: #F37021;
+            --color-secondary: #00A859;
+            --color-bg: #f5f5f5;
         }
 
         body {
@@ -20,7 +20,7 @@
         }
 
         .sidebar {
-            background: linear-gradient(135deg, var(--color-primary) 0%, #a0522d 100%);
+            background: linear-gradient(135deg, var(--color-primary) 0%, #D95F14 100%);
         }
 
         .sidebar-item {
@@ -29,55 +29,18 @@
 
         .sidebar-item:hover,
         .sidebar-item.active {
-            background-color: rgba(255, 255, 255, 0.15);
+            background-color: rgba(255, 255, 255, 0.15) !important;
         }
     </style>
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-gray-50 h-full overflow-auto" style="background-color: var(--color-bg);">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <aside class="sidebar w-64 text-white flex flex-col shadow-2xl">
-            <div class="p-6 border-b border-white/20">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold">BookNest</h1>
-                        <p class="text-xs text-white/70">Admin Dashboard</p>
-                    </div>
-                </div>
-            </div>
-
-            <nav class="flex-1 overflow-y-auto p-4 space-y-2">
-                <a href="/admin" class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
-                    <span>Dashboard</span>
-                </a>
-                <a href="/admin/books" class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
-                    <span>Book Management</span>
-                </a>
-                <a href="/admin/stationery" class="sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
-                    <span>Stationery </span>
-                </a>
-                <a href="/admin/categories" class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
-                    <span>Category</span>
-                </a>
-                <a href="/admin/users" class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
-                    <span>User</span>
-                </a>
-                <a href="/admin/orders" class="sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3">
-                    <span>Order</span>
-                </a>
-            </nav>
-        </aside>
+        <div th:replace="~{admin/fragments/sidebar :: adminSidebar('stationery')}"></div>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto">
+        <main class="flex-1 overflow-y-auto ml-64">
             <div class="p-8">
                 <!-- Header -->
                 <div class="mb-8 flex items-center justify-between">
@@ -127,7 +90,9 @@
 
                                 <div class="flex items-start border-b border-gray-100 pb-4">
                                     <div class="w-40 font-semibold text-gray-700">Price:</div>
-                                    <div class="flex-1 font-bold text-green-600" th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + ' VND'"></div>
+                                    <div class="flex-1 font-bold text-green-600"
+                                        th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + ' VND'">
+                                    </div>
                                 </div>
 
                                 <div class="flex items-start border-b border-gray-100 pb-4">
@@ -137,17 +102,20 @@
 
                                 <div class="flex items-start border-b border-gray-100 pb-4">
                                     <div class="w-40 font-semibold text-gray-700">Category:</div>
-                                    <div class="flex-1 text-gray-600" th:text="${item.category.name}"></div>
+                                    <div class="flex-1 text-gray-600" th:text="${item.category != null ? item.category.name : 'N/A'}"></div>
                                 </div>
 
                                 <div class="flex items-start border-b border-gray-100 pb-4">
                                     <div class="w-40 font-semibold text-gray-700">Created At:</div>
-                                    <div class="flex-1 text-gray-600" th:text="${item.createdAt != null ? #temporals.format(item.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}"></div>
+                                    <div class="flex-1 text-gray-600"
+                                        th:text="${item.createdAt != null ? #temporals.format(item.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}">
+                                    </div>
                                 </div>
 
                                 <div class="flex items-start pt-2">
                                     <div class="w-40 font-semibold text-gray-700">Description:</div>
-                                    <div class="flex-1 text-gray-600 whitespace-pre-wrap" th:text="${item.description}"></div>
+                                    <div class="flex-1 text-gray-600 whitespace-pre-wrap" th:text="${item.description}">
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -150,4 +150,17 @@ public class AuthService {
         Long roleId = user.getRole().getId();
         return roleId != null && roleId == 1L;
     }
+
+    public boolean isStaff(User user) {
+        if (user == null || user.getRole() == null) {
+            return false;
+        }
+
+        String roleName = user.getRole().getRoleName();
+        return roleName != null && roleName.equalsIgnoreCase("staff");
+    }
+
+    public boolean canAccessAdminPanel(User user) {
+        return isAdmin(user) || isStaff(user);
+    }
 }

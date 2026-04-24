@@ -334,9 +334,9 @@
                     </a>
                 </div>
 
-                <form class="search-container" th:action="@{/books/search}" method="get">
-                    <input id="global-search-input" type="text" name="title"
-                        placeholder="Search books by Title, Author, Publisher..." autocomplete="off">
+                <form class="search-container" th:action="@{/search}" method="get">
+                    <input id="global-search-input" type="text" name="q" placeholder="Search books or stationery..."
+                        autocomplete="off">
                     <button type="submit">SEARCH</button>
                     <div id="global-search-suggest" class="hidden"></div>
                 </form>
@@ -391,5 +391,88 @@
                 </ul>
             </div>
         </div>
+
+        <script>
+            (function () {
+                if (window.__globalSearchSuggestInit) {
+                    return;
+                }
+                window.__globalSearchSuggestInit = true;
+
+                const input = document.getElementById('global-search-input');
+                const box = document.getElementById('global-search-suggest');
+                if (!input || !box) {
+                    return;
+                }
+
+                let debounceTimer;
+                let abortController;
+
+                const escapeHtml = (text) => (text || '')
+                    .replaceAll('&', '&amp;')
+                    .replaceAll('<', '&lt;')
+                    .replaceAll('>', '&gt;')
+                    .replaceAll('"', '&quot;')
+                    .replaceAll("'", '&#39;');
+
+                const hide = () => {
+                    box.classList.add('hidden');
+                    box.innerHTML = '';
+                };
+
+                const render = (items) => {
+                    if (!Array.isArray(items) || !items.length) {
+                        hide();
+                        return;
+                    }
+
+                    box.innerHTML = items.map((item) => {
+                        const title = escapeHtml(item.title || '');
+                        const author = escapeHtml(item.author || '');
+                        const typeName = escapeHtml(item.typeName || 'Book');
+                        const url = item.url || `/books/${item.id}`;
+                        return `<a href="${url}" style="display:block;padding:10px 12px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#333;"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;"><div style="font-size:12px;font-weight:600;">${title}</div><span style="font-size:10px;font-weight:700;color:#F37021;text-transform:uppercase;">${typeName}</span></div><div style="font-size:11px;color:#777;">${author}</div></a>`;
+                    }).join('');
+
+                    box.classList.remove('hidden');
+                };
+
+                input.addEventListener('input', () => {
+                    const q = (input.value || '').trim();
+                    clearTimeout(debounceTimer);
+
+                    if (q.length < 2) {
+                        hide();
+                        return;
+                    }
+
+                    debounceTimer = setTimeout(async () => {
+                        try {
+                            if (abortController) {
+                                abortController.abort();
+                            }
+                            abortController = new AbortController();
+                            const response = await fetch(`/search/suggest?q=${encodeURIComponent(q)}`, {
+                                signal: abortController.signal
+                            });
+                            if (!response.ok) {
+                                hide();
+                                return;
+                            }
+                            const data = await response.json();
+                            render(data);
+                        } catch {
+                            hide();
+                        }
+                    }, 180);
+                });
+
+                document.addEventListener('click', (event) => {
+                    if (!box.contains(event.target) && event.target !== input) {
+                        hide();
+                    }
+                });
+            })();
+        </script>
     </div>
 </div>
