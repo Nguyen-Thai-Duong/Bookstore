@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -18,6 +19,8 @@ public class UserFormDTO {
     private String password;
     private String phone;
     private String address;
+    private String gender;
+    private LocalDate dateOfBirth;
     private String status;
     private LocalDateTime createdAt;
     private RoleDTO role;
@@ -34,6 +37,8 @@ public class UserFormDTO {
                 null,
                 user.getPhone(),
                 user.getAddress(),
+                user.getGender(),
+                user.getDateOfBirth(),
                 user.getStatus(),
                 user.getCreatedAt(),
                 RoleDTO.fromEntity(user.getRole()));
@@ -47,6 +52,8 @@ public class UserFormDTO {
                 encodedPassword,
                 phone,
                 address,
+                gender,
+                dateOfBirth,
                 status,
                 createdAt,
                 role == null ? null : role.toEntity(),

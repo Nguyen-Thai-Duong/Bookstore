@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public class AuthService {
         return userRepository.findByEmail(email);
     }
 
-    public User register(String fullName, String email, String rawPassword, String phone, String address) {
+    public User register(String fullName, String email, String rawPassword, String phone, String address, String gender, String dateOfBirth) {
         Role defaultRole = roleRepository.findById(defaultRoleId)
                 .or(() -> roleRepository.findByRoleName("Customer"))
                 .or(() -> roleRepository.findByRoleName("User"))
@@ -42,6 +43,14 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(rawPassword));
         user.setPhone(phone);
         user.setAddress(address);
+        user.setGender(gender);
+        if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
+            try {
+                user.setDateOfBirth(LocalDate.parse(dateOfBirth));
+            } catch (Exception e) {
+                // Ignore invalid date format
+            }
+        }
         user.setStatus("Active");
         user.setCreatedAt(LocalDateTime.now());
         user.setRole(defaultRole);
@@ -82,7 +91,7 @@ public class AuthService {
         });
     }
 
-    public User updateProfile(Long userId, String fullName, String phone, String address) {
+    public User updateProfile(Long userId, String fullName, String phone, String address, String gender, String dateOfBirth) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             return null;
@@ -92,6 +101,14 @@ public class AuthService {
         user.setFullName(fullName);
         user.setPhone(phone);
         user.setAddress(address);
+        user.setGender(gender);
+        if (dateOfBirth != null && !dateOfBirth.isEmpty()) {
+            try {
+                user.setDateOfBirth(LocalDate.parse(dateOfBirth));
+            } catch (Exception e) {
+                // Ignore invalid date format
+            }
+        }
         return userRepository.save(user);
     }
 

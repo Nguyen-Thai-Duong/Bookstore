@@ -421,9 +421,7 @@
                             at
                         </p>
                     </div>
-                    <span class="status-badge"
-                        th:classappend="${#strings.equalsIgnoreCase(order.status, 'Pending')} ? ' status-pending' : (${#strings.equalsIgnoreCase(order.status, 'Confirmed') or #strings.equalsIgnoreCase(order.status, 'Confirmed')} ? ' status-confirmed' : (${#strings.equalsIgnoreCase(order.status, 'Delivered') or #strings.equalsIgnoreCase(order.status, 'Completed')} ? ' status-delivered' : (${#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled') or #strings.equalsIgnoreCase(order.status, 'Cancelled')} ? ' status-cancelled' : (${#strings.equalsIgnoreCase(order.status, 'Shipping') or #strings.equalsIgnoreCase(order.status, 'Shipping')} ? ' status-shipping' : ' status-default'))))"
-                        th:text="${order.status}">Status</span>
+                    <span class="status-badge" th:text="${order.status}">Status</span>
                 </div>
 
                 <div class="meta-grid">
@@ -445,9 +443,15 @@
                     </div>
                     <div class="meta-box">
                         <span class="meta-label">Shipping address</span>
-                        <p class="meta-value"
-                            th:text="${order.shippingAddress != null and !order.shippingAddress.isBlank() ? order.shippingAddress : 'Updating'}">
-                            Address</p>
+                        <p class="meta-value" th:text="${order.shippingAddress}">Address</p>
+                    </div>
+                    <div class="meta-box">
+                        <span class="meta-label">Gender</span>
+                        <p class="meta-value" th:text="${order.user != null and order.user.gender != null ? order.user.gender : 'Updating'}">Gender</p>
+                    </div>
+                    <div class="meta-box">
+                        <span class="meta-label">Date of birth</span>
+                        <p class="meta-value" th:text="${order.user != null and order.user.dateOfBirth != null ? #temporals.format(order.user.dateOfBirth, 'dd-MM-yyyy') : 'Updating'}">Date of birth</p>
                     </div>
                 </div>
 

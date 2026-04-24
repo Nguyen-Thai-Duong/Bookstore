@@ -25,6 +25,8 @@
                 <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
                 <p><strong>Phone Number:</strong> <span th:text="${user.phone != null ? user.phone : '-'}"></span></p>
                 <p><strong>Address:</strong> <span th:text="${user.address != null ? user.address : '-'}"></span></p>
+                <p><strong>Gender:</strong> <span th:text="${user.gender != null ? user.gender : '-'}"></span></p>
+                <p><strong>Date of Birth:</strong> <span th:text="${user.dateOfBirth != null ? #temporals.format(user.dateOfBirth, 'dd-MM-yyyy') : '-'}"></span></p>
                 <p><strong>Role:</strong> <span th:text="${user.role != null ? user.role.roleName : '-'}"></span></p>
                 <p><strong>Status:</strong> <span th:text="${user.status}"></span></p>
                 <p><strong>Creation Date:</strong> <span th:text="${user.createdAt}"></span></p>

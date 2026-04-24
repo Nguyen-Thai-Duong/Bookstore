@@ -242,6 +242,80 @@
         .hidden {
             display: none;
         }
+
+        .rank-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.2s;
+        }
+
+        .rank-item:hover {
+            background: #f9f9f9;
+        }
+
+        .rank-item:last-child {
+            border-bottom: none;
+        }
+
+        .rank-number {
+            width: 24px;
+            height: 24px;
+            background: var(--vb-brown);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .rank-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rank-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .rank-author {
+            font-size: 10px;
+            color: #888;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #global-search-suggest {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 58px;
+            z-index: 20;
+            background: #fff;
+            border: 1px solid #e6e6e6;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #global-search-suggest a:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 

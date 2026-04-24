@@ -69,6 +69,8 @@ public class AuthController {
             @RequestParam String password,
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String address,
+            @RequestParam(required = false) String gender,
+            @RequestParam(required = false) String dateOfBirth,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
         
@@ -84,6 +86,8 @@ public class AuthController {
         session.setAttribute("regPassword", password);
         session.setAttribute("regPhone", phone);
         session.setAttribute("regAddress", address);
+        session.setAttribute("regGender", gender);
+        session.setAttribute("regDateOfBirth", dateOfBirth);
         session.setAttribute("otp", otp);
         session.setAttribute("otpExpiry", System.currentTimeMillis() + 180000); 
 
@@ -172,7 +176,9 @@ public class AuthController {
                     (String) session.getAttribute("regEmail"),
                     (String) session.getAttribute("regPassword"),
                     (String) session.getAttribute("regPhone"),
-                    (String) session.getAttribute("regAddress")
+                    (String) session.getAttribute("regAddress"),
+                    (String) session.getAttribute("regGender"),
+                    (String) session.getAttribute("regDateOfBirth")
                 );
                 session.removeAttribute("otp");
                 session.removeAttribute("regEmail");
