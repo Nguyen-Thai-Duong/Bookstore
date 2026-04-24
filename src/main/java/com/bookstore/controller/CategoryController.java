@@ -30,14 +30,14 @@ public class CategoryController {
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("category", new CategoryDTO());
-        return "categories/form";
+        return "admin/categories/form";
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         categoryService.getCategoryById(id)
                 .ifPresent(category -> model.addAttribute("category", CategoryDTO.fromEntity(category)));
-        return "categories/form";
+        return "admin/categories/form";
     }
 
     @PostMapping

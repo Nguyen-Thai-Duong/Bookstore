@@ -45,7 +45,7 @@ public class OrderController {
         }
 
         model.addAttribute("orders", orders);
-        return "orders";
+        return "user/orders/order-list";
     }
 
     @GetMapping("/{id}")
@@ -67,7 +67,7 @@ public class OrderController {
         }
 
         model.addAttribute("order", OrderDTO.fromEntity(order));
-        return "orders/view";
+        return "user/orders/order-detail";
     }
 
     @PostMapping("/{id}/cancel")

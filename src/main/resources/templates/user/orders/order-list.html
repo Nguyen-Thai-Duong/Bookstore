@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookNest | Your Orders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --vb-brown: #F37021;
+            --bg-gray: #f5f5f5;
+            --border: #ddd;
+            --text: #333;
+            --price: #d0021b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gray);
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+
+        header {
+            background: #fff;
+            padding: 15px 0;
+            border-bottom: 2px solid var(--vb-brown);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            min-width: 220px;
+        }
+
+        .logo-text {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--vb-brown);
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .search-container {
+            flex: 1;
+            display: flex;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+
+        .search-container button {
+            background: var(--vb-brown);
+            color: #fff;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .cart-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f9f9f9;
+            padding: 8px 15px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            text-decoration: none;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .auth-links {
+            display: flex;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .auth-links a,
+        .auth-links button {
+            text-decoration: none;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: #444;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .auth-links a.primary {
+            background: var(--vb-brown);
+            color: #fff;
+            border-color: var(--vb-brown);
+        }
+
+        .nav-bar {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 22px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            overflow-x: auto;
+        }
+
+        .nav-links li a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .nav-links li a:hover {
+            background: var(--vb-brown);
+            color: #fff;
+        }
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 14px;
+        }
+
+        .panel-head {
+            background: #f3f3f3;
+            color: var(--vb-brown);
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+            font-weight: 700;
+            padding: 12px 14px;
+            text-transform: uppercase;
+        }
+
+        .panel-body {
+            padding: 14px;
+        }
+
+        .alert {
+            border-radius: 4px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .alert.error {
+            border: 1px solid #f3c3c3;
+            background: #fff3f3;
+            color: #ba1f1f;
+        }
+
+        .alert.success {
+            border: 1px solid #b7f0c4;
+            background: #f0fff4;
+            color: #166534;
+        }
+
+        .filter-row {
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .order-filter-btn {
+            border: 1px solid #ddd;
+            background: #fff;
+            border-radius: 4px;
+            padding: 7px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .order-filter-btn.active {
+            background: var(--vb-brown);
+            border-color: var(--vb-brown);
+            color: #fff;
+        }
+
+        .order-card {
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #fff;
+        }
+
+        .order-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .order-id {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d241e;
+            margin-bottom: 4px;
+        }
+
+        .order-date {
+            color: #777;
+            font-size: 12px;
+        }
+
+        .status-badge {
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 4px 10px;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff6db;
+            color: #9f5a00;
+        }
+
+        .status-confirmed {
+            background: #e7ebff;
+            color: #3730a3;
+        }
+
+        .status-shipping {
+            background: #e3f0ff;
+            color: #1f3ea8;
+        }
+
+        .status-delivered {
+            background: #ddf7e5;
+            color: #14663a;
+        }
+
+        .status-cancelled {
+            background: #ffe3e3;
+            color: #a71f1f;
+        }
+
+        .status-default {
+            background: #eee;
+            color: #555;
+        }
+
+        .order-items {
+            margin: 10px 0;
+            padding: 10px;
+            background: #fcfcfc;
+            border: 1px solid #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-item-img {
+            width: 40px;
+            height: 56px;
+            object-fit: cover;
+            border: 1px solid #eee;
+            border-radius: 2px;
+        }
+
+        .order-item-info {
+            flex: 1;
+        }
+
+        .order-item-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2d241e;
+            margin-bottom: 2px;
+        }
+
+        .order-item-qty {
+            font-size: 11px;
+            color: #777;
+        }
+
+        .order-item-price {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--price);
+        }
+
+        .order-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-top: 1px dashed #e1e1e1;
+            padding-top: 10px;
+        }
+
+        .order-total {
+            color: var(--price);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-weight: 700;
+            font-size: 12px;
+            border: 1px solid #ddd;
+            background: #fff;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .btn.primary {
+            background: var(--vb-brown);
+            border-color: var(--vb-brown);
+            color: #fff;
+        }
+
+        .btn.danger {
+            background: #fff3f3;
+            border-color: #f3c3c3;
+            color: #ba1f1f;
+        }
+
+        .empty-box {
+            text-align: center;
+            color: #777;
+            padding: 30px 10px;
+            border: 1px dashed #ddd;
+            border-radius: 4px;
+            background: #fcfcfc;
+        }
+
+        footer {
+            background: #fff;
+            border-top: 3px solid var(--vb-brown);
+            padding: 30px 0;
+            margin-top: 40px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 1024px) {
+            .header-content {
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                min-width: 170px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .logo-text {
+                font-size: 28px;
+            }
+
+            .search-container {
+                width: 100%;
+                order: 3;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{fragments/site-header :: siteHeader('orders')}"></div>
+
+    <main class="container" style="margin-bottom:30px;">
+        <div th:if="${orderSuccess}" class="alert success" th:text="${orderSuccess}"></div>
+        <div th:if="${orderError}" class="alert error" th:text="${orderError}"></div>
+
+        <section class="panel" th:if="${!#lists.isEmpty(orders)}">
+            <div class="panel-head">Your Orders</div>
+            <div class="panel-body">
+                <div class="filter-row">
+                    <button type="button" data-filter="all" class="order-filter-btn active">All</button>
+                    <button type="button" data-filter="pending" class="order-filter-btn">Pending</button>
+                    <button type="button" data-filter="confirmed" class="order-filter-btn">Confirmed</button>
+                    <button type="button" data-filter="shipping" class="order-filter-btn">Shipping</button>
+                    <button type="button" data-filter="delivered" class="order-filter-btn">Delivered</button>
+                    <button type="button" data-filter="cancelled" class="order-filter-btn">Cancelled</button>
+                </div>
+
+                <div class="order-card" th:each="order : ${orders}" th:attr="data-status-raw=${order.status}">
+                    <div class="order-top">
+                        <div>
+                            <p class="order-id" th:text="'Order #BN-' + ${order.id}">Order #BN-1</p>
+                            <p class="order-date"
+                                th:text="'Ordered on: ' + ${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">
+                                Ordered
+                                on</p>
+                        </div>
+
+                        <span class="status-badge"
+                            th:classappend="${#strings.equalsIgnoreCase(order.status, 'Pending')} ? ' status-pending' : (${#strings.equalsIgnoreCase(order.status, 'Confirmed') or #strings.equalsIgnoreCase(order.status, 'Confirmed')} ? ' status-confirmed' : (${#strings.equalsIgnoreCase(order.status, 'Delivered') or #strings.equalsIgnoreCase(order.status, 'Completed')} ? ' status-delivered' : (${#strings.equalsIgnoreCase(order.status, 'Canceled') or #strings.equalsIgnoreCase(order.status, 'Cancelled') or #strings.equalsIgnoreCase(order.status, 'Cancelled')} ? ' status-cancelled' : (${#strings.equalsIgnoreCase(order.status, 'Shipping') or #strings.equalsIgnoreCase(order.status, 'Shipping')} ? ' status-shipping' : ' status-default'))))"
+                            th:text="${order.status}">Status</span>
+                    </div>
+
+                    <div class="order-items" th:if="${order.orderDetails != null and !#lists.isEmpty(order.orderDetails)}">
+                        <div class="order-item" th:each="detail : ${order.orderDetails}">
+                            <div class="order-item-info">
+                                <p class="order-item-title" th:text="${detail.book.title}">Book Title</p>
+                                <p class="order-item-qty">Qty: <span th:text="${detail.quantity}">1</span></p>
+                            </div>
+                            <div class="order-item-price"
+                                th:text="${detail.unitPrice != null ? #numbers.formatDecimal(detail.unitPrice, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
+                                0 VND</div>
+                        </div>
+                    </div>
+
+                    <div class="order-bottom">
+                        <div>
+                            <span style="color:#777;">Total: </span>
+                            <span class="order-total"
+                                th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
+                                VND</span>
+                        </div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <a th:href="@{/orders/{id}(id=${order.id})}" class="btn primary">View Details</a>
+                            <form th:if="${#strings.equalsIgnoreCase(order.status, 'Pending')}"
+                                th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post"
+                                style="display:inline;">
+                                <button type="submit" class="btn danger">Cancel order</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="orders-filter-empty" class="empty-box hidden">No orders match this filter.</div>
+            </div>
+        </section>
+
+        <section class="panel" th:if="${#lists.isEmpty(orders)}">
+            <div class="panel-head">Your Orders</div>
+            <div class="panel-body">
+                <div class="empty-box">
+                    You haven't placed any orders yet. <a th:href="@{/books}"
+                        style="color:#0066cc;text-decoration:none;font-weight:700;">Start shopping</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+        <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
+
+    <script>
+        lucide.createIcons();
+
+        const filterButtons = Array.from(document.querySelectorAll('.order-filter-btn'));
+        const orderCards = Array.from(document.querySelectorAll('.order-card[data-status-raw]'));
+        const filterEmpty = document.getElementById('orders-filter-empty');
+        const allowedFilters = new Set(['all', 'pending', 'confirmed', 'shipping', 'delivered', 'cancelled']);
+
+        const setActiveFilterButton = (activeButton) => {
+            filterButtons.forEach((button) => {
+                button.classList.toggle('active', button === activeButton);
+            });
+        };
+
+        const normalizeVietnamese = (value) => {
+            return (value || '')
+                .trim()
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/Ä‘/g, 'd');
+        };
+
+        const normalizeStatus = (rawStatus) => {
+            const normalized = normalizeVietnamese(rawStatus);
+
+            if (normalized.includes('pend') || normalized.includes('cho xu ly') || normalized.includes('processing')) {
+                return 'pending';
+            }
+            if (normalized.includes('xac nhan don') || normalized.includes('confirmed')) {
+                return 'confirmed';
+            }
+            if (normalized.includes('ship') || normalized.includes('dang giao') || normalized.includes('in transit')) {
+                return 'shipping';
+            }
+            if (normalized.includes('deliver') || normalized.includes('da giao') || normalized.includes('hoan thanh') || normalized.includes('complete')) {
+                return 'delivered';
+            }
+            if (normalized.includes('cancel') || normalized.includes('da huy') || normalized.includes('huy')) {
+                return 'cancelled';
+            }
+
+            return 'default';
+        };
+
+        const applyOrderFilter = (filterValue) => {
+            let visibleCount = 0;
+
+            orderCards.forEach((card) => {
+                const status = normalizeStatus(card.getAttribute('data-status-raw'));
+                const show = filterValue === 'all' || status === filterValue;
+                card.classList.toggle('hidden', !show);
+                if (show) {
+                    visibleCount += 1;
+                }
+            });
+
+            if (filterEmpty) {
+                filterEmpty.classList.toggle('hidden', visibleCount > 0);
+            }
+        };
+
+        const updateFilterInUrl = (filterValue) => {
+            const url = new URL(window.location.href);
+            if (filterValue === 'all') {
+                url.searchParams.delete('status');
+            } else {
+                url.searchParams.set('status', filterValue);
+            }
+            window.history.replaceState({}, '', url);
+        };
+
+        if (filterButtons.length && orderCards.length) {
+            const getButtonByFilter = (filterValue) => filterButtons.find((button) => button.getAttribute('data-filter') === filterValue);
+
+            const currentStatusParam = new URLSearchParams(window.location.search).get('status') || 'all';
+            const initialFilter = allowedFilters.has(currentStatusParam) ? currentStatusParam : 'all';
+            const initialButton = getButtonByFilter(initialFilter) || filterButtons[0];
+            if (initialButton) {
+                setActiveFilterButton(initialButton);
+                applyOrderFilter(initialFilter);
+            }
+
+            filterButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const filterValue = button.getAttribute('data-filter') || 'all';
+                    setActiveFilterButton(button);
+                    applyOrderFilter(filterValue);
+                    updateFilterInUrl(filterValue);
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

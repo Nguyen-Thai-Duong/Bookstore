@@ -87,10 +87,10 @@ public class StationeryController {
         model.addAttribute("items", items);
         model.addAttribute("categories", categoryService.getCategoriesByProductType(2L));
         model.addAttribute("activePage", "stationery");
-        return "stationery-list";
+        return "user/stationery-list";
     }
 
-    @GetMapping("/detail/{id}")
+    @GetMapping({"/detail/{id}", "/{id}"})
     public String viewStationeryDetail(@PathVariable Long id, Model model) {
         bookService.getBookById(id).ifPresent(item -> {
             model.addAttribute("item", item);
@@ -105,7 +105,7 @@ public class StationeryController {
             model.addAttribute("relatedItems", relatedItems);
         });
         model.addAttribute("activePage", "stationery");
-        return "stationery-detail";
+        return "user/stationery-detail";
     }
 
     @GetMapping("/suggest")

@@ -415,7 +415,7 @@
                     <div th:if="${avatarSuccess}" class="message success" th:text="${avatarSuccess}"></div>
                     <form method="post" th:action="@{/account/avatar}" enctype="multipart/form-data">
                         <div class="field" style="margin-bottom: 8px;">
-                            <label for="avatar-input">Avatar (JPG, PNG, WEBP, GIF - max 2MB)</label>
+                            <label for="avatar-input">Avatar (JPG, PNG, WEBP, GIF - max 10MB)</label>
                             <input id="avatar-input" type="file" name="avatar" accept="image/*" required>
                         </div>
                         <button type="submit" class="btn-primary" style="width: 100%;">Upload avatar</button>
