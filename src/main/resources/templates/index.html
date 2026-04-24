@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookNest | Online Bookstore - Buy Books Online</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
@@ -99,8 +99,7 @@
             font-weight: 700;
             color: #fff;
             background: var(--vb-brown);
-            flex: 0 0 auto;
-            margin-top: 2px;
+            flex: 0 0 auto; margin-top: 2px;
         }
 
         .rank-title {
@@ -196,6 +195,10 @@
             display: block;
         }
 
+        .book-title:hover {
+            text-decoration: underline;
+        }
+
         .author {
             font-size: 11px;
             color: #888;
@@ -284,14 +287,13 @@
                             BOOK
                         </span>
 
-                        <a
-                            th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery' : '/books/' + p.id}">
-                            <img
-                                th:src="${p.imageUrl != null && !p.imageUrl.isEmpty() ? p.imageUrl : 'https://via.placeholder.com/110x160'}">
+                        <!-- ĐƯỜNG DẪN ĐÃ SỬA: Bỏ /detail/ -->
+                        <a th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery/' + p.id : '/books/' + p.id}">
+                            <img th:src="${p.imageUrl != null && !p.imageUrl.isEmpty() ? p.imageUrl : 'https://via.placeholder.com/110x160'}">
                         </a>
 
                         <a class="book-title"
-                            th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery' : '/books/' + p.id}"
+                            th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery/' + p.id : '/books/' + p.id}"
                             th:text="${p.title}">
                         </a>
 
@@ -317,8 +319,9 @@
                 <div class="rank-item" th:each="p,iter : ${featuredProducts}" th:if="${iter.index < 3}">
                     <span class="rank-badge" th:text="${iter.index + 1}">1</span>
                     <div style="min-width:0;">
+                        <!-- ĐƯỜNG DẪN ĐÃ SỬA: Bỏ /detail/ -->
                         <a class="rank-title"
-                            th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery' : '/books/' + p.id}"
+                            th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery/' + p.id : '/books/' + p.id}"
                             th:text="${p.title}">Title</a>
                         <div class="rank-author" th:text="${p.author}">Author</div>
                     </div>
@@ -360,7 +363,7 @@
                     const title = escapeHtml(item.title || "");
                     const author = escapeHtml(item.author || "");
                     const typeName = escapeHtml(item.typeName || 'Book');
-                    const url = item.url || `/books/${item.id}`;
+                    const url = item.url || (typeName === 'Stationery' ? `/stationery/${item.id}` : `/books/${item.id}`);
                     return `<a href="${url}" style="display:block;padding:10px 12px;border-bottom:1px solid #f0f0f0;text-decoration:none;color:#333;"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;"><div style="font-weight:600;font-size:12px;">${title}</div><span style="font-size:10px;font-weight:700;color:#F37021;text-transform:uppercase;">${typeName}</span></div><div style="font-size:11px;color:#777;">${author}</div></a>`;
                 }).join("");
 

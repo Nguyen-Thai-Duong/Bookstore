@@ -4,324 +4,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${item.title} + ' | BookNest Stationery'"></title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <title>BookNest | Stationery Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root {
-            --vb-brown: #F37021;
-            --bg-gray: #f5f5f5;
-            --border: #ddd;
-            --text: #333;
-            --price: #d0021b;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-gray);
-            color: var(--text);
-            font-size: 14px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 10px;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .detail-wrapper {
-            background: #fff;
-            padding: 25px;
-            margin-top: 20px;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: grid;
-            grid-template-columns: 400px 1fr;
-            gap: 40px;
-        }
-
-        .image-section {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .main-image {
-            width: 100%;
-            aspect-ratio: 1/1;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fdfdfd;
-        }
-
-        .main-image img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        .info-section h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: #222;
-        }
-
-        .brand-info {
-            font-size: 15px;
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        .price-box {
-            background: #fafafa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
-
-        .price-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--price);
-        }
-
-        .stock-info {
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .stock-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .stock-in { background: #e8f7ef; color: #00A859; }
-        .stock-out { background: #fee2e2; color: #ef4444; }
-
-        .action-btns {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .btn {
-            padding: 12px 30px;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: all 0.2s;
-            border: none;
-        }
-
-        .btn-add-cart {
-            background: var(--vb-brown);
-            color: #fff;
-            flex: 1;
-        }
-
-        .btn-add-cart:hover { filter: brightness(0.9); transform: translateY(-1px); }
-
-        .description-box {
-            border-top: 1px solid #eee;
-            padding-top: 25px;
-        }
-
-        .description-box h3 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: var(--vb-brown);
-        }
-
-        .description-content {
-            line-height: 1.6;
-            color: #555;
-            white-space: pre-wrap;
-        }
-
-        /* ===== RELATED PRODUCTS ===== */
-        .related-section {
-            margin-top: 40px;
-            margin-bottom: 40px;
-        }
-
-        .related-section h2 {
-            font-size: 20px;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--vb-brown);
-            text-transform: uppercase;
-        }
-
-        .related-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-
-        .related-card {
-            background: #fff;
-            padding: 15px;
-            text-align: center;
-            border-radius: 4px;
-            border: 1px solid transparent;
-            text-decoration: none;
-            color: inherit;
-            transition: all 0.2s;
-        }
-
-        .related-card:hover {
-            border-color: var(--border);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        .related-card img {
-            width: 100%;
-            aspect-ratio: 1/1;
-            object-fit: cover;
-            margin-bottom: 10px;
-            border-radius: 4px;
-        }
-
-        .related-card h4 {
-            font-size: 14px;
-            height: 40px;
-            overflow: hidden;
-            margin-bottom: 10px;
-            color: #0066cc;
-        }
-
-        .related-price {
-            font-weight: bold;
-            color: var(--price);
-        }
-
-        @media (max-width: 900px) {
-            .detail-wrapper { grid-template-columns: 1fr; }
-            .related-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        .alert {
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        .alert-success { background: #e8f7ef; border: 1px solid #00A859; color: #00A859; }
-        .alert-danger { background: #fee2e2; border: 1px solid #ef4444; color: #ef4444; }
+        :root { --primary: #F37021; --bg: #f8fafc; --text: #1f2937; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; }
+        .detail-container { max-width: 1240px; width: 100%; margin: 0 auto; padding: 0 12px; }
+        .content-wrap { display: grid; gap: 24px; margin: 10px auto 28px; }
+        .crumbs { display: flex; align-items: center; gap: 8px; color: #64748b; font-size: 13px; }
+        .crumbs a { text-decoration: none; color: #64748b; }
+        .crumbs a:hover { color: #d97706; }
+        .product-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 18px; overflow: hidden; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05); }
+        .product-grid { display: grid; grid-template-columns: minmax(320px, 420px) 1fr; }
+        .product-image-col { background: #f8fafc; border-right: 1px solid #f1f5f9; padding: 28px 20px; display: flex; justify-content: center; align-items: center; }
+        .image-wrap { width: min(100%, 360px); height: 520px; position: relative; background: #fff; border-radius: 14px; overflow: hidden; }
+        .product-image { width: 100%; height: 100%; object-fit: contain; box-shadow: 0 18px 32px rgba(0, 0, 0, 0.18); transition: transform .25s ease; }
+        .product-image:hover { transform: scale(1.02); }
+        .stock-badge { position: absolute; top: 10px; right: 10px; padding: 6px 10px; border-radius: 999px; color: #fff; font-size: 11px; font-weight: 700; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+        .stock-badge.in { background: #16a34a; }
+        .stock-badge.out { background: #dc2626; }
+        .product-info-col { padding: 30px 34px; display: grid; gap: 16px; align-content: start; }
+        .product-title { font-size: 36px; line-height: 1.2; color: #111827; font-weight: 800; }
+        .meta-rows { display: grid; gap: 8px; background: #fcfcfd; border: 1px solid #edf2f7; border-radius: 12px; padding: 10px 12px; }
+        .meta-row { display: flex; align-items: baseline; border-bottom: 1px solid #eef2f6; padding-bottom: 6px; color: #475569; }
+        .meta-row:last-child { border-bottom: none; }
+        .meta-label { width: 130px; flex-shrink: 0; font-weight: 600; color: #6b7280; }
+        .product-price { font-size: 40px; font-weight: 800; color: #111827; }
+        .price-unit { font-size: 20px; color: #6b7280; }
+        .btn-primary { border: none; background: linear-gradient(135deg, #F37021 0%, #FF8A3D 100%); color: #fff; border-radius: 12px; font-weight: 800; padding: 12px 18px; cursor: pointer; box-shadow: 0 8px 20px rgba(243, 112, 33, 0.35); text-decoration: none; }
+        .btn-outline { border: 2px solid #e5e7eb; background: #fff; color: #4b5563; border-radius: 12px; font-weight: 700; padding: 11px 18px; text-decoration: none; }
+        .section-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 22px; margin-bottom: 20px; }
+        .section-title { font-size: 22px; font-weight: 700; margin-bottom: 14px; }
+        .review-card { border: 1px solid #f1f5f9; background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+        .star-input input { display: none; }
+        .star-input label { color: #e5e7eb; cursor: pointer; font-size: 22px; }
+        .star-input input:checked~label, .star-input label:hover, .star-input label:hover~label { color: #f59e0b; }
+        @media (max-width: 1024px) { .product-grid { grid-template-columns: 1fr; } .product-image-col { border-right: none; border-bottom: 1px solid #f1f5f9; } }
     </style>
 </head>
 
 <body>
+    <div th:replace="~{fragments/site-header :: siteHeader('stationery')}"></div>
 
-    <!-- Shared Header -->
-    <div th:replace="~{fragments/site-header :: siteHeader(activePage='stationery')}"></div>
+    <div class="detail-container content-wrap">
+        <nav class="crumbs">
+            <a th:href="@{/}">Home</a> <span>/</span>
+            <a th:href="@{/stationery}">Stationery</a> <span>/</span>
+            <span style="color:#1f2937;font-weight:600;" th:text="${item.title}">Details</span>
+        </nav>
 
-    <main class="container">
-        <!-- Breadcrumb -->
-        <div style="margin-top: 20px; font-size: 13px; color: #888;">
-            <a th:href="@{/}" style="color: inherit; text-decoration: none;">Home</a> / 
-            <a th:href="@{/stationery}" style="color: inherit; text-decoration: none;">Stationery</a> / 
-            <span th:text="${item.title}">Product Name</span>
-        </div>
-
-        <!-- Success/Error Messages -->
-        <div th:if="${cartSuccess}" class="alert alert-success" th:text="${cartSuccess}"></div>
-        <div th:if="${cartError}" class="alert alert-danger" th:text="${cartError}"></div>
-
-        <div class="detail-wrapper">
-            <!-- Left: Image -->
-            <div class="image-section">
-                <div class="main-image">
-                    <img th:if="${item.imageUrl != null and !item.imageUrl.isEmpty()}" 
-                         th:src="${item.imageUrl}" th:alt="${item.title}">
-                    <i th:unless="${item.imageUrl != null and !item.imageUrl.isEmpty()}" 
-                       data-lucide="package" size="100" style="color: #eee;"></i>
-                </div>
-            </div>
-
-            <!-- Right: Info -->
-            <div class="info-section">
-                <h1 th:text="${item.title}">Product Name</h1>
-                
-                <div class="brand-info">
-                    Brand: <strong th:text="${item.author != null ? item.author : 'No Brand'}">Brand</strong> | 
-                    Category: <strong th:text="${item.category != null ? item.category.name : 'Uncategorized'}">Category</strong>
+        <section class="product-card">
+            <div class="product-grid">
+                <div class="product-image-col">
+                    <div class="image-wrap">
+                        <img class="product-image" th:src="${item.imageUrl != null and !item.imageUrl.isEmpty() ? item.imageUrl : 'https://via.placeholder.com/500x620?text=No+Image'}" th:alt="${item.title}">
+                        <span class="stock-badge in" th:if="${item.stock != null and item.stock > 0}" th:text="${'IN STOCK: ' + item.stock}">IN STOCK</span>
+                        <span class="stock-badge out" th:if="${item.stock == null or item.stock <= 0}">OUT OF STOCK</span>
+                    </div>
                 </div>
 
-                <div class="price-box">
-                    <div class="price-value" th:text="${item.price != null ? #numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0 VND</div>
-                </div>
-
-                <div class="stock-info">
-                    <span th:if="${item.stock > 0}" class="stock-badge stock-in">Available: <span th:text="${item.stock}"></span></span>
-                    <span th:unless="${item.stock > 0}" class="stock-badge stock-out">Out of Stock</span>
-                </div>
-
-                <div class="action-btns" th:if="${item.stock > 0}">
-                    <form th:action="@{/cart/add}" method="post" style="flex: 1;">
-                        <input type="hidden" name="bookId" th:value="${item.id}" />
-                        <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                            <label>Quantity:</label>
-                            <input type="number" name="quantity" value="1" min="1" th:max="${item.stock}" 
-                                   style="padding: 8px; width: 80px; border: 1px solid var(--border); border-radius: 4px;">
+                <div class="product-info-col">
+                    <h1 class="product-title" th:text="${item.title}">Item Name</h1>
+                    
+                    <div class="meta-rows">
+                        <div class="meta-row">
+                            <span class="meta-label">Brand:</span>
+                            <span class="meta-value" th:text="${item.author != null and !item.author.isBlank() ? item.author : 'N/A'}">Brand</span>
                         </div>
-                        <button type="submit" class="btn btn-add-cart">
-                            <i data-lucide="shopping-cart" size="18" style="vertical-align: middle; margin-right: 8px;"></i>
-                            Add to Cart
-                        </button>
-                    </form>
-                </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Category:</span>
+                            <span class="meta-value" th:text="${item.category != null ? item.category.name : 'N/A'}">Category</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Dimensions:</span>
+                            <span class="meta-value" th:text="${item.widthCm != null ? item.widthCm + 'x' + item.heightCm + 'x' + item.thicknessCm + ' cm' : 'N/A'}">N/A</span>
+                        </div>
+                    </div>
 
-                <div class="description-box">
-                    <h3>Product Description</h3>
-                    <div class="description-content" th:text="${item.description}">
-                        Product description goes here...
+                    <div class="price-block mt-4">
+                        <div class="product-price">
+                            <span th:text="${item.price != null ? #numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') : '0'}">0</span>
+                            <small class="price-unit">VND</small>
+                        </div>
+                    </div>
+
+                    <div th:if="${session.loggedInUser != null and item.stock > 0}" class="action-row mt-6">
+                        <form method="post" th:action="@{/cart/add}" class="flex gap-4">
+                            <input type="hidden" name="bookId" th:value="${item.id}">
+                            <input type="number" name="quantity" value="1" min="1" th:attr="max=${item.stock}" class="w-16 border rounded-lg text-center">
+                            <button class="btn-primary" type="submit">ADD TO CART</button>
+                        </form>
+                    </div>
+
+                    <div th:if="${session.loggedInUser == null}" class="mt-6">
+                        <a th:href="@{/login}" class="btn-primary">LOGIN TO BUY</a>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Related Products -->
-        <div class="related-section" th:if="${not #lists.isEmpty(relatedItems)}">
-            <h2>Related Products</h2>
-            <div class="related-grid">
-                <div th:each="rel : ${relatedItems}">
-                    <a th:href="@{/stationery/detail/{id}(id=${rel.id})}" class="related-card">
-                        <img th:if="${rel.imageUrl != null and !rel.imageUrl.isEmpty()}" 
-                             th:src="${rel.imageUrl}" th:alt="${rel.title}">
-                        <div th:unless="${rel.imageUrl != null and !rel.imageUrl.isEmpty()}" 
-                             style="width:100%; aspect-ratio:1/1; background:#f4f4f4; display:flex; align-items:center; justify-content:center;">
-                            <i data-lucide="package" size="40" style="color:#ccc;"></i>
-                        </div>
-                        <h4 th:text="${rel.title}">Related Title</h4>
-                        <div class="related-price" th:text="${rel.price != null ? #numbers.formatDecimal(rel.price, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0 VND</div>
-                    </a>
+        <section class="section-card">
+            <h2 class="section-title">Description</h2>
+            <p th:text="${item.description != null ? item.description : 'No description available.'}">Description</p>
+        </section>
+
+        <section class="section-card">
+            <h2 class="section-title">Reviews</h2>
+            <div th:if="${#lists.isEmpty(reviews)}" class="text-gray-500">No reviews yet for this item.</div>
+            <div th:each="review : ${reviews}" class="review-card">
+                <div class="flex justify-between">
+                    <strong th:text="${review.user.fullName}">User</strong>
+                    <span class="text-yellow-500" th:each="i : ${#numbers.sequence(1, review.rating)}">&#9733;</span>
                 </div>
+                <p class="mt-2 text-gray-600" th:text="${review.comment}">Comment</p>
             </div>
-        </div>
-    </main>
+        </section>
+    </div>
 
-    <!-- Shared Footer -->
     <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
-
-    <script>
-        lucide.createIcons();
-    </script>
 </body>
 </html>

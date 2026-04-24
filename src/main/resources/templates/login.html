@@ -331,7 +331,7 @@
             <div class="panel-body">
                 <div th:if="${error}" class="error-box" th:text="${error}"></div>
                 <div th:if="${successMessage}" class="success-box" th:text="${successMessage}"></div>
-                <div th:if="${param.verified}" class="success-box">Tài khoản đã xác thực thành công. Vui lòng đăng nhập.</div>
+                <div th:if="${param.verified}" class="success-box">Account verified successfully. Please log in.</div>
 
                 <form method="post" th:action="@{/login}">
                     <div class="field">

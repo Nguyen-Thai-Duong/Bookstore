@@ -45,7 +45,9 @@
                 <span>Dashboard</span>
             </a>
 
-            <a href="/admin/books"
+            <!-- Chỉ Admin mới thấy các mục quản lý khác -->
+            <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
+               href="/admin/books"
                 th:class="${activePage == 'books'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -54,7 +56,8 @@
                 <span>Book Management</span>
             </a>
 
-            <a href="/admin/stationery"
+            <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
+               href="/admin/stationery"
                 th:class="${activePage == 'stationery'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -63,7 +66,8 @@
                 <span>Stationery</span>
             </a>
 
-            <a href="/admin/categories"
+            <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
+               href="/admin/categories"
                 th:class="${activePage == 'categories'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -72,7 +76,6 @@
                 <span>Category</span>
             </a>
 
-            <!-- Mục Supplier (Dành cho Admin) -->
             <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
                href="/admin/suppliers"
                 th:class="${activePage == 'suppliers'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
@@ -82,7 +85,6 @@
                 <span>Supplier</span>
             </a>
 
-            <!-- Chỉ Admin mới thấy User Management -->
             <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
                href="/admin/users"
                 th:class="${activePage == 'users'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
@@ -93,7 +95,6 @@
                 <span>User</span>
             </a>
 
-            <!-- Chỉ Admin mới thấy Voucher Management -->
             <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
                href="/admin/vouchers"
                 th:class="${activePage == 'vouchers'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
@@ -104,7 +105,8 @@
                 <span>Voucher</span>
             </a>
 
-            <a href="/admin/reviews"
+            <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
+               href="/admin/reviews"
                 th:class="${activePage == 'reviews'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -113,7 +115,8 @@
                 <span>Review</span>
             </a>
 
-            <a href="/admin/orders"
+            <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
+               href="/admin/orders"
                 th:class="${activePage == 'orders'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -122,20 +125,20 @@
                 <span>Order</span>
             </a>
 
-            <!-- Mục Import (Chỉ dành cho Staff) -->
+            <!-- Mục Import (Cập nhật đường dẫn mới cho Staff) -->
             <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Staff')}" 
-               href="/admin/purchase-orders"
-                th:class="${activePage == 'purchase-orders'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
+               href="/admin/imports"
+                th:class="${activePage == 'imports'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
                 <span>Import</span>
             </a>
 
-            <!-- Mục Confirm Import (Chỉ dành cho Admin) -->
+            <!-- Mục Confirm Import (Cập nhật đường dẫn mới cho Admin) -->
             <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
-               href="/admin/purchase-orders/confirm"
-                th:class="${activePage == 'confirm-purchase-orders'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
+               href="/admin/imports/confirm"
+                th:class="${activePage == 'confirm-imports'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
@@ -143,7 +146,6 @@
             </a>
         </nav>
 
-        <!-- Hiển thị thông tin User thực tế đang đăng nhập -->
         <div class="p-4 border-t border-white/20">
             <div class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10">
                 <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">

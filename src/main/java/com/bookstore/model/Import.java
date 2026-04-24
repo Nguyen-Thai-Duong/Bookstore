@@ -9,15 +9,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "PurchaseOrder")
+@Table(name = "Import")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PurchaseOrder {
+public class Import {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "POID")
+    @Column(name = "ImportID")
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,6 +40,6 @@ public class PurchaseOrder {
     @Column(name = "Note", length = 500)
     private String note;
 
-    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PurchaseOrderDetail> details;
+    @OneToMany(mappedBy = "importOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImportDetail> details;
 }

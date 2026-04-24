@@ -2,21 +2,21 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Create Purchase Request - BookNest</title>
+    <title>Create Import Request - BookNest</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50">
-    <div th:replace="~{admin/fragments/sidebar :: adminSidebar('purchase-orders')}"></div>
+    <div th:replace="~{admin/fragments/sidebar :: adminSidebar('imports')}"></div>
 
     <main class="ml-64 p-8">
         <div class="max-w-5xl mx-auto">
             <div class="mb-6">
-                <a href="/admin/purchase-orders" class="text-orange-500 hover:underline">← Back to List</a>
-                <h1 class="text-2xl font-bold text-gray-800 mt-2">Create Purchase Request</h1>
+                <a href="/admin/imports" class="text-orange-500 hover:underline">← Back to List</a>
+                <h1 class="text-2xl font-bold text-gray-800 mt-2">Create Import Request</h1>
             </div>
 
             <div class="bg-white rounded-xl shadow-sm p-8">
-                <form th:action="@{/admin/purchase-orders/save}" method="post" id="poForm" class="space-y-6">
+                <form th:action="@{/admin/imports/save}" method="post" id="importForm" class="space-y-6" onsubmit="return validateForm()">
                     <!-- Chọn Nhà cung cấp -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Select Supplier</label>
@@ -50,11 +50,11 @@
                                     </select>
                                 </div>
                                 <div class="col-span-2">
-                                    <input type="number" name="quantities" min="1" value="1" required placeholder="Qty" 
+                                    <input type="number" name="quantities" min="1" step="1" required placeholder="Qty" 
                                            class="qty-input w-full px-3 py-2 border rounded text-sm focus:ring-1 focus:ring-orange-500">
                                 </div>
                                 <div class="col-span-3">
-                                    <input type="number" name="prices" min="0" value="0" step="1000" required placeholder="Price" 
+                                    <input type="number" name="prices" min="1000" step="1" required placeholder="Price" 
                                            class="price-input w-full px-3 py-2 border rounded text-sm focus:ring-1 focus:ring-orange-500">
                                 </div>
                                 <div class="col-span-2 text-right font-bold text-gray-700">
@@ -81,9 +81,9 @@
                     </div>
 
                     <div class="pt-6 border-t flex justify-end gap-4">
-                        <a href="/admin/purchase-orders" class="px-6 py-2 border rounded-lg hover:bg-gray-50">Cancel</a>
+                        <a href="/admin/imports" class="px-6 py-2 border rounded-lg hover:bg-gray-50">Cancel</a>
                         <button type="submit" class="px-8 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 shadow-lg shadow-orange-200 transition font-bold">
-                            Create Purchase Request
+                            Create Import Request
                         </button>
                     </div>
                 </form>
@@ -92,11 +92,12 @@
     </main>
 
     <script>
+        const MAX_TOTAL = 1000000000; // 1 tỷ VNĐ
+
         function addProductRow() {
             const firstRow = document.querySelector('.product-item');
             const newRow = firstRow.cloneNode(true);
-            newRow.querySelector('.qty-input').value = '1';
-            newRow.querySelector('.price-input').value = '0';
+            newRow.querySelectorAll('input').forEach(i => i.value = ''); 
             newRow.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
             newRow.querySelector('.subtotal-display').innerText = '0';
             document.getElementById('product-list').appendChild(newRow);
@@ -119,29 +120,89 @@
                 let qtyInput = row.querySelector('.qty-input');
                 let priceInput = row.querySelector('.price-input');
                 
-                // Ngăn chặn số âm ngay khi nhập
-                if (qtyInput.value < 0) qtyInput.value = 1;
-                if (priceInput.value < 0) priceInput.value = 0;
+                let rawQty = qtyInput.value;
+                let rawPrice = priceInput.value;
 
-                const qty = parseFloat(qtyInput.value) || 0;
-                const price = parseFloat(priceInput.value) || 0;
+                if (rawQty !== "" && parseFloat(rawQty) < 1) {
+                    qtyInput.value = 1;
+                    rawQty = "1";
+                }
+                if (rawPrice !== "" && parseFloat(rawPrice) < 0) {
+                    priceInput.value = 0;
+                    rawPrice = "0";
+                }
+
+                let qty = parseFloat(rawQty) || 0;
+                let price = parseFloat(rawPrice) || 0;
+
+                if (!Number.isInteger(qty)) {
+                    qty = Math.floor(qty);
+                    qtyInput.value = qty;
+                }
+
                 const subtotal = qty * price;
                 row.querySelector('.subtotal-display').innerText = subtotal.toLocaleString('vi-VN');
                 grandTotal += subtotal;
             });
-            document.getElementById('grand-total').innerText = grandTotal.toLocaleString('vi-VN');
+
+            const totalDisplay = document.getElementById('grand-total');
+            totalDisplay.innerText = grandTotal.toLocaleString('vi-VN');
+
+            if (grandTotal > MAX_TOTAL) {
+                totalDisplay.classList.remove('text-orange-600');
+                totalDisplay.classList.add('text-red-600');
+            } else {
+                totalDisplay.classList.remove('text-red-600');
+                totalDisplay.classList.add('text-orange-600');
+            }
+        }
+
+        function validateForm() {
+            let grandTotal = 0;
+            let isValid = true;
+            let rows = document.querySelectorAll('.product-item');
+
+            for (let i = 0; i < rows.length; i++) {
+                let row = rows[i];
+                const productSelect = row.querySelector('select');
+                const qtyVal = row.querySelector('.qty-input').value;
+                const priceVal = row.querySelector('.price-input').value;
+
+                if (!productSelect.value) {
+                    alert("Please select a product for row " + (i + 1));
+                    isValid = false; break;
+                }
+
+                const qty = parseInt(qtyVal);
+                const price = parseFloat(priceVal);
+                
+                if (isNaN(qty) || qty < 1) {
+                    alert("Row " + (i + 1) + ": Quantity must be at least 1.");
+                    isValid = false; break;
+                }
+                if (isNaN(price) || price < 1000) {
+                    alert("Row " + (i + 1) + ": Unit Price must be at least 1,000 VNĐ.");
+                    isValid = false; break;
+                }
+                grandTotal += (qty * price);
+            }
+
+            if (isValid && grandTotal > MAX_TOTAL) {
+                alert("Grand Total cannot exceed 1,000,000,000 VNĐ (1 Billion). Current: " + grandTotal.toLocaleString('vi-VN') + " VNĐ");
+                isValid = false;
+            }
+
+            return isValid;
         }
 
         function attachEvents() {
             document.querySelectorAll('.qty-input, .price-input').forEach(input => {
                 input.removeEventListener('input', calculateTotal);
                 input.addEventListener('input', calculateTotal);
-                // Thêm sự kiện change để chắc chắn không bị bypass bằng cách copy-paste số âm
                 input.addEventListener('change', calculateTotal);
             });
         }
 
-        // Initialize
         attachEvents();
     </script>
 </body>
