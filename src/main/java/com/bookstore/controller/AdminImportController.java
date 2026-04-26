@@ -14,31 +14,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/admin/purchase-orders")
+@RequestMapping("/admin/imports")
 @RequiredArgsConstructor
-public class AdminPurchaseOrderController {
+public class AdminImportController {
 
-    private final PurchaseOrderService poService;
+    private final ImportService importService;
     private final SupplierService supplierService;
     private final BookService bookService;
 
     @GetMapping
     public String listForStaff(Model model) {
-        model.addAttribute("orders", poService.getAllOrders());
-        model.addAttribute("activePage", "purchase-orders");
-        return "admin/purchase-order/staff-list";
+        model.addAttribute("imports", importService.getAllImportsSorted());
+        model.addAttribute("activePage", "imports");
+        return "admin/import/staff-list";
     }
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("suppliers", supplierService.getAllSuppliers());
+        model.addAttribute("suppliers", supplierService.getAllActiveSuppliers());
         model.addAttribute("products", bookService.getAllBooks());
-        model.addAttribute("activePage", "purchase-orders");
-        return "admin/purchase-order/form";
+        model.addAttribute("activePage", "imports");
+        return "admin/import/form";
     }
 
     @PostMapping("/save")
-    public String saveOrder(@RequestParam Integer supplierId,
+    public String saveImport(@RequestParam Integer supplierId,
                             @RequestParam List<Long> productIds,
                             @RequestParam List<Integer> quantities,
                             @RequestParam List<BigDecimal> prices,
@@ -46,18 +46,18 @@ public class AdminPurchaseOrderController {
         User user = (User) session.getAttribute("loggedInUser");
         Supplier supplier = supplierService.getSupplierById(supplierId).orElseThrow();
 
-        PurchaseOrder po = new PurchaseOrder();
-        po.setSupplier(supplier);
-        po.setUser(user);
-        po.setStatus("Requested");
+        Import importOrder = new Import();
+        importOrder.setSupplier(supplier);
+        importOrder.setUser(user);
+        importOrder.setStatus("Requested");
         
-        List<PurchaseOrderDetail> details = new ArrayList<>();
+        List<ImportDetail> details = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
 
         for (int i = 0; i < productIds.size(); i++) {
             Book book = bookService.getBookById(productIds.get(i)).orElseThrow();
-            PurchaseOrderDetail detail = new PurchaseOrderDetail();
-            detail.setPurchaseOrder(po);
+            ImportDetail detail = new ImportDetail();
+            detail.setImportOrder(importOrder);
             detail.setProduct(book);
             detail.setOrderedQuantity(quantities.get(i));
             detail.setUnitPrice(prices.get(i));
@@ -65,84 +65,84 @@ public class AdminPurchaseOrderController {
             total = total.add(prices.get(i).multiply(BigDecimal.valueOf(quantities.get(i))));
         }
         
-        po.setDetails(details);
-        po.setTotalAmount(total);
-        poService.saveOrder(po);
-        return "redirect:/admin/purchase-orders";
+        importOrder.setDetails(details);
+        importOrder.setTotalAmount(total);
+        importService.saveImport(importOrder);
+        return "redirect:/admin/imports";
     }
 
     @GetMapping("/view/{id}")
     public String viewDetail(@PathVariable Integer id, Model model, HttpSession session) {
         User user = (User) session.getAttribute("loggedInUser");
-        poService.getOrderById(id).ifPresent(order -> model.addAttribute("order", order));
+        importService.getImportById(id).ifPresent(importOrder -> model.addAttribute("importOrder", importOrder));
         
         String role = user.getRole().getRoleName();
-        model.addAttribute("activePage", role.equalsIgnoreCase("Admin") ? "confirm-purchase-orders" : "purchase-orders");
-        return "admin/purchase-order/detail";
+        model.addAttribute("activePage", role.equalsIgnoreCase("Admin") ? "confirm-imports" : "imports");
+        return "admin/import/detail";
     }
 
     @GetMapping("/receive/{id}")
     public String showReceiveForm(@PathVariable Integer id, Model model) {
-        poService.getOrderById(id).ifPresent(order -> model.addAttribute("order", order));
-        model.addAttribute("activePage", "purchase-orders");
-        return "admin/purchase-order/receive-form";
+        importService.getImportById(id).ifPresent(importOrder -> model.addAttribute("importOrder", importOrder));
+        model.addAttribute("activePage", "imports");
+        return "admin/import/receive-form";
     }
 
     @PostMapping("/receive/save")
-    public String saveReceivedQuantity(@RequestParam Integer poId, 
+    public String saveReceivedQuantity(@RequestParam Integer importId, 
                                       @RequestParam List<Integer> detailIds,
                                       @RequestParam List<Integer> receivedQtys) {
-        List<PurchaseOrderDetail> details = new ArrayList<>();
+        List<ImportDetail> details = new ArrayList<>();
         for (int i = 0; i < detailIds.size(); i++) {
-            PurchaseOrderDetail d = new PurchaseOrderDetail();
+            ImportDetail d = new ImportDetail();
             d.setId(detailIds.get(i));
             d.setReceivedQuantity(receivedQtys.get(i));
             details.add(d);
         }
-        poService.receiveOrder(poId, details);
-        return "redirect:/admin/purchase-orders";
+        importService.receiveImport(importId, details);
+        return "redirect:/admin/imports";
     }
 
     @GetMapping("/finalize/{id}")
     public String showFinalizeForm(@PathVariable Integer id, Model model) {
-        poService.getOrderById(id).ifPresent(order -> model.addAttribute("order", order));
-        model.addAttribute("activePage", "confirm-purchase-orders");
-        return "admin/purchase-order/finalize";
+        importService.getImportById(id).ifPresent(importOrder -> model.addAttribute("importOrder", importOrder));
+        model.addAttribute("activePage", "confirm-imports");
+        return "admin/import/finalize";
     }
 
     @PostMapping("/finalize/save")
-    public String finalizeOrder(@RequestParam Integer poId, @RequestParam(required = false) String note) {
-        poService.finalizeOrder(poId, note);
-        return "redirect:/admin/purchase-orders/confirm";
+    public String finalizeImport(@RequestParam Integer importId, @RequestParam(required = false) String note) {
+        importService.finalizeImport(importId, note);
+        return "redirect:/admin/imports/confirm";
     }
 
     @PostMapping("/stock-in/{id}")
     public String stockIn(@PathVariable Integer id, RedirectAttributes ra) {
         try {
-            poService.confirmAndStockIn(id);
+            importService.confirmAndStockIn(id);
             ra.addFlashAttribute("successMessage", "Stock updated successfully!");
         } catch (Exception e) {
             ra.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/admin/purchase-orders";
+        return "redirect:/admin/imports";
     }
 
     @GetMapping("/confirm")
     public String listForAdmin(Model model) {
-        model.addAttribute("orders", poService.getAllOrders());
-        model.addAttribute("activePage", "confirm-purchase-orders");
-        return "admin/purchase-order/admin-list";
+        model.addAttribute("imports", importService.getAllImportsSorted());
+        model.addAttribute("activePage", "confirm-imports");
+        return "admin/import/admin-list";
     }
 
     @PostMapping("/approve/{id}")
     public String approve(@PathVariable Integer id) {
-        poService.approveOrder(id);
-        return "redirect:/admin/purchase-orders/confirm";
+        importService.approveImport(id);
+        return "redirect:/admin/imports/confirm";
     }
 
     @PostMapping("/cancel/{id}")
     public String cancel(@PathVariable Integer id) {
-        poService.cancelOrder(id);
-        return "redirect:/admin/purchase-orders/confirm";
+        importService.cancelImport(id);
+        return "redirect:/admin/imports/confirm";
     }
 }

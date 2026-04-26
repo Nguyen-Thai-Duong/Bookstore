@@ -30,7 +30,6 @@ public class AuthController {
             Model model) {
         User user = (User) session.getAttribute("loggedInUser");
         if (user != null) {
-            // Sửa ở đây: Nếu là Admin hoặc Staff thì vào /admin
             return authService.canAccessAdminPanel(user) ? "redirect:/admin" : "redirect:/";
         }
 
@@ -53,7 +52,6 @@ public class AuthController {
         }
 
         session.setAttribute("loggedInUser", user);
-        // Sửa ở đây: Nếu là Admin hoặc Staff thì vào /admin
         return authService.canAccessAdminPanel(user) ? "redirect:/admin" : "redirect:/";
     }
 
@@ -104,7 +102,7 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public String handleForgotPassword(@RequestParam String email, HttpSession session, RedirectAttributes redirectAttributes) {
         if (authService.findByEmail(email).isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "Email không tồn tại trong hệ thống!");
+            redirectAttributes.addFlashAttribute("error", "Email does not exist in our system!");
             return "redirect:/forgot-password";
         }
 
@@ -139,17 +137,16 @@ public class AuthController {
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            redirectAttributes.addFlashAttribute("error", "Mật khẩu xác nhận không khớp!");
+            redirectAttributes.addFlashAttribute("error", "Password confirmation does not match!");
             return "redirect:/reset-password";
         }
 
         authService.resetPassword(email, newPassword);
         
-        // Clear session
         session.removeAttribute("forgotEmail");
         session.removeAttribute("otpVerified");
         
-        redirectAttributes.addFlashAttribute("successMessage", "Đổi mật khẩu thành công! Vui lòng đăng nhập.");
+        redirectAttributes.addFlashAttribute("successMessage", "Password reset successfully! Please log in.");
         return "redirect:/login";
     }
 
@@ -165,7 +162,7 @@ public class AuthController {
         Long expiry = (Long) session.getAttribute("otpExpiry");
 
         if (serverOtp == null || expiry == null || System.currentTimeMillis() > expiry) {
-            redirectAttributes.addFlashAttribute("error", "Mã OTP đã hết hạn!");
+            redirectAttributes.addFlashAttribute("error", "OTP code has expired!");
             return "redirect:/otp";
         }
 
@@ -190,7 +187,7 @@ public class AuthController {
             }
             return "redirect:/login";
         } else {
-            redirectAttributes.addFlashAttribute("error", "Mã OTP không chính xác!");
+            redirectAttributes.addFlashAttribute("error", "Invalid OTP code!");
             return "redirect:/otp";
         }
     }

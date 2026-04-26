@@ -35,4 +35,16 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             """)
     List<Object[]> countOrdersByUserIdsAndStatusIgnoreCase(@Param("userIds") List<Long> userIds,
                                                           @Param("status") String status);
+
+    @Query("""
+            select o.user.id, count(o)
+            from Order o
+            where lower(o.status) = lower(:status)
+              and o.user.id in :userIds
+              and o.orderDate >= :startDate
+            group by o.user.id
+            """)
+    List<Object[]> countOrdersByUserIdsAndStatusIgnoreCaseAndDateAfter(@Param("userIds") List<Long> userIds,
+                                                                      @Param("status") String status,
+                                                                      @Param("startDate") LocalDateTime startDate);
 }

@@ -66,20 +66,31 @@ public class VoucherServiceImpl implements VoucherService {
 
         helper.setFrom(senderEmail);
         helper.setTo(to);
-        helper.setSubject("🎁 Quà tặng từ BookNest: Voucher " + discount);
+        helper.setSubject("🎁 Gift from BookNest: " + discount + " Voucher");
 
         String htmlContent = 
-            "<div style='font-family: sans-serif; line-height: 1.5; color: #333;'>" +
-                "<h3>Chúc mừng! Bạn nhận được một mã ưu đãi:</h3>" +
-                "<div style='background: #fff3cd; padding: 15px; border: 1px dashed #ffc107; text-align: center;'>" +
-                    "<span style='font-size: 24px; font-weight: bold; color: #856404;'>" + voucherCode + "</span>" +
+            "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden;'>" +
+                "<div style='background-color: #F37021; padding: 20px; text-align: center;'>" +
+                    "<h1 style='color: #ffffff; margin: 0;'>BookNest</h1>" +
                 "</div>" +
-                "<p style='margin-top: 15px;'><b>Giảm giá:</b> <span style='color: #d9534f; font-size: 18px;'>" + discount + "</span></p>" +
-                "<p style='font-size: 14px;'>" +
-                    "📅 <b>Bắt đầu:</b> " + startDate + "<br>" +
-                    "⌛ <b>Kết thúc:</b> " + endDate + 
-                "</p>" +
-                "<p style='font-size: 12px; color: #888;'>Áp dụng khi thanh toán tại website BookNest.</p>" +
+                "<div style='padding: 30px; line-height: 1.6; color: #333333;'>" +
+                    "<h2 style='color: #F37021;'>Congratulations!</h2>" +
+                    "<p>You have received a special discount code from <b>BookNest</b>:</p>" +
+                    "<div style='background: #fffaf7; padding: 20px; border: 2px dashed #F37021; text-align: center; margin: 20px 0;'>" +
+                        "<span style='font-size: 28px; font-weight: bold; color: #F37021;'>" + voucherCode + "</span>" +
+                    "</div>" +
+                    "<p style='margin-top: 15px;'><b>Discount:</b> <span style='color: #ef4444; font-size: 20px; font-weight: bold;'>" + discount + "</span></p>" +
+                    "<p style='font-size: 14px; color: #555;'>" +
+                        "📅 <b>Start Date:</b> " + startDate + "<br>" +
+                        "⌛ <b>End Date:</b> " + endDate + 
+                    "</p>" +
+                    "<p style='font-size: 13px; color: #7f8c8d; margin-top: 20px; border-top: 1px solid #eee; pt: 15px;'>" +
+                        "Apply this code at checkout on the BookNest website." +
+                    "</p>" +
+                    "<p style='font-size: 12px; color: #95a5a6; text-align: center; margin-top: 30px;'>" +
+                        "&copy; 2026 BookNest Store. All rights reserved." +
+                    "</p>" +
+                "</div>" +
             "</div>";
 
         helper.setText(htmlContent, true);

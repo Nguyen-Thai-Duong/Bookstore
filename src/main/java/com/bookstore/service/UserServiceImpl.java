@@ -6,7 +6,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getCustomersOnly() {
-        // Chỉ lấy user có role là Customer (RoleID = 2 theo config của bạn)
         return userRepository.findAll().stream()
                 .filter(u -> u.getRole() != null && (u.getRole().getId() == 2L || "Customer".equalsIgnoreCase(u.getRole().getRoleName())))
                 .toList();
@@ -72,31 +70,31 @@ public class UserServiceImpl implements UserService {
 
             helper.setFrom(senderEmail, "BookNest Store");
             helper.setTo(email);
-            helper.setSubject("Mã xác thực OTP - BookNest");
+            helper.setSubject("OTP Verification - BookNest");
 
             String htmlContent = 
                 "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden;'>" +
-                    "<div style='background-color: #8b5a3c; padding: 20px; text-align: center;'>" +
+                    "<div style='background-color: #F37021; padding: 20px; text-align: center;'>" +
                         "<h1 style='color: #ffffff; margin: 0;'>BookNest</h1>" +
                     "</div>" +
                     "<div style='padding: 30px; line-height: 1.6; color: #333333;'>" +
-                        "<h2 style='color: #8b5a3c;'>Xác thực đăng ký tài khoản</h2>" +
-                        "<p>Chào bạn,</p>" +
-                        "<p>Cảm ơn bạn đã lựa chọn <b>BookNest</b>. Để hoàn tất quá trình đăng ký, vui lòng sử dụng mã OTP dưới đây:</p>" +
+                        "<h2 style='color: #F37021;'>Email Verification</h2>" +
+                        "<p>Hello,</p>" +
+                        "<p>Thank you for choosing <b>BookNest</b>. To complete your registration, please use the OTP code below:</p>" +
                         "<div style='text-align: center; margin: 30px 0;'>" +
-                            "<span style='display: inline-block; padding: 15px 30px; background-color: #fdfcfb; border: 2px dashed #8b5a3c; font-size: 32px; font-weight: bold; color: #8b5a3c; letter-spacing: 5px; border-radius: 5px;'>" + otp + "</span>" +
+                            "<span style='display: inline-block; padding: 15px 30px; background-color: #fffaf7; border: 2px dashed #F37021; font-size: 32px; font-weight: bold; color: #F37021; letter-spacing: 5px; border-radius: 5px;'>" + otp + "</span>" +
                         "</div>" +
-                        "<p style='color: #e74c3c;'><b>Lưu ý:</b> Mã này sẽ hết hạn sau <b>180 giây</b>.</p>" +
-                        "<p>Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này hoặc liên hệ với bộ phận hỗ trợ.</p>" +
+                        "<p style='color: #ef4444;'><b>Note:</b> This code will expire in <b>180 seconds</b>.</p>" +
+                        "<p>If you did not request this code, please ignore this email or contact our support team.</p>" +
                         "<hr style='border: 0; border-top: 1px solid #eeeeee; margin: 20px 0;'>" +
-                        "<p style='font-size: 12px; color: #7f8c8d; text-align: center;'>Đây là email tự động, vui lòng không phản hồi email này.<br>&copy; 2026 BookNest Team.</p>" +
+                        "<p style='font-size: 12px; color: #7f8c8d; text-align: center;'>This is an automated email, please do not reply.<br>&copy; 2026 BookNest Team.</p>" +
                     "</div>" +
                 "</div>";
 
             helper.setText(htmlContent, true);
             mailSender.send(message);
         } catch (MessagingException | java.io.UnsupportedEncodingException e) {
-            throw new RuntimeException("Lỗi gửi email: " + e.getMessage());
+            throw new RuntimeException("Email sending failed: " + e.getMessage());
         }
     }
 }

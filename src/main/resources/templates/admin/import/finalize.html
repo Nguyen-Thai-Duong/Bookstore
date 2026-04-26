@@ -6,32 +6,32 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50">
-    <div th:replace="~{admin/fragments/sidebar :: adminSidebar('confirm-purchase-orders')}"></div>
+    <div th:replace="~{admin/fragments/sidebar :: adminSidebar('confirm-imports')}"></div>
 
     <main class="ml-64 p-8">
         <div class="max-w-4xl mx-auto">
-            <h1 class="text-2xl font-bold text-gray-800 mb-6" th:text="'Reviewing PO-' + ${order.id}"></h1>
+            <h1 class="text-2xl font-bold text-gray-800 mb-6" th:text="'Reviewing IMP-' + ${importOrder.id}"></h1>
 
             <div class="bg-white rounded-xl shadow-sm p-8">
-                <form th:action="@{/admin/purchase-orders/finalize/save}" method="post" id="finalizeForm" class="space-y-6">
-                    <input type="hidden" name="poId" th:value="${order.id}" />
+                <form th:action="@{/admin/imports/finalize/save}" method="post" id="finalizeForm" class="space-y-6">
+                    <input type="hidden" name="importId" th:value="${importOrder.id}" />
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
                             <thead class="bg-gray-100 border-b">
                                 <tr>
                                     <th class="px-4 py-3 font-semibold text-gray-700">Product</th>
-                                    <th class="px-4 py-3 font-semibold text-gray-700">Ordered</th>
-                                    <th class="px-4 py-3 font-semibold text-gray-700">Staff Reported</th>
-                                    <th class="px-4 py-3 font-semibold text-gray-700">Diff</th>
+                                    <th class="px-4 py-3 font-semibold text-gray-700 text-center">Ordered</th>
+                                    <th class="px-4 py-3 font-semibold text-gray-700 text-center">Staff Reported</th>
+                                    <th class="px-4 py-3 font-semibold text-gray-700 text-center">Diff</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y">
-                                <tr th:each="detail : ${order.details}" class="hover:bg-gray-50">
+                                <tr th:each="detail : ${importOrder.details}" class="hover:bg-gray-50">
                                     <td class="px-4 py-4 text-gray-800" th:text="${detail.product.title}"></td>
-                                    <td class="px-4 py-4 text-gray-600 font-bold" th:text="${detail.orderedQuantity}"></td>
-                                    <td class="px-4 py-4 text-purple-600 font-bold" th:text="${detail.receivedQuantity}"></td>
-                                    <td class="px-4 py-4">
+                                    <td class="px-4 py-4 text-center text-gray-600 font-bold" th:text="${detail.orderedQuantity}"></td>
+                                    <td class="px-4 py-4 text-center text-purple-600 font-bold" th:text="${detail.receivedQuantity}"></td>
+                                    <td class="px-4 py-4 text-center">
                                         <span th:with="diff=${detail.receivedQuantity - detail.orderedQuantity}"
                                               th:class="${diff == 0 ? 'text-gray-400' : (diff > 0 ? 'text-green-600 font-bold' : 'text-red-600 font-bold')}"
                                               th:text="${(diff > 0 ? '+' : '') + diff}"></span>
@@ -42,24 +42,22 @@
                     </div>
 
                     <div class="mt-6">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Admin's Final Notes (Reason for discrepancy, etc.)</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Admin's Final Notes</label>
                         <textarea name="note" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
                                   placeholder="Explain why there is a shortage or surplus..."></textarea>
                     </div>
                 </form>
 
                 <div class="pt-6 border-t flex justify-end gap-4">
-                    <a href="/admin/purchase-orders/confirm" class="px-6 py-2 border rounded-lg hover:bg-gray-50 transition">Back</a>
+                    <a href="/admin/imports/confirm" class="px-6 py-2 border rounded-lg hover:bg-gray-50 transition">Back</a>
                     
-                    <!-- Nút Hủy Đơn (Màu đỏ) -->
-                    <form th:action="@{'/admin/purchase-orders/cancel/' + ${order.id}}" method="post" class="inline">
-                        <button type="submit" onclick="return confirm('Are you sure you want to CANCEL this entire order?')"
+                    <form th:action="@{'/admin/imports/cancel/' + ${importOrder.id}}" method="post" class="inline">
+                        <button type="submit" onclick="return confirm('Are you sure you want to CANCEL this entire import?')"
                                 class="px-6 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition font-bold">
-                            Cancel Order
+                            Cancel Import
                         </button>
                     </form>
 
-                    <!-- Nút Chốt (Màu xanh) -->
                     <button type="submit" form="finalizeForm"
                             class="px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-200 transition font-bold">
                         Finalize and Allow Stock-in

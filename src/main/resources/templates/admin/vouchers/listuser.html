@@ -114,24 +114,59 @@
                         <p class="text-sm text-gray-500">
                             Send voucher <span class="font-bold" style="color: var(--color-primary);"
                                 th:text="${voucher.code}"></span>
-                            to a customer
+                            to customers
                         </p>
                     </div>
+                    <button type="button" id="btnSendSelected"
+                        class="btn-primary text-white px-6 py-2 rounded-lg text-sm font-medium shadow-md">
+                        Send to Selected
+                    </button>
                 </div>
             </header>
 
             <div class="p-8">
+                <!-- Filters: Min Orders & Time Range -->
+                <form id="filterForm" method="get" th:action="@{/admin/sendmail/select-user}" class="mb-6 bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex flex-wrap items-center gap-6">
+                    <input type="hidden" name="voucherId" th:value="${voucher.id}" />
+                    
+                    <div class="flex items-center gap-3">
+                        <label for="minOrders" class="text-sm font-semibold text-gray-600">Min Completed Orders:</label>
+                        <input type="number" id="minOrders" name="minOrders" th:value="${minOrders}" min="0" 
+                               class="w-20 rounded-lg border-gray-300 text-sm focus:ring-orange-500" />
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <label for="days" class="text-sm font-semibold text-gray-600">Orders From:</label>
+                        <select id="days" name="days" class="rounded-lg border-gray-300 text-sm focus:ring-orange-500">
+                            <option value="0" th:selected="${currentDays == 0}">All Time</option>
+                            <option value="7" th:selected="${currentDays == 7}">Last 7 Days</option>
+                            <option value="30" th:selected="${currentDays == 30}">Last 30 Days</option>
+                            <option value="90" th:selected="${currentDays == 90}">Last 90 Days</option>
+                            <option value="180" th:selected="${currentDays == 180}">Last 6 Months</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition">
+                        Apply Filter
+                    </button>
+                    
+                    <a th:href="@{/admin/sendmail/select-user(voucherId=${voucher.id})}" class="text-sm text-gray-500 hover:text-orange-600">Reset</a>
+                </form>
+
                 <div th:if="${successMessage}"
                     class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-700"
                     th:text="${successMessage}"></div>
-                <div th:if="${error}"
-                    class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700"
+                <div th:if="${error}" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700"
                     th:text="${error}"></div>
 
                 <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-                    <table class="w-full">
+                    <table class="w-full" id="userTable">
                         <thead class="bg-gray-50 border-b">
                             <tr>
+                                <th class="px-6 py-4 text-left">
+                                    <input type="checkbox" id="selectAll"
+                                        class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                </th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Customer
                                     Name</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Email</th>
@@ -143,6 +178,10 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             <tr th:each="user : ${users}" class="table-row">
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" name="userIds" th:value="${user.id}"
+                                        class="user-checkbox w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                </td>
                                 <td class="px-6 py-4 text-sm font-medium text-gray-900" th:text="${user.fullName}"></td>
                                 <td class="px-6 py-4 text-sm text-gray-600" th:text="${user.email}"></td>
                                 <td class="px-6 py-4 text-center">
@@ -151,11 +190,11 @@
                                         th:text="${completedOrderCounts[user.id] != null ? completedOrderCounts[user.id] : 0}">0</span>
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <form th:action="@{/admin/sendmail/send-voucher}" method="post">
+                                    <form th:action="@{/admin/sendmail/send-voucher}" method="post" class="inline">
                                         <input type="hidden" name="userId" th:value="${user.id}" />
                                         <input type="hidden" name="voucherId" th:value="${voucher.id}" />
                                         <button type="submit"
-                                            class="btn-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition">
+                                            class="text-orange-600 hover:text-orange-800 text-sm font-semibold">
                                             Send Now
                                         </button>
                                     </form>
@@ -164,12 +203,52 @@
                         </tbody>
                     </table>
                     <div th:if="${users.empty}" class="p-8 text-center text-gray-500">
-                        No customers found in the system.
+                        No customers found matching the criteria.
                     </div>
                 </div>
             </div>
         </main>
     </div>
+
+    <script th:inline="javascript">
+        // Select All logic
+        document.getElementById('selectAll').addEventListener('change', function () {
+            document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = this.checked);
+        });
+
+        // Bulk Send logic
+        document.getElementById('btnSendSelected').addEventListener('click', function () {
+            const selectedCbs = document.querySelectorAll('.user-checkbox:checked');
+            if (selectedCbs.length === 0) {
+                alert('Please select at least one customer.');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to send this voucher to ${selectedCbs.length} selected customers?`)) {
+                const voucherId = /*[[${voucher.id}]]*/ null;
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/admin/sendmail/send-voucher-bulk';
+
+                selectedCbs.forEach(cb => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'userIds';
+                    input.value = cb.value;
+                    form.appendChild(input);
+                });
+
+                const vInput = document.createElement('input');
+                vInput.type = 'hidden';
+                vInput.name = 'voucherId';
+                vInput.value = voucherId;
+                form.appendChild(vInput);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    </script>
 </body>
 
 </html>

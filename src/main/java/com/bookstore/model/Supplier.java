@@ -31,5 +31,5 @@ public class Supplier {
     private String status = "Active";
 
     @OneToMany(mappedBy = "supplier")
-    private List<PurchaseOrder> purchaseOrders;
+    private List<Import> imports;
 }

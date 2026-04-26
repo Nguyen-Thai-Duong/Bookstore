@@ -69,7 +69,8 @@
                             <label class="block text-sm font-semibold mb-2">Item Name *</label>
                             <input type="text" th:field="*{title}" required
                                    class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500"
-                                   th:classappend="${#fields.hasErrors('title')} ? 'border-red-500' : ''">
+                                   th:classappend="${#fields.hasErrors('title')} ? 'border-red-500' : ''"
+                                   placeholder="Enter Item Name">
                             <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="text-red-500 text-xs mt-1"></p>
                         </div>
 
@@ -77,7 +78,8 @@
                             <label class="block text-sm font-semibold mb-2">Brand *</label>
                             <input type="text" th:field="*{author}" required
                                    class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500"
-                                   th:classappend="${#fields.hasErrors('author')} ? 'border-red-500' : ''">
+                                   th:classappend="${#fields.hasErrors('author')} ? 'border-red-500' : ''"
+                                   placeholder="Enter Brand Name">
                             <p th:if="${#fields.hasErrors('author')}" th:errors="*{author}" class="text-red-500 text-xs mt-1"></p>
                         </div>
 
@@ -95,44 +97,62 @@
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-semibold mb-2">Price</label>
-                            <input type="number" th:field="*{price}" min="0"
+                            <label class="block text-sm font-semibold mb-2">Price (VND)</label>
+                            <input type="number" th:field="*{price}" min="0" step="1000"
                                    class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500"
-                                   th:classappend="${#fields.hasErrors('price')} ? 'border-red-500' : ''">
+                                   th:classappend="${#fields.hasErrors('price')} ? 'border-red-500' : ''"
+                                   placeholder="0">
                             <p th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-red-500 text-xs mt-1"></p>
                         </div>
 
+                        <!-- Image from URL -->
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-semibold mb-2">Image</label>
-                            <input type="file" name="imageFile"
-                                   class="w-full px-4 py-3 border rounded-lg bg-white">
+                            <label class="block text-sm font-semibold mb-2">Image from URL</label>
+                            <input type="url" th:field="*{imageUrl}"
+                                   class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                                   placeholder="https://example.com/image.jpg">
+                            <p class="text-xs text-gray-500 mt-2">Paste an image URL here or upload a file from your device below.</p>
+                        </div>
+
+                        <!-- Image from File -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-semibold mb-2">Upload Image</label>
+                            <input type="file" name="imageFile" accept="image/*"
+                                   class="w-full px-4 py-3 border rounded-lg bg-white focus:ring-2 focus:ring-orange-500">
+                            <p class="text-xs text-gray-500 mt-2">If both URL and file are provided, the uploaded file will be used.</p>
+                            <div th:if="${item.imageUrl != null and !item.imageUrl.isEmpty()}" class="mt-4">
+                                <p class="text-sm font-medium text-gray-700 mb-2">Current image:</p>
+                                <img th:src="${item.imageUrl}" alt="Item Image" class="h-40 rounded-lg border"
+                                     onerror="this.style.display='none'">
+                            </div>
                         </div>
 
                         <div class="md:col-span-2">
                             <label class="block text-sm font-semibold mb-2">Description</label>
                             <textarea th:field="*{description}" rows="4"
-                                      class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500"></textarea>
+                                      class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                                      placeholder="Enter Item Description..."></textarea>
                         </div>
 
                     </div>
 
                     <!-- Buttons -->
                     <div class="flex justify-end space-x-4 mt-8 pt-6 border-t">
-                        <a href="/admin/stationery" class="px-6 py-3 bg-gray-100 rounded-lg">Cancel</a>
+                        <a href="/admin/stationery" class="px-6 py-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium">Cancel</a>
 
-                        <button type="submit" class="px-6 py-3 text-white rounded-lg"
+                        <button type="submit" class="px-6 py-3 text-white rounded-lg transition font-medium"
                                 style="background: linear-gradient(135deg, var(--color-primary), #D95F14);">
-                            Save
+                            <span th:text="${item.id != null ? 'Update' : 'Add Item'}">Save</span>
                         </button>
-                        </div>
+                    </div>
 
-                    </form>
-                </div>
-
+                </form>
             </div>
-        </main>
 
-    </div>
+        </div>
+    </main>
+
+</div>
 </body>
 
 </html>

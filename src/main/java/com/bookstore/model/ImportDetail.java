@@ -7,20 +7,20 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "PurchaseOrderDetail")
+@Table(name = "ImportDetail")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PurchaseOrderDetail {
+public class ImportDetail {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PODetailID")
+    @Column(name = "ImportDetailID")
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "POID", nullable = false)
-    private PurchaseOrder purchaseOrder;
+    @JoinColumn(name = "ImportID", nullable = false)
+    private Import importOrder;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ProductID", nullable = false)

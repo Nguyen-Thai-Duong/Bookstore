@@ -1,5 +1,6 @@
 package com.bookstore.controller;
 
+import com.bookstore.dto.BookDTO;
 import com.bookstore.dto.ReviewDTO;
 import com.bookstore.model.Book;
 import com.bookstore.model.User;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.math.BigDecimal;
 import java.text.Normalizer;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/stationery")
@@ -31,69 +34,29 @@ import java.util.stream.Collectors;
 public class StationeryController {
 
     private static final long STATIONERY_PRODUCT_TYPE_ID = 2L;
+    private static final int STATIONERY_PER_PAGE = 12;
     private static final int REVIEWS_PER_PAGE = 4;
+
     private final BookService bookService;
     private final CategoryService categoryService;
     private final ReviewRepository reviewRepository;
     private final OrderDetailRepository orderDetailRepository;
 
     @GetMapping
-    public String listStationery(@RequestParam(required = false) String name,
-            @RequestParam(required = false) Long categoryId,
-            @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice,
-            @RequestParam(required = false) String sort,
+    public String listStationery(@RequestParam(defaultValue = "1") int page,
+            @RequestParam(required = false) String categoryId,
+            @RequestParam(required = false) String minPrice,
+            @RequestParam(required = false) String maxPrice,
             Model model) {
+        Long normalizedCategoryId = parseCategoryId(categoryId);
+        BigDecimal normalizedMinPrice = parsePrice(minPrice);
+        BigDecimal normalizedMaxPrice = parsePrice(maxPrice);
 
-        // Lấy tất cả sản phẩm Stationery (ProductTypeID = 2) và chỉ lấy sản phẩm Active
-        List<Book> items = bookService.getProductsByProductType(2L).stream()
-                .filter(i -> "Active".equalsIgnoreCase(i.getStatus()))
-                .collect(Collectors.toList());
-
-        // Filter logic
-        if (name != null && !name.isEmpty()) {
-            String lowerName = name.toLowerCase();
-            items = items.stream()
-                    .filter(i -> (i.getTitle() != null && i.getTitle().toLowerCase().contains(lowerName)) ||
-                            (i.getAuthor() != null && i.getAuthor().toLowerCase().contains(lowerName)))
-                    .collect(Collectors.toList());
-        }
-
-        if (categoryId != null) {
-            items = items.stream()
-                    .filter(i -> i.getCategory() != null && i.getCategory().getId().equals(categoryId))
-                    .collect(Collectors.toList());
-        }
-
-        if (minPrice != null) {
-            items = items.stream()
-                    .filter(i -> i.getPrice() != null && i.getPrice().doubleValue() >= minPrice)
-                    .collect(Collectors.toList());
-        }
-
-        if (maxPrice != null) {
-            items = items.stream()
-                    .filter(i -> i.getPrice() != null && i.getPrice().doubleValue() <= maxPrice)
-                    .collect(Collectors.toList());
-        }
-
-        // Xử lý sắp xếp
-        if (sort != null) {
-            switch (sort) {
-                case "name_asc":
-                    items.sort(Comparator.comparing(Book::getTitle, Comparator.nullsLast(String::compareToIgnoreCase)));
-                    break;
-                case "price_asc":
-                    items.sort(Comparator.comparing(Book::getPrice, Comparator.nullsLast(Comparator.naturalOrder())));
-                    break;
-                case "price_desc":
-                    items.sort(Comparator.comparing(Book::getPrice, Comparator.nullsLast(Comparator.reverseOrder())));
-                    break;
-            }
-        }
-
-        model.addAttribute("items", items);
-        model.addAttribute("categories", categoryService.getCategoriesByProductType(2L));
+        List<BookDTO> stationeries = filterStationery("", "", normalizedCategoryId, normalizedMinPrice,
+                normalizedMaxPrice);
+        addPaginationAttributes(model, stationeries, page, null, null, normalizedCategoryId, normalizedMinPrice,
+                normalizedMaxPrice);
+        model.addAttribute("categories", categoryService.getCategoriesByProductType(STATIONERY_PRODUCT_TYPE_ID));
         model.addAttribute("activePage", "stationery");
         return "user/stationery-list";
     }
@@ -114,17 +77,7 @@ public class StationeryController {
             return "redirect:/stationery";
         }
 
-        model.addAttribute("item", item);
-
-        List<Book> relatedItems = bookService.getProductsByProductType(STATIONERY_PRODUCT_TYPE_ID).stream()
-                .filter(i -> i.getCategory() != null
-                        && item.getCategory() != null
-                        && i.getCategory().getId().equals(item.getCategory().getId())
-                        && !i.getId().equals(item.getId())
-                        && "Active".equalsIgnoreCase(i.getStatus()))
-                .limit(4)
-                .collect(Collectors.toList());
-        model.addAttribute("relatedItems", relatedItems);
+        model.addAttribute("item", BookDTO.fromEntity(item));
 
         Comparator<ReviewDTO> reviewComparator = Comparator
                 .comparing((ReviewDTO r) -> r.getRating() == null ? 0 : r.getRating(), Comparator.reverseOrder())
@@ -139,15 +92,11 @@ public class StationeryController {
                 ? ratingFilter
                 : null;
 
-        List<ReviewDTO> filteredReviews;
-        if (normalizedRatingFilter == null) {
-            filteredReviews = allReviews;
-        } else {
-            final int filterValue = normalizedRatingFilter.intValue();
-            filteredReviews = allReviews.stream()
-                    .filter(r -> r.getRating() != null && r.getRating().intValue() == filterValue)
-                    .toList();
-        }
+        List<ReviewDTO> filteredReviews = normalizedRatingFilter == null
+                ? allReviews
+                : allReviews.stream()
+                        .filter(r -> r.getRating() != null && r.getRating().intValue() == normalizedRatingFilter)
+                        .toList();
 
         if (!allReviews.isEmpty()) {
             double avgRating = allReviews.stream()
@@ -181,11 +130,9 @@ public class StationeryController {
             model.addAttribute("remainingReviewCount", 0L);
             model.addAttribute("reviewEligibilityMessage", "Please log in to write a review.");
         } else {
-            long completedPurchaseCount = orderDetailRepository
-                    .findByOrder_User_IdAndBook_Id(user.getId(), item.getId())
+            long completedPurchaseCount = orderDetailRepository.findByOrder_User_IdAndBook_Id(user.getId(), item.getId())
                     .stream()
-                    .filter(detail -> isCompletedStatus(
-                            detail.getOrder() != null ? detail.getOrder().getStatus() : null))
+                    .filter(detail -> isCompletedStatus(detail.getOrder() != null ? detail.getOrder().getStatus() : null))
                     .count();
             long submittedReviewCount = reviewRepository.countByBook_IdAndUser_Id(item.getId(), user.getId());
             long remainingReviewCount = Math.max(0L, completedPurchaseCount - submittedReviewCount);
@@ -206,6 +153,107 @@ public class StationeryController {
         return "user/stationery-detail";
     }
 
+    @GetMapping("/search")
+    public String searchStationery(@RequestParam(required = false) String title,
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) String categoryId,
+            @RequestParam(required = false) String minPrice,
+            @RequestParam(required = false) String maxPrice,
+            @RequestParam(defaultValue = "1") int page,
+            Model model) {
+        String normalizedTitle = title == null ? "" : title.trim();
+        String normalizedAuthor = author == null ? "" : author.trim();
+        Long normalizedCategoryId = parseCategoryId(categoryId);
+        BigDecimal normalizedMinPrice = parsePrice(minPrice);
+        BigDecimal normalizedMaxPrice = parsePrice(maxPrice);
+
+        List<BookDTO> filteredStationery = filterStationery(normalizedTitle, normalizedAuthor, normalizedCategoryId,
+                normalizedMinPrice,
+                normalizedMaxPrice);
+
+        addPaginationAttributes(model, filteredStationery, page,
+                normalizedTitle.isBlank() ? null : normalizedTitle,
+                normalizedAuthor.isBlank() ? null : normalizedAuthor,
+                normalizedCategoryId,
+                normalizedMinPrice,
+                normalizedMaxPrice);
+        model.addAttribute("categories", categoryService.getCategoriesByProductType(STATIONERY_PRODUCT_TYPE_ID));
+        model.addAttribute("activePage", "stationery");
+        return "user/stationery-list";
+    }
+
+    private Long parseCategoryId(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return Long.parseLong(value.trim());
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    private BigDecimal parsePrice(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            BigDecimal parsed = new BigDecimal(value.trim());
+            return parsed.compareTo(BigDecimal.ZERO) < 0 ? null : parsed;
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    private List<BookDTO> filterStationery(String title, String author, Long categoryId, BigDecimal minPrice,
+            BigDecimal maxPrice) {
+        String normalizedTitle = title == null ? "" : title.trim().toLowerCase();
+        String normalizedAuthor = author == null ? "" : author.trim().toLowerCase();
+
+        return bookService.getProductsByProductType(STATIONERY_PRODUCT_TYPE_ID).stream()
+                .filter(this::isStationeryProduct)
+                .filter(item -> "Active".equalsIgnoreCase(item.getStatus()))
+                .filter(item -> normalizedTitle.isBlank() || (item.getTitle() != null
+                        && item.getTitle().toLowerCase().contains(normalizedTitle)))
+                .filter(item -> normalizedAuthor.isBlank() || (item.getAuthor() != null
+                        && item.getAuthor().toLowerCase().contains(normalizedAuthor)))
+                .filter(item -> categoryId == null || (item.getCategory() != null
+                        && categoryId.equals(item.getCategory().getId())))
+                .filter(item -> minPrice == null || (item.getPrice() != null
+                        && item.getPrice().compareTo(minPrice) >= 0))
+                .filter(item -> maxPrice == null || (item.getPrice() != null
+                        && item.getPrice().compareTo(maxPrice) <= 0))
+                .map(BookDTO::fromEntity)
+                .toList();
+    }
+
+    private void addPaginationAttributes(Model model, List<BookDTO> items, int requestedPage,
+            String title, String author, Long categoryId, BigDecimal minPrice, BigDecimal maxPrice) {
+        int totalItems = items.size();
+        int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / STATIONERY_PER_PAGE));
+        int page = Math.max(1, Math.min(requestedPage, totalPages));
+
+        int fromIndex = (page - 1) * STATIONERY_PER_PAGE;
+        int toIndex = Math.min(fromIndex + STATIONERY_PER_PAGE, totalItems);
+        List<BookDTO> pageItems = fromIndex < toIndex ? items.subList(fromIndex, toIndex) : List.of();
+
+        boolean isSearch = (title != null && !title.isBlank()) || (author != null && !author.isBlank())
+                || categoryId != null || minPrice != null || maxPrice != null;
+
+        model.addAttribute("items", pageItems);
+        model.addAttribute("page", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalItems", totalItems);
+        model.addAttribute("hasPrevious", page > 1);
+        model.addAttribute("hasNext", page < totalPages);
+        model.addAttribute("title", title == null ? "" : title);
+        model.addAttribute("author", author == null ? "" : author);
+        model.addAttribute("selectedCategoryId", categoryId == null ? "" : categoryId.toString());
+        model.addAttribute("minPrice", minPrice == null ? "" : minPrice.stripTrailingZeros().toPlainString());
+        model.addAttribute("maxPrice", maxPrice == null ? "" : maxPrice.stripTrailingZeros().toPlainString());
+        model.addAttribute("isSearch", isSearch);
+    }
+
     @GetMapping("/suggest")
     @ResponseBody
     public List<Map<String, Object>> suggestStationery(@RequestParam(name = "q", required = false) String q) {
@@ -214,24 +262,24 @@ public class StationeryController {
             return List.of();
         }
 
-        String lowerKeyword = keyword.toLowerCase();
-        List<Book> items = bookService.getProductsByProductType(2L).stream()
-                .filter(i -> "Active".equalsIgnoreCase(i.getStatus()))
-                .filter(i -> (i.getTitle() != null && i.getTitle().toLowerCase().contains(lowerKeyword)) ||
-                        (i.getAuthor() != null && i.getAuthor().toLowerCase().contains(lowerKeyword)))
+        var uniqueItems = Stream.concat(
+                bookService.searchBooksByTitle(keyword).stream(),
+                bookService.searchBooksByAuthor(keyword).stream())
+                .collect(Collectors.toMap(Book::getId, b -> b, (first, ignored) -> first, LinkedHashMap::new))
+                .values();
+
+        return uniqueItems.stream()
+                .filter(this::isStationeryProduct)
+                .filter(item -> "Active".equalsIgnoreCase(item.getStatus()))
                 .limit(8)
-                .collect(Collectors.toList());
-
-        return items.stream()
+                .map(BookDTO::fromEntity)
                 .map(item -> {
-                    Map<String, Object> result = new LinkedHashMap<>();
-                    result.put("id", item.getId());
-                    result.put("title", item.getTitle() == null ? "" : item.getTitle());
-                    result.put("author", item.getAuthor() == null ? "" : item.getAuthor());
-                    return result;
-                })
-                .toList();
-
+                    Map<String, Object> map = new LinkedHashMap<>();
+                    map.put("id", item.getId());
+                    map.put("title", item.getTitle() == null ? "" : item.getTitle());
+                    map.put("author", item.getAuthor() == null ? "" : item.getAuthor());
+                    return map;
+                }).toList();
     }
 
     private boolean isStationeryProduct(Book item) {
