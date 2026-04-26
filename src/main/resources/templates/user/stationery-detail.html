@@ -545,7 +545,7 @@
                             </div>
                             <div class="meta-row">
                                 <span class="meta-label">Product type:</span>
-                                <span class="meta-value" th:text="${item.category != null and item.category.productType != null and item.category.productType.name != null ? item.category.productType.name : 'N/A'}">N/A</span>
+                                <span class="meta-value" th:text="${item.category != null and item.category.productTypeName != null ? item.category.productTypeName : 'N/A'}">N/A</span>
                             </div>
                             <div class="meta-row">
                                 <span class="meta-label">Category:</span>
@@ -604,7 +604,7 @@
                             <div class="spec-key">Brand</div>
                             <div class="spec-val" th:text="${item.author != null and !item.author.isBlank() ? item.author : 'Updating'}">Brand</div>
                             <div class="spec-key">Product type</div>
-                            <div class="spec-val" th:text="${item.category != null and item.category.productType != null and item.category.productType.name != null ? item.category.productType.name : 'N/A'}">N/A</div>
+                            <div class="spec-val" th:text="${item.category != null and item.category.productTypeName != null ? item.category.productTypeName : 'N/A'}">N/A</div>
                             <div class="spec-key">Category</div>
                             <div class="spec-val" th:text="${item.category != null and item.category.name != null ? item.category.name : 'N/A'}">N/A</div>
                         </div>
