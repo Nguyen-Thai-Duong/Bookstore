@@ -449,6 +449,14 @@
 
                     <div class="order-items" th:if="${order.orderDetails != null and !#lists.isEmpty(order.orderDetails)}">
                         <div class="order-item" th:each="detail : ${order.orderDetails}">
+                            <img class="order-item-img"
+                                th:if="${detail.book.imageUrl != null and !detail.book.imageUrl.isEmpty()}"
+                                th:src="${detail.book.imageUrl}"
+                                th:alt="${detail.book.title}">
+                            <img class="order-item-img"
+                                th:if="${detail.book.imageUrl == null or detail.book.imageUrl.isEmpty()}"
+                                src="https://via.placeholder.com/40x56?text=No+Image"
+                                alt="No image">
                             <div class="order-item-info">
                                 <p class="order-item-title" th:text="${detail.book.title}">Book Title</p>
                                 <p class="order-item-qty">Qty: <span th:text="${detail.quantity}">1</span></p>
