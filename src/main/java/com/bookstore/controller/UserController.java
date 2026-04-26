@@ -24,27 +24,27 @@ public class UserController {
     @GetMapping
     public String listUsers(Model model) {
         model.addAttribute("users", userService.getAllUsers().stream().map(UserDTO::fromEntity).toList());
-        return "users/list";
+        return "user/users/list";
     }
 
     @GetMapping("/{id}")
     public String viewUser(@PathVariable Long id, Model model) {
         userService.getUserById(id).ifPresent(user -> model.addAttribute("user", UserDTO.fromEntity(user)));
-        return "users/view";
+        return "user/users/view";
     }
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("user", new UserFormDTO());
         model.addAttribute("roles", roleService.getAllRoles());
-        return "users/form";
+        return "user/users/form";
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         userService.getUserById(id).ifPresent(user -> model.addAttribute("user", UserFormDTO.fromEntity(user)));
         model.addAttribute("roles", roleService.getAllRoles());
-        return "users/form";
+        return "user/users/form";
     }
 
     @PostMapping

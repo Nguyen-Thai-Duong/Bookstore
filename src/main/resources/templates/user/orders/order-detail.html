@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookNest | Order details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --vb-brown: #F37021;
+            --bg-gray: #f5f5f5;
+            --border: #ddd;
+            --text: #333;
+            --price: #d0021b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gray);
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+
+        header {
+            background: #fff;
+            padding: 15px 0;
+            border-bottom: 2px solid var(--vb-brown);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            min-width: 220px;
+        }
+
+        .logo-text {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--vb-brown);
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .search-container {
+            flex: 1;
+            display: flex;
+        }
+
+        .search-container input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+        }
+
+        .search-container button {
+            background: var(--vb-brown);
+            color: #fff;
+            border: none;
+            padding: 0 20px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .cart-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f9f9f9;
+            padding: 8px 15px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            text-decoration: none;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .auth-links {
+            display: flex;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .auth-links a,
+        .auth-links button {
+            text-decoration: none;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: #444;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-bar {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 22px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            overflow-x: auto;
+        }
+
+        .nav-links li a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .nav-links li a:hover {
+            background: var(--vb-brown);
+            color: #fff;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 14px;
+        }
+
+        .panel-head {
+            background: #f3f3f3;
+            color: var(--vb-brown);
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+            font-weight: 700;
+            padding: 12px 14px;
+            text-transform: uppercase;
+        }
+
+        .panel-body {
+            padding: 14px;
+        }
+
+        .order-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .order-id {
+            font-size: 24px;
+            color: #2d241e;
+            font-weight: 800;
+        }
+
+        .order-sub {
+            margin-top: 4px;
+            color: #777;
+            font-size: 12px;
+        }
+
+        .status-badge {
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 4px 10px;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff6db;
+            color: #9f5a00;
+        }
+
+        .status-confirmed {
+            background: #e7ebff;
+            color: #3730a3;
+        }
+
+        .status-shipping {
+            background: #e3f0ff;
+            color: #1f3ea8;
+        }
+
+        .status-delivered {
+            background: #ddf7e5;
+            color: #14663a;
+        }
+
+        .status-cancelled {
+            background: #ffe3e3;
+            color: #a71f1f;
+        }
+
+        .status-default {
+            background: #eee;
+            color: #555;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .meta-box {
+            border: 1px solid #ececec;
+            border-radius: 4px;
+            background: #fcfcfc;
+            padding: 10px;
+        }
+
+        .meta-label {
+            display: block;
+            margin-bottom: 4px;
+            color: #666;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .meta-value {
+            color: #2f2f2f;
+            font-weight: 600;
+        }
+
+        .items-wrap {
+            border: 1px solid #ececec;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .item-row {
+            display: grid;
+            grid-template-columns: 62px 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-cover {
+            width: 62px;
+            height: 84px;
+            object-fit: cover;
+            border: 1px solid #eee;
+            background: #fafafa;
+        }
+
+        .item-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #2d241e;
+            margin-bottom: 4px;
+        }
+
+        .item-meta {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .item-price {
+            text-align: right;
+            color: var(--price);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .total-row {
+            border-top: 1px dashed #ddd;
+            margin-top: 10px;
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        .total-price {
+            color: var(--price);
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-weight: 700;
+            font-size: 12px;
+            border: 1px solid #ddd;
+            background: #fff;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .btn.primary {
+            background: var(--vb-brown);
+            border-color: var(--vb-brown);
+            color: #fff;
+        }
+
+        .btn.danger {
+            background: #fff3f3;
+            border-color: #f3c3c3;
+            color: #ba1f1f;
+        }
+
+        .empty-box {
+            text-align: center;
+            color: #777;
+            padding: 20px 10px;
+            border: 1px dashed #ddd;
+            border-radius: 4px;
+            background: #fcfcfc;
+        }
+
+        footer {
+            background: #fff;
+            border-top: 3px solid var(--vb-brown);
+            padding: 30px 0;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .header-content {
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                min-width: 170px;
+            }
+
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .logo-text {
+                font-size: 28px;
+            }
+
+            .search-container {
+                width: 100%;
+                order: 3;
+            }
+
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{fragments/site-header :: siteHeader('orders')}"></div>
+
+    <main class="container layout">
+        <section class="panel">
+            <div class="panel-head">Order details</div>
+            <div class="panel-body">
+                <div class="order-top">
+                    <div>
+                        <p class="order-id" th:text="'Order #BN-' + ${order.id}">Order #BN-1</p>
+                        <p class="order-sub"
+                            th:text="'Ordered at: ' + ${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">Ordered
+                            at
+                        </p>
+                    </div>
+                    <span th:if="${order.status == 'Pending' or order.status == 'pending'}"
+                        class="status-badge status-pending">Pending</span>
+                    <span th:if="${order.status == 'Confirmed' or order.status == 'confirmed'}"
+                        class="status-badge status-confirmed">Confirmed</span>
+                    <span th:if="${order.status == 'Shipping' or order.status == 'shipping'}"
+                        class="status-badge status-shipping">Shipping</span>
+                    <span th:if="${order.status == 'Completed' or order.status == 'completed' or order.status == 'Delivered' or order.status == 'delivered'}"
+                        class="status-badge status-delivered">Completed</span>
+                    <span th:if="${order.status == 'Cancelled' or order.status == 'Canceled' or order.status == 'cancelled' or order.status == 'canceled'}"
+                        class="status-badge status-cancelled">Cancelled</span>
+                    <span th:if="${order.status != null and order.status != 'Pending' and order.status != 'pending' and order.status != 'Confirmed' and order.status != 'confirmed' and order.status != 'Shipping' and order.status != 'shipping' and order.status != 'Completed' and order.status != 'completed' and order.status != 'Delivered' and order.status != 'delivered' and order.status != 'Cancelled' and order.status != 'Canceled' and order.status != 'cancelled' and order.status != 'canceled'}"
+                        class="status-badge status-default" th:text="${order.status}"></span>
+                </div>
+
+                <div class="meta-grid">
+                    <div class="meta-box">
+                        <span class="meta-label">Recipient</span>
+                        <p class="meta-value" th:text="${order.user != null ? order.user.fullName : 'Updating'}">
+                            Recipient</p>
+                    </div>
+                    <div class="meta-box">
+                        <span class="meta-label">Phone number</span>
+                        <p class="meta-value"
+                            th:text="${order.user != null and order.user.phone != null and !order.user.phone.isBlank() ? order.user.phone : 'Updating'}">
+                            Phone</p>
+                    </div>
+                    <div class="meta-box">
+                        <span class="meta-label">Email</span>
+                        <p class="meta-value" th:text="${order.user != null ? order.user.email : 'Updating'}">Email
+                        </p>
+                    </div>
+                    <div class="meta-box">
+                        <span class="meta-label">Shipping address</span>
+                        <p class="meta-value" th:text="${order.shippingAddress}">Address</p>
+                    </div>
+                    <div class="meta-box">
+                        <span class="meta-label">Gender</span>
+                        <p class="meta-value" th:text="${order.user != null and order.user.gender != null ? order.user.gender : 'Updating'}">Gender</p>
+                    </div>
+                    <div class="meta-box">
+                        <span class="meta-label">Date of birth</span>
+                        <p class="meta-value" th:text="${order.user != null and order.user.dateOfBirth != null ? #temporals.format(order.user.dateOfBirth, 'dd-MM-yyyy') : 'Updating'}">Date of birth</p>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top:14px; margin-bottom:0;">
+                    <div class="panel-head">Items in order</div>
+                    <div class="panel-body">
+                        <div th:if="${#lists.isEmpty(order.orderDetails)}" class="empty-box">This order has no items.
+                        </div>
+
+                        <div class="items-wrap" th:if="${!#lists.isEmpty(order.orderDetails)}">
+                            <div class="item-row" th:each="item : ${order.orderDetails}">
+                                <img class="item-cover"
+                                    th:if="${item.book.imageUrl != null and !item.book.imageUrl.isEmpty()}"
+                                    th:src="${item.book.imageUrl}" th:alt="${item.book.title}">
+                                <img class="item-cover"
+                                    th:if="${item.book.imageUrl == null or item.book.imageUrl.isEmpty()}"
+                                    src="https://via.placeholder.com/62x84?text=No+Image" alt="No image">
+
+                                <div>
+                                    <p class="item-title" th:text="${item.book.title}">Book Title</p>
+                                    <p class="item-meta">Quantity: <span th:text="${item.quantity}">1</span></p>
+                                    <p class="item-meta"
+                                        th:text="'Unit price: ' + ${item.unitPrice != null ? #numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
+                                        Unit price</p>
+                                </div>
+
+                                <div class="item-price"
+                                    th:text="${item.unitPrice != null and item.quantity != null ? #numbers.formatDecimal(item.unitPrice * item.quantity, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
+                                    0 VND</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <aside class="panel" style="height: fit-content; position: sticky; top: 18px;">
+            <div class="panel-head">Payment total</div>
+            <div class="panel-body">
+                <div class="summary-row">
+                    <span>Order code</span>
+                    <strong th:text="'BN-' + ${order.id}">BN-1</strong>
+                </div>
+                <div class="summary-row">
+                    <span>Order date</span>
+                    <span th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">01/01/2026</span>
+                </div>
+                <div class="summary-row">
+                    <span>Payment method</span>
+                    <span>Cash on delivery (COD)</span>
+                </div>
+
+                <div class="total-row">
+                    <span>Total</span>
+                    <span class="total-price"
+                        th:text="${order.totalAmount != null ? #numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">0
+                        VND</span>
+                </div>
+
+                <div class="btn-row">
+                    <a th:href="@{/orders}" class="btn">Go back to list</a>
+                    <form th:if="${#strings.equalsIgnoreCase(order.status, 'Pending')}"
+                        th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn danger">Cancel order</button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+        <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

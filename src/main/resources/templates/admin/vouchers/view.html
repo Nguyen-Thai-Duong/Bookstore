@@ -87,13 +87,13 @@
     </style>
 </head>
 
-<body class="h-full overflow-auto" style="background-color: var(--color-bg);">
-    <div class="flex min-h-screen w-full">
+<body class="h-full overflow-hidden" style="background-color: var(--color-bg);">
+    <div class="flex h-full w-full overflow-hidden">
         <!-- Sidebar -->
         <div th:replace="~{admin/fragments/sidebar :: adminSidebar('vouchers')}"></div>
 
         <!-- Main Content -->
-        <main class="flex-1 ml-64">
+        <main class="flex-1 ml-64 overflow-y-auto h-full">
             <!-- Header -->
             <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
                 <div class="px-8 py-4">

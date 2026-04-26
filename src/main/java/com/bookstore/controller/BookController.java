@@ -44,7 +44,7 @@ public class BookController {
         List<BookDTO> books = filterBooks("", "", normalizedCategoryId, normalizedMinPrice, normalizedMaxPrice);
         addPaginationAttributes(model, books, page, null, null, normalizedCategoryId, normalizedMinPrice,
                 normalizedMaxPrice);
-        return "books/list";
+        return "user/books/book-list";
     }
 
     @GetMapping("/{id}")
@@ -81,7 +81,7 @@ public class BookController {
                     .ifPresent(review -> model.addAttribute("myReview", review));
         }
 
-        return "books/view";
+        return "user/books/book-detail";
     }
 
     @GetMapping("/new")
@@ -90,7 +90,7 @@ public class BookController {
         model.addAttribute("categories", categoryService.getAllCategories().stream()
                 .map(CategoryDTO::fromEntity)
                 .toList());
-        return "books/form";
+        return "user/books/form";
     }
 
     @GetMapping("/edit/{id}")
@@ -101,7 +101,7 @@ public class BookController {
                     .map(CategoryDTO::fromEntity)
                     .toList());
         });
-        return "books/form";
+        return "user/books/form";
     }
 
     @PostMapping
@@ -151,7 +151,7 @@ public class BookController {
                 normalizedCategoryId,
                 normalizedMinPrice,
                 normalizedMaxPrice);
-        return "books/list";
+        return "user/books/book-list";
     }
 
     private Long parseCategoryId(String value) {

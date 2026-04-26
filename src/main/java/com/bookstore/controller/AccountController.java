@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 public class AccountController {
 
     private final AuthService authService;
-    private static final long MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
+    private static final long MAX_AVATAR_SIZE_BYTES = 10 * 1024 * 1024;
     private static final Set<String> ALLOWED_AVATAR_EXTENSIONS = Set.of("jpg", "jpeg", "png", "webp", "gif");
 
     @GetMapping("/account")
@@ -59,7 +59,7 @@ public class AccountController {
         }
 
         if (avatar.getSize() > MAX_AVATAR_SIZE_BYTES) {
-            redirectAttributes.addFlashAttribute("avatarError", "Maximum image size is 2MB");
+            redirectAttributes.addFlashAttribute("avatarError", "Maximum image size is 10MB");
             return "redirect:/account";
         }
 

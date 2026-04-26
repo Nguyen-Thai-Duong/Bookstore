@@ -171,7 +171,7 @@ public class ReviewController {
                 .map(ReviewDTO::fromEntity)
                 .toList();
         model.addAttribute("reviews", reviews);
-        return "admin-reviews";
+        return "admin/admin-reviews";
     }
 
     @PostMapping("/admin/reviews/reply")

@@ -182,7 +182,7 @@ public class AdminController {
         model.addAttribute("book", dto);
         model.addAttribute("categories",
                 categoryService.getCategoriesByProductType(BOOK_PRODUCT_TYPE_ID).stream().map(CategoryDTO::fromEntity).toList());
-        return "admin/books/form";
+        return "admin/books/add-book";
     }
 
     @GetMapping("/books/edit/{id}")
@@ -192,7 +192,7 @@ public class AdminController {
             model.addAttribute("categories",
                     categoryService.getCategoriesByProductType(BOOK_PRODUCT_TYPE_ID).stream().map(CategoryDTO::fromEntity).toList());
         });
-        return "admin/books/form";
+        return "admin/books/add-book";
     }
 
     @PostMapping("/books/save")
