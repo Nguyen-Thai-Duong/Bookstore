@@ -5,123 +5,349 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookNest | Stationery Details</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root { --primary: #F37021; --bg: #f8fafc; --text: #1f2937; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; }
-        .detail-container { max-width: 1240px; width: 100%; margin: 0 auto; padding: 0 12px; }
-        .content-wrap { display: grid; gap: 24px; margin: 10px auto 28px; }
-        .crumbs { display: flex; align-items: center; gap: 8px; color: #64748b; font-size: 13px; }
-        .crumbs a { text-decoration: none; color: #64748b; }
-        .crumbs a:hover { color: #d97706; }
-        .product-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 18px; overflow: hidden; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05); }
-        .product-grid { display: grid; grid-template-columns: minmax(320px, 420px) 1fr; }
-        .product-image-col { background: #f8fafc; border-right: 1px solid #f1f5f9; padding: 28px 20px; display: flex; justify-content: center; align-items: center; }
-        .image-wrap { width: min(100%, 360px); height: 520px; position: relative; background: #fff; border-radius: 14px; overflow: hidden; }
-        .product-image { width: 100%; height: 100%; object-fit: contain; box-shadow: 0 18px 32px rgba(0, 0, 0, 0.18); transition: transform .25s ease; }
-        .product-image:hover { transform: scale(1.02); }
-        .stock-badge { position: absolute; top: 10px; right: 10px; padding: 6px 10px; border-radius: 999px; color: #fff; font-size: 11px; font-weight: 700; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
-        .stock-badge.in { background: #16a34a; }
-        .stock-badge.out { background: #dc2626; }
-        .product-info-col { padding: 30px 34px; display: grid; gap: 16px; align-content: start; }
-        .product-title { font-size: 36px; line-height: 1.2; color: #111827; font-weight: 800; }
-        .meta-rows { display: grid; gap: 8px; background: #fcfcfd; border: 1px solid #edf2f7; border-radius: 12px; padding: 10px 12px; }
-        .meta-row { display: flex; align-items: baseline; border-bottom: 1px solid #eef2f6; padding-bottom: 6px; color: #475569; }
-        .meta-row:last-child { border-bottom: none; }
-        .meta-label { width: 130px; flex-shrink: 0; font-weight: 600; color: #6b7280; }
-        .product-price { font-size: 40px; font-weight: 800; color: #111827; }
-        .price-unit { font-size: 20px; color: #6b7280; }
-        .btn-primary { border: none; background: linear-gradient(135deg, #F37021 0%, #FF8A3D 100%); color: #fff; border-radius: 12px; font-weight: 800; padding: 12px 18px; cursor: pointer; box-shadow: 0 8px 20px rgba(243, 112, 33, 0.35); text-decoration: none; }
-        .btn-outline { border: 2px solid #e5e7eb; background: #fff; color: #4b5563; border-radius: 12px; font-weight: 700; padding: 11px 18px; text-decoration: none; }
-        .section-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 22px; margin-bottom: 20px; }
-        .section-title { font-size: 22px; font-weight: 700; margin-bottom: 14px; }
-        .review-card { border: 1px solid #f1f5f9; background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
-        .star-input input { display: none; }
-        .star-input label { color: #e5e7eb; cursor: pointer; font-size: 22px; }
-        .star-input input:checked~label, .star-input label:hover, .star-input label:hover~label { color: #f59e0b; }
-        @media (max-width: 1024px) { .product-grid { grid-template-columns: 1fr; } .product-image-col { border-right: none; border-bottom: 1px solid #f1f5f9; } }
+        .star-input input {
+            display: none;
+        }
+
+        .star-input label {
+            color: #e5e0d8;
+            cursor: pointer;
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+
+        .star-input input:checked~label,
+        .star-input label:hover,
+        .star-input label:hover~label {
+            color: #f59e0b;
+        }
+
+        /* fpt-theme-overrides */
+        a {
+            transition: color 0.2s ease;
+        }
+
+        main a,
+        .sidebar-list a,
+        .footer-col a,
+        .info,
+        .text-info {
+            color: #0072BC;
+        }
+
+        button,
+        input[type="submit"],
+        .btn,
+        .btn-primary,
+        .checkout-btn {
+            border-radius: 8px;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+        }
+
+        button:hover,
+        input[type="submit"]:hover,
+        .btn:hover,
+        .btn-primary:hover,
+        .checkout-btn:hover {
+            filter: brightness(0.95);
+            transform: translateY(-1px);
+        }
+
+        .alert.success,
+        .message.success {
+            background: #e8f7ef;
+            border-color: #00A859;
+            color: #00A859;
+        }
     </style>
 </head>
 
-<body>
-    <div th:replace="~{fragments/site-header :: siteHeader('stationery')}"></div>
+<body class="bg-[#f8f6f1] text-[#1a1410]">
 
-    <div class="detail-container content-wrap">
-        <nav class="crumbs">
-            <a th:href="@{/}">Home</a> <span>/</span>
-            <a th:href="@{/stationery}">Stationery</a> <span>/</span>
-            <span style="color:#1f2937;font-weight:600;" th:text="${item.title}">Details</span>
-        </nav>
+<!-- Site Header -->
+<div th:replace="~{fragments/site-header :: siteHeader('stationery')}"></div>
 
-        <section class="product-card">
-            <div class="product-grid">
-                <div class="product-image-col">
-                    <div class="image-wrap">
-                        <img class="product-image" th:src="${item.imageUrl != null and !item.imageUrl.isEmpty() ? item.imageUrl : 'https://via.placeholder.com/500x620?text=No+Image'}" th:alt="${item.title}">
-                        <span class="stock-badge in" th:if="${item.stock != null and item.stock > 0}" th:text="${'IN STOCK: ' + item.stock}">IN STOCK</span>
-                        <span class="stock-badge out" th:if="${item.stock == null or item.stock <= 0}">OUT OF STOCK</span>
-                    </div>
-                </div>
+<div class="max-w-5xl mx-auto px-6 py-10">
 
-                <div class="product-info-col">
-                    <h1 class="product-title" th:text="${item.title}">Item Name</h1>
-                    
-                    <div class="meta-rows">
-                        <div class="meta-row">
-                            <span class="meta-label">Brand:</span>
-                            <span class="meta-value" th:text="${item.author != null and !item.author.isBlank() ? item.author : 'N/A'}">Brand</span>
-                        </div>
-                        <div class="meta-row">
-                            <span class="meta-label">Category:</span>
-                            <span class="meta-value" th:text="${item.category != null ? item.category.name : 'N/A'}">Category</span>
-                        </div>
-                        <div class="meta-row">
-                            <span class="meta-label">Dimensions:</span>
-                            <span class="meta-value" th:text="${item.widthCm != null ? item.widthCm + 'x' + item.heightCm + 'x' + item.thicknessCm + ' cm' : 'N/A'}">N/A</span>
-                        </div>
-                    </div>
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+        <a th:href="@{/}" class="hover:text-[#F37021]">Home</a>
+        <span>/</span>
+        <a th:href="@{/stationery}" class="hover:text-[#F37021]">Stationery</a>
+        <span>/</span>
+        <span class="text-[#1a1410] font-semibold" th:text="${item.title}">Details</span>
+    </nav>
 
-                    <div class="price-block mt-4">
-                        <div class="product-price">
-                            <span th:text="${item.price != null ? #numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') : '0'}">0</span>
-                            <small class="price-unit">VND</small>
-                        </div>
-                    </div>
+    <!-- Product Card -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-[360px_1fr]">
 
-                    <div th:if="${session.loggedInUser != null and item.stock > 0}" class="action-row mt-6">
-                        <form method="post" th:action="@{/cart/add}" class="flex gap-4">
-                            <input type="hidden" name="bookId" th:value="${item.id}">
-                            <input type="number" name="quantity" value="1" min="1" th:attr="max=${item.stock}" class="w-16 border rounded-lg text-center">
-                            <button class="btn-primary" type="submit">ADD TO CART</button>
-                        </form>
-                    </div>
-
-                    <div th:if="${session.loggedInUser == null}" class="mt-6">
-                        <a th:href="@{/login}" class="btn-primary">LOGIN TO BUY</a>
-                    </div>
+            <!-- Image Column -->
+            <div class="bg-[#f8fafc] border-b md:border-b-0 md:border-r border-gray-100 p-6 flex items-center justify-center">
+                <div class="relative w-full max-w-[300px]">
+                    <img
+                            th:src="${item.imageUrl != null and !item.imageUrl.isEmpty() ? item.imageUrl : 'https://via.placeholder.com/400x500?text=No+Image'}"
+                            th:alt="${item.title}"
+                            class="w-full h-auto object-contain rounded-xl"
+                            style="max-height: 420px;"
+                    >
+                    <span
+                            th:if="${item.stock != null and item.stock > 0}"
+                            th:text="${'IN STOCK: ' + item.stock}"
+                            class="absolute top-2 right-2 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        </span>
+                    <span
+                            th:if="${item.stock == null or item.stock <= 0}"
+                            class="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                            OUT OF STOCK
+                        </span>
                 </div>
             </div>
-        </section>
 
-        <section class="section-card">
-            <h2 class="section-title">Description</h2>
-            <p th:text="${item.description != null ? item.description : 'No description available.'}">Description</p>
-        </section>
+            <!-- Info Column -->
+            <div class="p-8 flex flex-col gap-4">
 
-        <section class="section-card">
-            <h2 class="section-title">Reviews</h2>
-            <div th:if="${#lists.isEmpty(reviews)}" class="text-gray-500">No reviews yet for this item.</div>
-            <div th:each="review : ${reviews}" class="review-card">
-                <div class="flex justify-between">
-                    <strong th:text="${review.user.fullName}">User</strong>
-                    <span class="text-yellow-500" th:each="i : ${#numbers.sequence(1, review.rating)}">&#9733;</span>
+                <!-- Title -->
+                <h1 class="text-3xl font-bold text-gray-900 leading-tight" th:text="${item.title}">Item Name</h1>
+
+                <!-- Star Rating Summary -->
+                <div class="flex items-center gap-2 text-sm text-gray-500">
+                        <span class="text-yellow-400 text-base">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}"
+                                  th:text="${reviews != null and !reviews.isEmpty() ? (i <= avgRating ? '★' : '☆') : '☆'}">☆</span>
+                        </span>
+                    <span th:if="${reviews == null or reviews.isEmpty()}">No reviews yet</span>
+                    <span th:if="${reviews != null and !reviews.isEmpty()}"
+                          th:text="${#lists.size(reviews) + ' review(s)'}"></span>
                 </div>
-                <p class="mt-2 text-gray-600" th:text="${review.comment}">Comment</p>
+
+                <!-- Meta Table -->
+                <div class="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 text-sm grid gap-2">
+                    <div class="flex border-b border-gray-100 pb-2">
+                        <span class="w-36 font-semibold text-gray-500">Brand:</span>
+                        <span th:text="${item.author != null and !item.author.isBlank() ? item.author : 'N/A'}">Brand</span>
+                    </div>
+                    <div class="flex border-b border-gray-100 pb-2">
+                        <span class="w-36 font-semibold text-gray-500">Product type:</span>
+                        <span th:text="${item.category != null and item.category.productTypeName != null ? item.category.productTypeName : 'N/A'}">N/A</span>
+                    </div>
+                    <div class="flex">
+                        <span class="w-36 font-semibold text-gray-500">Category:</span>
+                        <span th:text="${item.category != null and item.category.name != null ? item.category.name : 'N/A'}">N/A</span>
+                    </div>
+                </div>
+
+                <!-- Price -->
+                <div class="mt-2">
+                    <div class="text-4xl font-extrabold text-gray-900">
+                        <span th:text="${item.price != null ? #numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT') : '0'}">0</span>
+                        <small class="text-xl font-normal text-gray-500 ml-1">VND</small>
+                    </div>
+                    <div class="text-sm text-gray-500 mt-1">
+                        Available: <span th:text="${item.stock != null ? item.stock : 0}">0</span> item(s)
+                    </div>
+                </div>
+
+                <!-- Add to Cart -->
+                <div th:if="${session.loggedInUser != null and item.stock > 0}" class="mt-2 flex items-center gap-3">
+                    <form method="post" th:action="@{/cart/add}" class="flex items-center gap-3">
+                        <input type="hidden" name="bookId" th:value="${item.id}">
+                        <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                            <button type="button"
+                                    onclick="const q=this.nextElementSibling;if(q.value>1)q.value--"
+                                    class="px-3 py-2 text-gray-600 hover:bg-gray-100 font-bold">-</button>
+                            <input type="number" name="quantity" value="1" min="1"
+                                   th:attr="max=${item.stock}"
+                                   class="w-12 text-center border-0 focus:ring-0 py-2 text-sm">
+                            <button type="button"
+                                    onclick="const q=this.previousElementSibling;const max=q.getAttribute('max');if(!max||parseInt(q.value)<parseInt(max))q.value++"
+                                    class="px-3 py-2 text-gray-600 hover:bg-gray-100 font-bold">+</button>
+                        </div>
+                        <button type="submit"
+                                class="px-6 py-2 rounded-lg bg-[#F37021] text-white font-bold text-sm shadow-sm">
+                            ADD TO CART
+                        </button>
+                        <a th:href="@{/stationery}" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 text-sm font-semibold hover:bg-gray-50">
+                            Go back to list
+                        </a>
+                    </form>
+                </div>
+
+                <!-- Login prompt -->
+                <div th:if="${session.loggedInUser == null}" class="mt-2 flex items-center gap-3">
+                    <a th:href="@{/login}"
+                       class="px-6 py-2 rounded-lg bg-[#F37021] text-white font-bold text-sm">
+                        LOGIN TO BUY
+                    </a>
+                    <a th:href="@{/stationery}" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 text-sm font-semibold hover:bg-gray-50">
+                        Go back to list
+                    </a>
+                </div>
+
             </div>
-        </section>
+        </div>
     </div>
 
-    <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
+    <!-- Description + Product Details -->
+    <div class="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-6 mb-6">
+
+        <!-- Description -->
+        <div class="bg-white rounded-2xl p-6">
+            <h2 class="text-lg font-bold mb-3">Description</h2>
+            <div class="border border-gray-100 rounded-xl px-4 py-3 text-sm text-gray-700 leading-relaxed">
+                <p th:text="${item.description != null ? item.description : 'No description available.'}">Description</p>
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="bg-white rounded-2xl p-6">
+            <h2 class="text-lg font-bold mb-3">Product Details</h2>
+            <div class="text-sm grid gap-2">
+                <div class="flex border-b border-gray-100 pb-2">
+                    <span class="w-28 text-xs font-semibold text-gray-400 uppercase tracking-wide">Brand</span>
+                    <span class="text-gray-800" th:text="${item.author != null and !item.author.isBlank() ? item.author : 'N/A'}">N/A</span>
+                </div>
+                <div class="flex border-b border-gray-100 pb-2">
+                    <span class="w-28 text-xs font-semibold text-gray-400 uppercase tracking-wide">Product type</span>
+                    <span class="text-gray-800" th:text="${item.category != null and item.category.productTypeName != null ? item.category.productTypeName : 'N/A'}">N/A</span>
+                </div>
+                <div class="flex">
+                    <span class="w-28 text-xs font-semibold text-gray-400 uppercase tracking-wide">Category</span>
+                    <span class="text-gray-800" th:text="${item.category != null ? item.category.name : 'N/A'}">N/A</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Section -->
+    <div class="bg-white rounded-2xl p-6">
+        <h2 class="text-xl font-bold mb-6">Customer Reviews</h2>
+
+        <!-- Write Review Section (Only if logged in) -->
+        <div th:if="${session.loggedInUser != null}" class="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-100">
+            
+            <!-- Can write a review -->
+            <div th:if="${canReview}">
+                <h3 class="font-bold text-gray-900 mb-4">Write a Review</h3>
+                <form id="reviewForm" method="post" th:action="@{/reviews/add}" class="space-y-4">
+                    <input type="hidden" name="bookId" th:value="${item.id}">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Your Rating</label>
+                        <div class="flex gap-2 star-input">
+                            <input type="radio" id="star5" name="rating" value="5" required />
+                            <label for="star5" title="5 stars">★</label>
+                            <input type="radio" id="star4" name="rating" value="4" />
+                            <label for="star4" title="4 stars">★</label>
+                            <input type="radio" id="star3" name="rating" value="3" />
+                            <label for="star3" title="3 stars">★</label>
+                            <input type="radio" id="star2" name="rating" value="2" />
+                            <label for="star2" title="2 stars">★</label>
+                            <input type="radio" id="star1" name="rating" value="1" />
+                            <label for="star1" title="1 star">★</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-2">Your Comment</label>
+                        <textarea name="content" rows="3" required
+                                  class="w-full rounded-xl border-gray-200 focus:border-[#F37021] focus:ring-[#F37021] text-sm"
+                                  placeholder="Share your experience with this item..."></textarea>
+                    </div>
+                    <button type="submit" id="submitReviewBtn"
+                            class="px-6 py-2 bg-[#F37021] text-white font-bold rounded-lg text-sm shadow-sm hover:opacity-90">
+                        Submit Review
+                    </button>
+                </form>
+            </div>
+
+            <!-- Limit reached or not purchased -->
+            <div th:if="${!canReview}" class="text-center py-4">
+                <p class="text-orange-600 font-semibold">
+                    You have reached the review limit for your purchases or haven't bought this item yet.
+                </p>
+                <p class="text-gray-500 text-xs mt-1">Please ensure you have completed orders for this item to leave a review.</p>
+            </div>
+        </div>
+
+        <!-- Login Prompt -->
+        <div th:if="${session.loggedInUser == null}" class="mb-8 p-6 bg-orange-50 rounded-xl border border-orange-100 text-center">
+            <p class="text-gray-700 mb-3">Please login to write a review.</p>
+            <a th:href="@{/login}" class="inline-block px-6 py-2 bg-[#F37021] text-white font-bold rounded-lg text-sm">
+                Login Now
+            </a>
+        </div>
+
+        <!-- Messages -->
+        <div th:if="${reviewSuccess}" class="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm" th:text="${reviewSuccess}"></div>
+        <div th:if="${reviewError}" class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm" th:text="${reviewError}"></div>
+
+        <!-- Display Reviews -->
+        <div class="space-y-6">
+            <div th:each="review : ${reviews}" class="border-b border-gray-100 pb-6 last:border-0">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-[#F37021]"
+                             th:text="${#strings.substring(review.userName, 0, 1)}">U</div>
+                        <div>
+                            <div class="font-bold text-gray-900" th:text="${review.userName}">User Name</div>
+                            <div class="text-xs text-gray-500" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy HH:mm')}">Date</div>
+                        </div>
+                    </div>
+                    <div class="flex text-yellow-400">
+                        <span th:each="i : ${#numbers.sequence(1, 5)}" th:text="${i <= review.rating ? '★' : '☆'}">★</span>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-700 leading-relaxed mb-4" th:text="${review.comment}">Review comment</p>
+                
+                <div th:if="${review.adminReply != null}" class="ml-6 p-4 bg-gray-50 rounded-xl border-l-4 border-[#F37021]">
+                    <div class="font-bold text-xs text-[#F37021] uppercase tracking-wider mb-1">BookNest Reply</div>
+                    <p class="text-sm text-gray-600" th:text="${review.adminReply}">Admin response</p>
+                </div>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(reviews)}" class="text-center py-10 text-gray-400">
+                <p>Be the first to review this product!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/site-footer :: siteFooter}"></div>
+
+<script>
+    lucide.createIcons();
+
+    const reviewForm = document.getElementById('reviewForm');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitReviewBtn');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Submitting...';
+
+            const formData = new FormData(this);
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => {
+                // Force a clean GET request to the current URL
+                window.location.replace(window.location.href);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                btn.disabled = false;
+                btn.innerText = originalText;
+                alert('An error occurred. Please try again.');
+            });
+        });
+    }
+</script>
+
 </body>
 </html>

@@ -36,7 +36,7 @@
                         <td class="px-6 py-4 font-mono text-blue-600 import-id" th:data-id="${imp.id}" th:text="'IMP-' + ${imp.id}"></td>
                         <td class="px-6 py-4 text-gray-800" th:text="${imp.user.fullName}"></td>
                         <td class="px-6 py-4 text-gray-800" th:text="${imp.supplier.supplierName}"></td>
-                        <td class="px-6 py-4 font-bold text-orange-600 text-right" th:text="${#numbers.formatDecimal(imp.totalAmount, 0, 'COMMA', 0, 'POINT') + ' đ'}"></td>
+                        <td class="px-6 py-4 font-bold text-orange-600 text-right" th:text="${#numbers.formatDecimal(imp.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VND'}"></td>
                         <td class="px-6 py-4 text-center">
                             <span th:class="${'px-2 py-1 rounded text-xs font-bold ' + 
                                 (imp.status == 'Requested' ? 'bg-yellow-100 text-yellow-700' : 

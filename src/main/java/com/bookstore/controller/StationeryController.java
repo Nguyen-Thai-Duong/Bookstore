@@ -1,11 +1,11 @@
 package com.bookstore.controller;
 
 import com.bookstore.dto.BookDTO;
-import com.bookstore.dto.CategoryDTO;
 import com.bookstore.dto.ReviewDTO;
 import com.bookstore.model.Book;
 import com.bookstore.model.User;
 import com.bookstore.repository.ReviewRepository;
+import com.bookstore.repository.OrderRepository;
 import com.bookstore.service.BookService;
 import com.bookstore.service.CategoryService;
 import jakarta.servlet.http.HttpSession;
@@ -30,6 +30,7 @@ public class StationeryController {
     private final BookService bookService;
     private final CategoryService categoryService;
     private final ReviewRepository reviewRepository;
+    private final OrderRepository orderRepository;
     private static final int STATIONERY_PER_PAGE = 12;
 
     @GetMapping
@@ -75,11 +76,17 @@ public class StationeryController {
         }
 
         User user = (User) session.getAttribute("loggedInUser");
+        boolean canReview = false;
         if (user != null) {
+            long totalCompletedOrders = orderRepository.countCompletedOrdersByUserIdAndBookId(user.getId(), stationery.getId());
+            long totalReviewsDone = reviewRepository.countByBook_IdAndUser_Id(stationery.getId(), user.getId());
+            canReview = totalCompletedOrders > totalReviewsDone;
+            
             reviewRepository.findByBook_IdAndUser_Id(stationery.getId(), user.getId())
                     .map(ReviewDTO::fromEntity)
                     .ifPresent(review -> model.addAttribute("myReview", review));
         }
+        model.addAttribute("canReview", canReview);
 
         return "stationery-detail";
     }
