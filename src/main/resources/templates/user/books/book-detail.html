@@ -535,12 +535,17 @@
                                     th:style="${avgRating != null and i <= T(java.lang.Math).round(avgRating)} ? '' : 'color:#ddd;'">&#9733;</span>
                             </div>
                             <span style="font-size:12px;color:#64748b;">
-                                <span th:if="${reviews != null and !reviews.isEmpty()}">
+                                <span
+                                    th:if="${(totalReviewCount != null and totalReviewCount > 0) or (totalReviewCount == null and reviews != null and !#lists.isEmpty(reviews))}">
                                     <span
                                         th:text="${avgRating != null ? #numbers.formatDecimal(avgRating,1,'POINT',1,'POINT') : '0.0'}">0.0</span>
-                                    (<span th:text="${reviews.size()}">0</span> reviews)
+                                    (<span
+                                        th:text="${totalReviewCount != null ? totalReviewCount : reviews.size()}">0</span>
+                                    reviews)
                                 </span>
-                                <span th:if="${reviews == null or reviews.isEmpty()}">No reviews yet</span>
+                                <span
+                                    th:if="${(totalReviewCount != null and totalReviewCount == 0) or (totalReviewCount == null and (reviews == null or #lists.isEmpty(reviews)))}">No
+                                    reviews yet</span>
                             </span>
                         </div>
 
@@ -655,14 +660,50 @@
                     </article>
                 </div>
 
-                <aside class="section-card reviews-panel">
+                <aside class="section-card reviews-panel" id="reviews-section"
+                    th:with="reviewTotal=${totalReviewCount != null ? totalReviewCount : (reviews != null ? reviews.size() : 0)}, reviewFiltered=${filteredReviewCount != null ? filteredReviewCount : (reviews != null ? reviews.size() : 0)}">
                     <h2 class="section-title">Reviews</h2>
 
+                    <div th:if="${reviewSuccess != null}" class="error-box"
+                        style="border-color:#86efac;background:#f0fdf4;color:#166534;margin-bottom:12px;"
+                        th:text="${reviewSuccess}">
+                        Review submitted.
+                    </div>
+                    <div th:if="${reviewError != null}" class="error-box" style="margin-bottom:12px;"
+                        th:text="${reviewError}">
+                        Review error.
+                    </div>
+
+                    <div th:if="${reviewTotal > 0}"
+                        style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #e5e7eb;">
+                        <form method="get" th:action="@{/books/{id}(id=${book.id})}" id="filter-form"
+                            style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                            <label style="font-weight:600;font-size:13px;color:#475569;">Filter:</label>
+                            <select name="ratingFilter"
+                                style="padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;cursor:pointer;"
+                                onchange="submitReviewFilterWithAnchor()">
+                                <option value="" th:selected="${selectedRatingFilter == null}">All ratings</option>
+                                <option value="5" th:selected="${selectedRatingFilter == 5}">★★★★★ 5 stars</option>
+                                <option value="4" th:selected="${selectedRatingFilter == 4}">★★★★ 4 stars</option>
+                                <option value="3" th:selected="${selectedRatingFilter == 3}">★★★ 3 stars</option>
+                                <option value="2" th:selected="${selectedRatingFilter == 2}">★★ 2 stars</option>
+                                <option value="1" th:selected="${selectedRatingFilter == 1}">★ 1 star</option>
+                            </select>
+                            <input type="hidden" name="reviewPage" value="1">
+                        </form>
+                    </div>
+
                     <div class="reviews-list" th:if="${!#lists.isEmpty(reviews)}">
-                        <article class="review-card" th:each="review : ${reviews}">
+                        <article class="review-card" th:each="review : ${reviews}" style="display:grid;gap:8px;">
                             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                                <strong
-                                    th:text="${review.user != null and review.user.fullName != null and !review.user.fullName.isBlank() ? review.user.fullName : 'User'}">User</strong>
+                                <div>
+                                    <strong
+                                        th:text="${review.user != null and review.user.fullName != null and !review.user.fullName.isBlank() ? review.user.fullName : 'User'}">User</strong>
+                                    <span style="font-size:11px;color:#64748b;margin-left:8px;"
+                                        th:text="${review.createdAt != null ? #temporals.format(review.createdAt, 'dd MMM yyyy HH:mm') : ''}">
+                                        Date
+                                    </span>
+                                </div>
                                 <div>
                                     <span th:each="i : ${#numbers.sequence(1,5)}"
                                         th:style="${review.rating != null and i <= review.rating} ? 'color:#f59e0b;' : 'color:#ddd;'">&#9733;</span>
@@ -681,10 +722,35 @@
                         </article>
                     </div>
 
-                    <p th:if="${#lists.isEmpty(reviews)}" style="color:#64748b;">No reviews yet for this book.</p>
+                    <div th:if="${totalReviewPages > 1}"
+                        style="margin-top:14px;padding-top:12px;border-top:1px solid #e5e7eb;display:flex;gap:4px;justify-content:center;flex-wrap:wrap;align-items:center;">
+                        <a th:if="${reviewPage > 1}"
+                            th:href="@{/books/{id}(id=${book.id},ratingFilter=${selectedRatingFilter},reviewPage=${reviewPage - 1})}"
+                            class="review-page-link"
+                            style="padding:6px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;text-decoration:none;color:#475569;cursor:pointer;background:#fff;display:inline-block;"
+                            onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">
+                            < </a>
+                                <span style="padding:6px 10px;font-size:12px;color:#64748b;display:inline-block;">
+                                    Page <span th:text="${reviewPage}">1</span> of <span
+                                        th:text="${totalReviewPages}">1</span>
+                                </span>
+                                <a th:if="${reviewPage < totalReviewPages}"
+                                    th:href="@{/books/{id}(id=${book.id},ratingFilter=${selectedRatingFilter},reviewPage=${reviewPage + 1})}"
+                                    class="review-page-link"
+                                    style="padding:6px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;text-decoration:none;color:#475569;cursor:pointer;background:#fff;display:inline-block;"
+                                    onmouseover="this.style.background='#f8fafc'"
+                                    onmouseout="this.style.background='#fff'">
+                                    >
+                                </a>
+                    </div>
 
-                    <div id="review-form" class="review-form"
-                        th:if="${session.loggedInUser != null and myReview == null}">
+                    <p th:if="${reviewFiltered == 0 and reviewTotal > 0}" style="color:#64748b;margin-top:12px;">
+                        No reviews found for the selected rating filter.
+                    </p>
+                    <p th:if="${reviewTotal == 0}" style="color:#64748b;">No reviews yet for this book.</p>
+
+                    <div id="review-form" class="review-form" th:if="${session.loggedInUser != null and canReview}"
+                        style="margin-top:14px;">
                         <form method="post" th:action="@{/reviews/add}">
                             <input type="hidden" name="bookId" th:value="${book.id}">
                             <label style="display:block;font-weight:700;margin-bottom:8px;">Your Review</label>
@@ -701,10 +767,27 @@
                                 <input type="radio" id="add-star-1" name="rating" value="1">
                                 <label for="add-star-1">&#9733;</label>
                             </div>
-                            <textarea name="content" rows="4" placeholder="Share your thoughts..."></textarea>
+                            <textarea name="content" rows="4" placeholder="Share your thoughts..."
+                                data-word-limit="100"></textarea>
+                            <div
+                                style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                <small style="color:#64748b;">Maximum 100 words.</small>
+                                <small style="color:#64748b;"><span id="review-word-counter">0</span>/100 words</small>
+                            </div>
                             <button type="submit" class="btn-primary">Submit Review</button>
                         </form>
                     </div>
+
+                    <p th:if="${session.loggedInUser != null and !canReview}"
+                        th:text="${reviewEligibilityMessage != null ? reviewEligibilityMessage : 'You cannot review this book right now.'}"
+                        style="margin-top:12px;color:#64748b;font-size:13px;line-height:1.5;">
+                        You cannot review this book right now.
+                    </p>
+
+                    <p th:if="${session.loggedInUser == null}"
+                        style="margin-top:12px;color:#64748b;font-size:13px;line-height:1.5;">
+                        Please log in and purchase this book to leave a review.
+                    </p>
                 </aside>
             </section>
         </main>
@@ -724,6 +807,61 @@
                 const next = Math.max(1, Math.min(maxValue, current + step));
                 input.value = next;
             }
+
+            function enforceReviewWordLimit() {
+                const textarea = document.querySelector('textarea[name="content"][data-word-limit]');
+                if (!textarea) {
+                    return;
+                }
+
+                const counter = document.getElementById('review-word-counter');
+                const maxWords = parseInt(textarea.getAttribute('data-word-limit') || '100', 10);
+
+                const update = () => {
+                    const tokens = (textarea.value || '').trim().split(/\s+/).filter(Boolean);
+                    if (tokens.length > maxWords) {
+                        textarea.value = tokens.slice(0, maxWords).join(' ');
+                    }
+
+                    const currentTokens = (textarea.value || '').trim().split(/\s+/).filter(Boolean);
+                    if (counter) {
+                        counter.textContent = String(currentTokens.length);
+                    }
+                };
+
+                textarea.addEventListener('input', update);
+                update();
+            }
+
+            function submitReviewFilterWithAnchor() {
+                const form = document.getElementById('filter-form');
+                if (!form) {
+                    return;
+                }
+
+                const action = form.getAttribute('action') || window.location.pathname;
+                const params = new URLSearchParams(new FormData(form));
+                const query = params.toString();
+                window.location.href = action + (query ? ('?' + query) : '') + '#reviews-section';
+            }
+
+            function bindReviewPaginationAnchor() {
+                const pageLinks = document.querySelectorAll('.review-page-link');
+                pageLinks.forEach((link) => {
+                    link.addEventListener('click', (event) => {
+                        const href = link.getAttribute('href');
+                        if (!href) {
+                            return;
+                        }
+
+                        event.preventDefault();
+                        window.location.href = href + '#reviews-section';
+                    });
+                });
+            }
+
+            enforceReviewWordLimit();
+            bindReviewPaginationAnchor();
         </script>
     </div>
 </body>

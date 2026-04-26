@@ -2,8 +2,10 @@ package com.bookstore.controller;
 
 import com.bookstore.dto.ReviewDTO;
 import com.bookstore.model.Book;
+import com.bookstore.model.OrderDetail;
 import com.bookstore.model.Review;
 import com.bookstore.model.User;
+import com.bookstore.repository.OrderDetailRepository;
 import com.bookstore.repository.ReviewRepository;
 import com.bookstore.service.AuthService;
 import com.bookstore.service.BookService;
@@ -17,14 +19,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
+import java.text.Normalizer;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
 public class ReviewController {
 
+    private static final long STATIONERY_PRODUCT_TYPE_ID = 2L;
     private final ReviewRepository reviewRepository;
+    private final OrderDetailRepository orderDetailRepository;
     private final BookService bookService;
     private final AuthService authService;
 
@@ -49,30 +55,40 @@ public class ReviewController {
             redirectAttributes.addFlashAttribute("reviewError", "Invalid book");
             return "redirect:/books";
         }
+        Book book = bookOpt.get();
+        String detailRedirectPath = resolveDetailRedirectPath(book);
+        String detailReviewAnchorRedirectPath = detailRedirectPath + "#reviews-section";
 
         if (rating < 1 || rating > 5) {
             redirectAttributes.addFlashAttribute("reviewError", "Rating must be between 1 and 5");
-            return "redirect:/books/" + bookId;
+            return "redirect:" + detailReviewAnchorRedirectPath;
         }
 
         String normalizedContent = content == null ? "" : content.trim();
         if (normalizedContent.isEmpty()) {
             redirectAttributes.addFlashAttribute("reviewError", "Review content cannot be empty");
-            return "redirect:/books/" + bookId;
+            return "redirect:" + detailReviewAnchorRedirectPath;
         }
-        if (normalizedContent.length() > 1000) {
-            redirectAttributes.addFlashAttribute("reviewError", "Review content too long");
-            return "redirect:/books/" + bookId;
+        if (countWords(normalizedContent) > 100) {
+            redirectAttributes.addFlashAttribute("reviewError", "Review can be at most 100 words");
+            return "redirect:" + detailReviewAnchorRedirectPath;
         }
 
-        Optional<Review> existing = reviewRepository.findByBook_IdAndUser_Id(bookId, user.getId());
-        if (existing.isPresent()) {
-            redirectAttributes.addFlashAttribute("reviewError", "You have already reviewed this book");
-            return "redirect:/books/" + bookId;
+        long completedPurchaseCount = countCompletedPurchases(user.getId(), bookId);
+        if (completedPurchaseCount == 0) {
+            redirectAttributes.addFlashAttribute("reviewError", "You need to buy this book before reviewing");
+            return "redirect:" + detailReviewAnchorRedirectPath;
+        }
+
+        long submittedReviewCount = reviewRepository.countByBook_IdAndUser_Id(bookId, user.getId());
+        if (submittedReviewCount >= completedPurchaseCount) {
+            redirectAttributes.addFlashAttribute("reviewError",
+                    "You already used all review turns for this book. Buy again to review again");
+            return "redirect:" + detailReviewAnchorRedirectPath;
         }
 
         Review review = new Review();
-        review.setBook(bookOpt.get());
+        review.setBook(book);
         review.setUser(user);
         review.setRating(rating);
         review.setComment(normalizedContent);
@@ -80,7 +96,7 @@ public class ReviewController {
         reviewRepository.save(review);
 
         redirectAttributes.addFlashAttribute("reviewSuccess", "Review submitted");
-        return "redirect:/books/" + bookId;
+        return "redirect:" + detailReviewAnchorRedirectPath;
     }
 
     @PostMapping("/reviews/update")
@@ -109,8 +125,8 @@ public class ReviewController {
             redirectAttributes.addFlashAttribute("reviewError", "Review content cannot be empty");
             return "redirect:/books/" + bookId;
         }
-        if (normalizedContent.length() > 1000) {
-            redirectAttributes.addFlashAttribute("reviewError", "Review content too long");
+        if (countWords(normalizedContent) > 100) {
+            redirectAttributes.addFlashAttribute("reviewError", "Review can be at most 100 words");
             return "redirect:/books/" + bookId;
         }
 
@@ -254,5 +270,59 @@ public class ReviewController {
         }
 
         return "/admin/reviews";
+    }
+
+    private long countCompletedPurchases(Long userId, Long bookId) {
+        return orderDetailRepository.findByOrder_User_IdAndBook_Id(userId, bookId).stream()
+                .filter(detail -> isCompletedStatus(detail))
+                .count();
+    }
+
+    private boolean isCompletedStatus(OrderDetail detail) {
+        if (detail == null || detail.getOrder() == null) {
+            return false;
+        }
+
+        String normalized = normalizeStatus(detail.getOrder().getStatus());
+        return normalized.contains("hoan thanh")
+                || normalized.contains("completed")
+                || normalized.contains("da giao")
+                || normalized.contains("delivered");
+    }
+
+    private String normalizeStatus(String status) {
+        if (status == null) {
+            return "";
+        }
+
+        return Normalizer.normalize(status, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}+", "")
+                .toLowerCase(Locale.ROOT)
+                .trim();
+    }
+
+    private int countWords(String content) {
+        if (content == null || content.isBlank()) {
+            return 0;
+        }
+
+        return content.trim().split("\\s+").length;
+    }
+
+    private String resolveDetailRedirectPath(Book book) {
+        if (book == null
+                || book.getId() == null
+                || book.getCategory() == null
+                || book.getCategory().getProductType() == null
+                || book.getCategory().getProductType().getId() == null) {
+            return "/books";
+        }
+
+        Long productTypeId = book.getCategory().getProductType().getId();
+        if (STATIONERY_PRODUCT_TYPE_ID == productTypeId.longValue()) {
+            return "/stationery/detail/" + book.getId();
+        }
+
+        return "/books/" + book.getId();
     }
 }
