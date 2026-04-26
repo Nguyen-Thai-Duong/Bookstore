@@ -15,7 +15,16 @@
             .sidebar-item.active {
                 background-color: rgba(255, 255, 255, 0.15) !important;
             }
+
+            nav.flex-1.overflow-y-auto {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            nav.flex-1.overflow-y-auto::-webkit-scrollbar { 
+                display: none;
+            }
         </style>
+        
         <div class="p-6 border-b border-white/20">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
@@ -26,7 +35,6 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-lg">BookNest</h1>
-                    <!-- Hiển thị Dashboard tương ứng với Role -->
                     <p class="text-xs opacity-75" 
                        th:text="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin') ? 'Admin Dashboard' : 'Staff Dashboard'}">
                        Admin Dashboard
@@ -72,7 +80,6 @@
                 <span>Category</span>
             </a>
 
-            <!-- Mục Supplier (Dành cho Admin) -->
             <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
                href="/admin/suppliers"
                 th:class="${activePage == 'suppliers'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
@@ -82,7 +89,6 @@
                 <span>Supplier</span>
             </a>
 
-            <!-- Chỉ Admin mới thấy User Management -->
             <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
                href="/admin/users"
                 th:class="${activePage == 'users'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
@@ -93,7 +99,6 @@
                 <span>User</span>
             </a>
 
-            <!-- Chỉ Admin mới thấy Voucher Management -->
             <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
                href="/admin/vouchers"
                 th:class="${activePage == 'vouchers'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
@@ -122,7 +127,6 @@
                 <span>Order</span>
             </a>
 
-            <!-- Mục Import (Chỉ dành cho Staff) -->
             <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Staff')}" 
                href="/admin/purchase-orders"
                 th:class="${activePage == 'purchase-orders'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
@@ -132,7 +136,6 @@
                 <span>Import</span>
             </a>
 
-            <!-- Mục Confirm Import (Chỉ dành cho Admin) -->
             <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
                href="/admin/purchase-orders/confirm"
                 th:class="${activePage == 'confirm-purchase-orders'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">
@@ -143,7 +146,6 @@
             </a>
         </nav>
 
-        <!-- Hiển thị thông tin User thực tế đang đăng nhập -->
         <div class="p-4 border-t border-white/20">
             <div class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/10">
                 <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
