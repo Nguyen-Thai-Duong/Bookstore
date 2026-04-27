@@ -51,12 +51,10 @@
                 <div class="pt-6 border-t flex justify-end gap-4">
                     <a href="/admin/imports/confirm" class="px-6 py-2 border rounded-lg hover:bg-gray-50 transition">Back</a>
                     
-                    <form th:action="@{'/admin/imports/cancel/' + ${importOrder.id}}" method="post" class="inline">
-                        <button type="submit" onclick="return confirm('Are you sure you want to CANCEL this entire import?')"
-                                class="px-6 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition font-bold">
-                            Cancel Import
-                        </button>
-                    </form>
+                    <a th:href="@{'/admin/imports/cancel/' + ${importOrder.id}}" 
+                       class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-lg shadow-red-200 transition font-bold">
+                        Cancel Order
+                    </a>
 
                     <button type="submit" form="finalizeForm"
                             class="px-8 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-200 transition font-bold">

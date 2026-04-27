@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cancel Import - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div th:replace="~{admin/fragments/sidebar :: adminSidebar('confirm-imports')}"></div>
+
+    <main class="ml-64 p-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-red-600" th:text="'Cancel Import IMP-' + ${importOrder.id}"></h1>
+                <p class="text-gray-600 mt-2">Please provide a reason for cancelling this import order.</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-8 border-t-4 border-red-500">
+                <form th:action="@{'/admin/imports/cancel/' + ${importOrder.id}}" method="post" class="space-y-6">
+                    <div>
+                        <label for="note" class="block text-sm font-semibold text-gray-700 mb-2">Cancellation Reason (Note) *</label>
+                        <textarea id="note" name="note" rows="4" required
+                                  placeholder="Enter the reason for cancellation..."
+                                  class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition"></textarea>
+                    </div>
+
+                    <div class="p-4 bg-gray-50 rounded-lg">
+                        <h3 class="font-bold text-gray-700 mb-2 text-sm uppercase tracking-wider">Order Summary</h3>
+                        <div class="grid grid-cols-2 gap-4 text-sm"
+                             th:with="actualTotal=${#aggregates.sum(importOrder.details.![unitPrice * (receivedQuantity != null ? receivedQuantity : orderedQuantity)])}">
+                            <div>
+                                <p class="text-gray-500">Supplier</p>
+                                <p class="font-medium text-gray-800" th:text="${importOrder.supplier.supplierName}"></p>
+                            </div>
+                            <div>
+                                <p class="text-gray-500">Actual Total Amount</p>
+                                <p class="font-bold text-orange-600" 
+                                   th:text="${#numbers.formatDecimal(actualTotal, 0, 'COMMA', 0, 'POINT') + ' VND'}"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t flex justify-end gap-4">
+                        <a href="/admin/imports/confirm" class="px-6 py-2 border rounded-lg hover:bg-gray-50 transition">Back to List</a>
+                        <button type="submit" class="px-8 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-lg shadow-red-200 transition font-bold">
+                            Confirm Cancellation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
