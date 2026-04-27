@@ -8,6 +8,7 @@ import com.bookstore.dto.UserDTO;
 import com.bookstore.dto.UserFormDTO;
 import com.bookstore.dto.VoucherDTO;
 import com.bookstore.model.Book;
+import com.bookstore.model.Category;
 import com.bookstore.model.Order;
 import com.bookstore.model.User;
 import com.bookstore.model.Voucher;
@@ -18,6 +19,7 @@ import com.bookstore.repository.ProductTypeRepository;
 import com.bookstore.repository.ReviewRepository;
 import com.bookstore.service.BookService;
 import com.bookstore.service.CategoryService;
+import com.bookstore.service.ImportService;
 import com.bookstore.service.OrderService;
 import com.bookstore.service.RoleService;
 import com.bookstore.service.UserService;
@@ -29,9 +31,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,6 +51,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -86,6 +93,9 @@ public class AdminController {
     @Autowired
     private ProductTypeRepository productTypeRepository;
 
+    @Autowired
+    private ImportService importService;
+
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @GetMapping
@@ -99,7 +109,8 @@ public class AdminController {
                 .toList();
 
         var allActiveProducts = bookRepository.findAll().stream()
-                .filter(product -> product != null && !product.isDiscontinued() && "Active".equalsIgnoreCase(product.getStatus()))
+                .filter(product -> product != null && !product.isDiscontinued()
+                        && "Active".equalsIgnoreCase(product.getStatus()))
                 .toList();
 
         var allProductTypes = productTypeRepository.findAll().stream()
@@ -170,6 +181,7 @@ public class AdminController {
     @GetMapping("/books")
     public String listBooks(Model model) {
         model.addAttribute("books", bookRepository.findByProductType(BOOK_PRODUCT_TYPE_ID).stream()
+                .filter(book -> book != null && !book.isDiscontinued() && "Active".equalsIgnoreCase(book.getStatus()))
                 .map(BookDTO::fromEntity)
                 .toList());
         return "admin/books";
@@ -179,77 +191,247 @@ public class AdminController {
     public String showCreateBookForm(Model model) {
         BookDTO dto = new BookDTO();
         dto.setProductTypeId(BOOK_PRODUCT_TYPE_ID);
-        model.addAttribute("book", dto);
-        model.addAttribute("categories",
-                categoryService.getCategoriesByProductType(BOOK_PRODUCT_TYPE_ID).stream().map(CategoryDTO::fromEntity).toList());
+        populateBookFormModel(model, dto);
         return "admin/books/add-book";
     }
 
     @GetMapping("/books/edit/{id}")
     public String showEditBookForm(@PathVariable Long id, Model model) {
-        bookService.getBookById(id).ifPresent(book -> {
-            model.addAttribute("book", BookDTO.fromEntity(book));
-            model.addAttribute("categories",
-                    categoryService.getCategoriesByProductType(BOOK_PRODUCT_TYPE_ID).stream().map(CategoryDTO::fromEntity).toList());
-        });
+        var bookOpt = bookService.getBookById(id);
+        if (bookOpt.isEmpty()) {
+            return "redirect:/admin/books";
+        }
+        Book book = bookOpt.get();
+        if (book.isDiscontinued() || !"Active".equalsIgnoreCase(book.getStatus())) {
+            return "redirect:/admin/books";
+        }
+        populateBookFormModel(model, BookDTO.fromEntity(book));
         return "admin/books/add-book";
     }
 
     @PostMapping("/books/save")
-    public String saveBook(@ModelAttribute("book") BookDTO bookDto,
+    public String saveBook(@Valid @ModelAttribute("book") BookDTO bookDto,
+            BindingResult bindingResult,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            Model model,
             RedirectAttributes redirectAttributes) {
-        Book book = bookDto.toEntity();
-        final String[] existingImageUrl = { null };
+        try {
+            Map<String, String> validationErrors = new LinkedHashMap<>();
+            collectBindingErrors(bindingResult, validationErrors);
+            validationErrors.putAll(validateBookFields(bookDto));
 
-        if (book.getStock() == null) {
-            book.setStock(0);
-        }
-
-        Long categoryId = bookDto.getCategory() != null ? bookDto.getCategory().getId() : null;
-        if (categoryId == null) {
-            redirectAttributes.addFlashAttribute("bookError", "Category is required.");
-            return "redirect:/admin/books/new";
-        }
-
-        var categoryOpt = categoryService.getCategoryById(categoryId);
-        if (categoryOpt.isEmpty()
-                || categoryOpt.get().getProductType() == null
-                || categoryOpt.get().getProductType().getId() == null
-                || !BOOK_PRODUCT_TYPE_ID.equals(categoryOpt.get().getProductType().getId())) {
-            redirectAttributes.addFlashAttribute("bookError", "Invalid category for Book product type.");
-            return "redirect:/admin/books/new";
-        }
-        book.setCategory(categoryOpt.get());
-
-        if (book.getId() != null) {
-            bookService.getBookById(book.getId()).ifPresent(existingBook -> {
-                existingImageUrl[0] = existingBook.getImageUrl();
-                if (book.getCreatedAt() == null) {
-                    book.setCreatedAt(existingBook.getCreatedAt());
-                }
-                if (book.getImageUrl() == null || book.getImageUrl().isBlank()) {
-                    book.setImageUrl(existingBook.getImageUrl());
-                }
-            });
-        }
-
-        if (book.getImageUrl() != null) {
-            book.setImageUrl(book.getImageUrl().trim());
-        }
-
-        if (imageFile != null && !imageFile.isEmpty()) {
-            try {
-                // If file is uploaded, prioritize file over URL.
-                String uploadedImageUrl = storeBookImage(imageFile, existingImageUrl[0]);
-                book.setImageUrl(uploadedImageUrl);
-            } catch (IOException e) {
-                throw new RuntimeException("Unable to save book image", e);
+            Long categoryId = bookDto.getCategory() != null ? bookDto.getCategory().getId() : null;
+            if (categoryId == null) {
+                validationErrors.putIfAbsent("category.id", "Category is required.");
             }
+
+            Optional<Category> categoryOpt = categoryId == null ? Optional.<Category>empty()
+                    : categoryService.getCategoryById(categoryId);
+            if (categoryId != null && (categoryOpt.isEmpty()
+                    || categoryOpt.get().getProductType() == null
+                    || categoryOpt.get().getProductType().getId() == null
+                    || !BOOK_PRODUCT_TYPE_ID.equals(categoryOpt.get().getProductType().getId()))) {
+                validationErrors.put("category.id", "Invalid category for Book product type.");
+            }
+
+            if (!validationErrors.isEmpty()) {
+                model.addAttribute("bookError", "Please fix the highlighted fields.");
+                model.addAttribute("validationErrors", validationErrors);
+                populateBookFormModel(model, bookDto);
+                return "admin/books/add-book";
+            }
+
+            Book book = bookDto.toEntity();
+            final String[] existingImageUrl = { null };
+            if (book.getPublisher() != null) {
+                book.setPublisher(book.getPublisher().trim());
+            }
+
+            if (book.getStock() == null) {
+                book.setStock(0);
+            }
+
+            if (book.getDescription() == null) {
+                book.setDescription("");
+            }
+
+            if (book.getStatus() == null || book.getStatus().isBlank()) {
+                book.setStatus("Active");
+            }
+
+            book.setCategory(categoryOpt.get());
+
+            if (book.getId() != null) {
+                bookService.getBookById(book.getId()).ifPresent(existingBook -> {
+                    existingImageUrl[0] = existingBook.getImageUrl();
+                    if (book.getCreatedAt() == null) {
+                        book.setCreatedAt(existingBook.getCreatedAt());
+                    }
+                });
+            }
+
+            String rawSubmittedImageUrl = book.getImageUrl() == null ? "" : book.getImageUrl().trim();
+            boolean explicitClearImage = "none".equalsIgnoreCase(rawSubmittedImageUrl)
+                    || "noimage".equalsIgnoreCase(rawSubmittedImageUrl);
+            String submittedImageUrl = explicitClearImage ? "" : rawSubmittedImageUrl;
+            String existingUrl = existingImageUrl[0] == null ? "" : existingImageUrl[0].trim();
+            boolean hasUploadedFile = imageFile != null && !imageFile.isEmpty();
+            boolean hasSubmittedUrl = !submittedImageUrl.isBlank();
+            boolean isEditing = book.getId() != null;
+            boolean submittedUrlChanged = !submittedImageUrl.equals(existingUrl);
+
+            if (hasUploadedFile && hasSubmittedUrl) {
+                // If both are submitted in one request:
+                // - New URL + upload => URL wins
+                // - URL is just unchanged prefilled value during edit => upload wins (newest input)
+                if (isEditing && !submittedUrlChanged) {
+                    try {
+                        String uploadedImageUrl = storeBookImage(imageFile, existingImageUrl[0]);
+                        book.setImageUrl(uploadedImageUrl);
+                    } catch (IOException e) {
+                        model.addAttribute("bookError", "Unable to upload image. Please try again.");
+                        populateBookFormModel(model, bookDto);
+                        return "admin/books/add-book";
+                    }
+                } else {
+                    book.setImageUrl(submittedImageUrl);
+                    if (existingImageUrl[0] != null && !existingImageUrl[0].equals(book.getImageUrl())) {
+                        deleteOldBookImageIfLocal(existingImageUrl[0]);
+                    }
+                }
+            } else if (hasUploadedFile) {
+                try {
+                    String uploadedImageUrl = storeBookImage(imageFile, existingImageUrl[0]);
+                    book.setImageUrl(uploadedImageUrl);
+                } catch (IOException e) {
+                    model.addAttribute("bookError", "Unable to upload image. Please try again.");
+                    populateBookFormModel(model, bookDto);
+                    return "admin/books/add-book";
+                }
+            } else if (hasSubmittedUrl) {
+                book.setImageUrl(submittedImageUrl);
+                if (existingImageUrl[0] != null && !existingImageUrl[0].equals(book.getImageUrl())) {
+                    deleteOldBookImageIfLocal(existingImageUrl[0]);
+                }
+            } else if (explicitClearImage) {
+                if (existingImageUrl[0] != null && !existingImageUrl[0].isBlank()) {
+                    deleteOldBookImageIfLocal(existingImageUrl[0]);
+                }
+                book.setImageUrl("Noimage");
+            } else if (isEditing) {
+                book.setImageUrl(existingImageUrl[0]);
+            } else {
+                book.setImageUrl("Noimage");
+            }
+
+            if (book.getImageUrl() == null || book.getImageUrl().isBlank()) {
+                book.setImageUrl("Noimage");
+            }
+
+            try {
+                bookService.saveBook(book);
+            } catch (RuntimeException e) {
+                model.addAttribute("bookError", "Unable to save book. Please check your input values.");
+                populateBookFormModel(model, bookDto);
+                return "admin/books/add-book";
+            }
+
+            return "redirect:/admin/books";
+        } catch (Exception e) {
+            model.addAttribute("bookError", "Unable to save book right now. Please try again.");
+            populateBookFormModel(model, bookDto);
+            return "admin/books/add-book";
+        }
+    }
+
+    private void populateBookFormModel(Model model, BookDTO dto) {
+        if (dto.getProductTypeId() == null) {
+            dto.setProductTypeId(BOOK_PRODUCT_TYPE_ID);
+        }
+        model.addAttribute("book", dto);
+        model.addAttribute("categories",
+                categoryService.getCategoriesByProductType(BOOK_PRODUCT_TYPE_ID).stream().map(CategoryDTO::fromEntity)
+                        .toList());
+    }
+
+    private void collectBindingErrors(BindingResult bindingResult, Map<String, String> validationErrors) {
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            String field = fieldError.getField();
+            if (validationErrors.containsKey(field)) {
+                continue;
+            }
+
+            String message = fieldError.getDefaultMessage();
+            if (fieldError.getCode() != null && fieldError.getCode().contains("typeMismatch")) {
+                message = switch (field) {
+                    case "publishedYear" -> "Published year must be a positive integer from 1450 to current year.";
+                    case "widthCm" -> "Width (cm) must be a valid number.";
+                    case "heightCm" -> "Height (cm) must be a valid number.";
+                    case "thicknessCm" -> "Thickness (cm) must be a valid number.";
+                    case "pageCount" -> "Page count must be a valid integer.";
+                    case "price" -> "Price must be a valid number.";
+                    default -> "Invalid value.";
+                };
+            }
+
+            validationErrors.put(field, message);
+        }
+    }
+
+    private Map<String, String> validateBookFields(BookDTO bookDto) {
+        Map<String, String> errors = new LinkedHashMap<>();
+        int currentYear = LocalDate.now().getYear();
+
+        Integer publishedYear = bookDto.getPublishedYear();
+        if (publishedYear == null) {
+            errors.put("publishedYear", "Published year is required.");
+        } else if (publishedYear < 1450 || publishedYear > currentYear) {
+            errors.put("publishedYear", "Published year must be between 1450 and " + currentYear + ".");
         }
 
-        bookService.saveBook(book);
-        return "redirect:/admin/books";
+        String publisher = bookDto.getPublisher();
+        if (publisher == null || publisher.trim().isEmpty()) {
+            errors.put("publisher", "Publisher is required.");
+        } else if (publisher.trim().length() > 150) {
+            errors.put("publisher", "Publisher cannot exceed 150 characters.");
+        }
+
+        validateDimension(bookDto.getWidthCm(), "widthCm", "Width", errors, true);
+        validateDimension(bookDto.getHeightCm(), "heightCm", "Height", errors, true);
+        validateDimension(bookDto.getThicknessCm(), "thicknessCm", "Thickness", errors, true);
+
+        Integer pageCount = bookDto.getPageCount();
+        if (pageCount == null) {
+            errors.put("pageCount", "Page count is required.");
+        } else if (pageCount <= 0) {
+            errors.put("pageCount", "Page count must be greater than 0.");
+        }
+
+        return errors;
+    }
+
+    private void validateDimension(BigDecimal value, String field, String label, Map<String, String> errors,
+            boolean required) {
+        if (value == null) {
+            if (required) {
+                errors.put(field, label + " (cm) is required.");
+            }
+            return;
+        }
+
+        if (value.compareTo(BigDecimal.ZERO) <= 0) {
+            errors.put(field, label + " (cm) must be greater than 0.");
+            return;
+        }
+
+        if (value.compareTo(new BigDecimal("999.99")) > 0) {
+            errors.put(field, label + " (cm) cannot exceed 999.99.");
+            return;
+        }
+
+        if (value.scale() > 2) {
+            errors.put(field, label + " (cm) supports up to 2 decimal places.");
+        }
     }
 
     private String storeBookImage(MultipartFile imageFile, String oldImageUrl) throws IOException {
@@ -305,42 +487,66 @@ public class AdminController {
         }
 
         Book book = bookOptional.get();
+        if (importService.hasOpenImportForProduct(id)) {
+            redirectAttributes.addFlashAttribute("bookError",
+                    "Cannot delete this product because it exists in an import that is not stock-in completed yet. Please complete or cancel that import first.");
+            return "redirect:/admin/books";
+        }
+
+        boolean hasBlockingOrder = orderDetailRepository.findByBookId(id).stream()
+                .anyMatch(detail -> detail.getOrder() != null && isBlockingDeleteOrderStatus(detail.getOrder().getStatus()));
+        if (hasBlockingOrder) {
+            redirectAttributes.addFlashAttribute("bookError",
+                    "Cannot delete this product because it exists in active orders (Pending/Confirmed/Shipping).");
+            return "redirect:/admin/books";
+        }
+
+        boolean inAnyCart = cartItemRepository.existsByBook_Id(id);
         if (!book.isDiscontinued()) {
             book.markDiscontinued();
             bookService.saveBook(book);
+
+            if (inAnyCart) {
+                redirectAttributes.addFlashAttribute("bookSuccess",
+                        "Product status changed to Discontinued. It is hidden from users now. After 2 minutes, click Delete again to remove only this product from all carts.");
+            } else {
+                redirectAttributes.addFlashAttribute("bookSuccess",
+                        "Product status changed to Discontinued. It is hidden from users and can only be restored by setting Status=Active in database.");
+            }
+            return "redirect:/admin/books";
+        }
+
+        if (!inAnyCart) {
             redirectAttributes.addFlashAttribute("bookSuccess",
-                    "Book hidden successfully. Customers cannot search or buy it now. This item will be removed from carts after 2 minutes.");
+                    "Product is already Discontinued and hidden. No hard delete is performed.");
             return "redirect:/admin/books";
         }
 
         if (book.isCartCleanupWindowActive()) {
             redirectAttributes.addFlashAttribute("bookError",
-                    "This hidden book is still in the 2-minute cart cleanup window. Please try deleting again after the timer ends.");
+                    "Product is in carts. Wait until the 2-minute window ends, then click Delete again to remove only this product from carts.");
             return "redirect:/admin/books";
         }
 
-        if (orderDetailRepository.existsByBook_Id(id)) {
-            redirectAttributes.addFlashAttribute("bookError",
-                    "Cannot hard-delete this book because it is referenced by order history.");
-            return "redirect:/admin/books";
-        }
-
-        if (cartItemRepository.existsByBook_Id(id)) {
-            redirectAttributes.addFlashAttribute("bookError",
-                    "Book is still present in some carts. Please wait for cleanup to finish and try again.");
-            return "redirect:/admin/books";
-        }
-
-        bookService.deleteBook(id);
-        redirectAttributes.addFlashAttribute("bookSuccess", "Book deleted successfully");
+        long removedRows = cartItemRepository.deleteByBook_Id(id);
+        redirectAttributes.addFlashAttribute("bookSuccess",
+                "Product remains Discontinued. Removed from " + removedRows
+                        + " cart line(s). Order history is preserved.");
         return "redirect:/admin/books";
+    }
+
+    private boolean isBlockingDeleteOrderStatus(String status) {
+        String normalized = normalizeOrderStatus(status);
+        return "pending".equals(normalized) || "confirmed".equals(normalized) || "shipping".equals(normalized);
     }
 
     @GetMapping("/books/search")
     public String searchBooks(@RequestParam(required = false) String title,
             @RequestParam(required = false) String author,
             Model model) {
-        var books = bookRepository.findByProductType(BOOK_PRODUCT_TYPE_ID);
+        var books = bookRepository.findByProductType(BOOK_PRODUCT_TYPE_ID).stream()
+                .filter(book -> book != null && !book.isDiscontinued() && "Active".equalsIgnoreCase(book.getStatus()))
+                .toList();
 
         if (title != null && !title.isEmpty()) {
             books = books.stream()
@@ -360,7 +566,15 @@ public class AdminController {
 
     @GetMapping("/books/{id}")
     public String viewBook(@PathVariable Long id, Model model) {
-        bookService.getBookById(id).ifPresent(book -> model.addAttribute("book", BookDTO.fromEntity(book)));
+        var bookOpt = bookService.getBookById(id);
+        if (bookOpt.isEmpty()) {
+            return "redirect:/admin/books";
+        }
+        Book book = bookOpt.get();
+        if (book.isDiscontinued() || !"Active".equalsIgnoreCase(book.getStatus())) {
+            return "redirect:/admin/books";
+        }
+        model.addAttribute("book", BookDTO.fromEntity(book));
         return "admin/books/view";
     }
 

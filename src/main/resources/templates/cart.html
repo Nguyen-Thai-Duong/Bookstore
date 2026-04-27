@@ -292,6 +292,17 @@
             gap: 6px;
         }
 
+        .item-status-discontinued {
+            margin: 8px 0;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+            background: #fff1f2;
+            color: #b91c1c;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
         .item-summary strong {
             color: #333;
         }
@@ -509,7 +520,9 @@
                         th:attr="data-line-total=${item.lineTotal != null ? item.lineTotal : 0}">
                         <div class="item-check-cell">
                             <input type="checkbox" class="check-input checkout-item" form="checkout-selected-form"
-                                name="selectedBookIds" th:value="${item.book.id}" checked>
+                                name="selectedBookIds" th:value="${item.book.id}"
+                                th:checked="${item.book != null and !item.book.discontinued}"
+                                th:disabled="${item.book != null and item.book.discontinued}">
                         </div>
 
                         <div>
@@ -529,13 +542,24 @@
                                 th:text="${item.book.price != null ? #numbers.formatDecimal(item.book.price, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
                                 0 VND</p>
 
-                            <form method="post" th:action="@{/cart/update}" class="qty-form">
+                            <div th:if="${item.book != null and item.book.discontinued}"
+                                class="item-status-discontinued">
+                                Cease business: This product cannot be ordered and will be auto removed from cart in
+                                about <span th:text="${item.book.cartCleanupRemainingMinutes}">2</span> minute(s).
+                            </div>
+
+                            <form method="post" th:if="${item.book == null or !item.book.discontinued}"
+                                th:action="@{/cart/update}" class="qty-form">
                                 <input type="hidden" name="bookId" th:value="${item.book.id}">
                                 <button type="button" onclick="adjustQty(this, -1)">-</button>
                                 <input type="number" name="quantity" min="0" th:value="${item.quantity}">
                                 <button type="button" onclick="adjustQty(this, 1)">+</button>
                                 <button type="submit" style="display:none;">Update</button>
                             </form>
+
+                            <div th:if="${item.book != null and item.book.discontinued}" class="item-summary">
+                                <span>Quantity locked: <strong th:text="${item.quantity}">1</strong></span>
+                            </div>
 
                             <form method="post" th:action="@{/cart/remove}" style="display:inline-block;">
                                 <input type="hidden" name="bookId" th:value="${item.book.id}">
@@ -595,7 +619,7 @@
         </aside>
     </main>
 
-        <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
+    <div th:replace="~{fragments/site-footer :: siteFooter}"></div>
 
     <script>
         lucide.createIcons();
@@ -613,6 +637,7 @@
 
         const selectAllCheckbox = document.getElementById('select-all-cart-items');
         const itemCheckboxes = Array.from(document.querySelectorAll('.checkout-item'));
+        const selectableCheckboxes = itemCheckboxes.filter(cb => !cb.disabled);
         const checkoutForm = document.getElementById('checkout-selected-form');
         const subtotalEl = document.getElementById('summary-subtotal');
         const discountEl = document.getElementById('summary-discount');
@@ -643,7 +668,7 @@
             const baseDiscount = parseRawNumber(discountEl.dataset.raw);
             const discountRate = baseSubtotal > 0 ? (baseDiscount / baseSubtotal) : 0;
 
-            const selectedSubtotal = itemCheckboxes
+            const selectedSubtotal = selectableCheckboxes
                 .filter(cb => cb.checked)
                 .reduce((sum, cb) => {
                     const card = cb.closest('.item-card');
@@ -669,7 +694,7 @@
                 return;
             }
 
-            const selectedCount = itemCheckboxes.filter(cb => cb.checked).length;
+            const selectedCount = selectableCheckboxes.filter(cb => cb.checked).length;
             submitButton.disabled = selectedCount === 0;
             submitButton.style.opacity = selectedCount === 0 ? '0.6' : '1';
             submitButton.style.cursor = selectedCount === 0 ? 'not-allowed' : 'pointer';
@@ -677,23 +702,28 @@
         }
 
         if (selectAllCheckbox) {
+            if (selectableCheckboxes.length === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.disabled = true;
+            }
+
             selectAllCheckbox.addEventListener('change', () => {
-                itemCheckboxes.forEach(cb => {
+                selectableCheckboxes.forEach(cb => {
                     cb.checked = selectAllCheckbox.checked;
                 });
                 refreshCheckoutButton();
             });
         }
 
-        itemCheckboxes.forEach(cb => {
+        selectableCheckboxes.forEach(cb => {
             cb.addEventListener('change', () => {
                 if (!selectAllCheckbox) {
                     refreshCheckoutButton();
                     return;
                 }
 
-                const checkedCount = itemCheckboxes.filter(item => item.checked).length;
-                selectAllCheckbox.checked = checkedCount === itemCheckboxes.length;
+                const checkedCount = selectableCheckboxes.filter(item => item.checked).length;
+                selectAllCheckbox.checked = selectableCheckboxes.length > 0 && checkedCount === selectableCheckboxes.length;
                 refreshCheckoutButton();
             });
         });

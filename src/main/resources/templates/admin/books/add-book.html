@@ -94,6 +94,10 @@
                         th:object="${book}">
                         <input type="hidden" th:field="*{id}" />
 
+                        <div th:if="${bookError}" class="mb-6 rounded-lg px-4 py-3 text-sm"
+                            style="background-color: rgba(220, 38, 38, 0.12); color: #991b1b;" th:text="${bookError}">
+                        </div>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Title -->
                             <div class="md:col-span-2">
@@ -103,6 +107,9 @@
                                 <input type="text" th:field="*{title}" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                                     placeholder="Enter Book Title">
+                                <p class="mt-1 text-xs text-red-600"
+                                    th:if="${validationErrors != null and validationErrors['title'] != null}"
+                                    th:text="${validationErrors['title']}"></p>
                             </div>
 
                             <!-- Author -->
@@ -113,6 +120,9 @@
                                 <input type="text" th:field="*{author}" required
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                                     placeholder="Enter Author Name">
+                                <p class="mt-1 text-xs text-red-600"
+                                    th:if="${validationErrors != null and validationErrors['author'] != null}"
+                                    th:text="${validationErrors['author']}"></p>
                             </div>
 
                             <!-- Price -->
@@ -123,6 +133,9 @@
                                 <input type="number" th:field="*{price}" required min="0" step="1000"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                                     placeholder="0">
+                                <p class="mt-1 text-xs text-red-600"
+                                    th:if="${validationErrors != null and validationErrors['price'] != null}"
+                                    th:text="${validationErrors['price']}"></p>
                             </div>
 
                             <!-- Category -->
@@ -137,6 +150,9 @@
                                         th:attr="data-product-type=${cat.productTypeId}">
                                         Category</option>
                                 </select>
+                                <p class="mt-1 text-xs text-red-600"
+                                    th:if="${validationErrors != null and validationErrors['category.id'] != null}"
+                                    th:text="${validationErrors['category.id']}"></p>
                             </div>
 
                             <!-- Published Year -->
@@ -144,9 +160,13 @@
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Published year
                                 </label>
-                                <input type="number" th:field="*{publishedYear}" min="0" max="3000"
+                                <input type="number" th:field="*{publishedYear}" min="1450" max="9999" step="1"
+                                    required inputmode="numeric"
+                                    data-validate="published-year"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                                     placeholder="2026">
+                                <p id="publishedYear-error" class="mt-1 text-xs text-red-600"
+                                    th:text="${validationErrors != null ? validationErrors['publishedYear'] : ''}"></p>
                             </div>
 
                             <!-- Publisher -->
@@ -154,9 +174,12 @@
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Publisher
                                 </label>
-                                <input type="text" th:field="*{publisher}"
+                                <input type="text" th:field="*{publisher}" required maxlength="150"
+                                    data-validate="publisher"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                                     placeholder="Enter Publisher Name">
+                                <p id="publisher-error" class="mt-1 text-xs text-red-600"
+                                    th:text="${validationErrors != null ? validationErrors['publisher'] : ''}"></p>
                             </div>
 
                             <!-- Width -->
@@ -164,9 +187,13 @@
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Width (cm)
                                 </label>
-                                <input type="number" th:field="*{widthCm}" min="0" step="0.01"
+                                <input type="number" th:field="*{widthCm}" min="0.01" max="999.99" step="0.01"
+                                    required inputmode="decimal"
+                                    data-validate="dimension" data-label="Width"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                                     placeholder="0.00">
+                                <p id="widthCm-error" class="mt-1 text-xs text-red-600"
+                                    th:text="${validationErrors != null ? validationErrors['widthCm'] : ''}"></p>
                             </div>
 
                             <!-- Height -->
@@ -174,9 +201,13 @@
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Height (cm)
                                 </label>
-                                <input type="number" th:field="*{heightCm}" min="0" step="0.01"
+                                <input type="number" th:field="*{heightCm}" min="0.01" max="999.99" step="0.01"
+                                    required inputmode="decimal"
+                                    data-validate="dimension" data-label="Height"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                                     placeholder="0.00">
+                                <p id="heightCm-error" class="mt-1 text-xs text-red-600"
+                                    th:text="${validationErrors != null ? validationErrors['heightCm'] : ''}"></p>
                             </div>
 
                             <!-- Thickness -->
@@ -184,9 +215,13 @@
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Thickness (cm)
                                 </label>
-                                <input type="number" th:field="*{thicknessCm}" min="0" step="0.01"
+                                <input type="number" th:field="*{thicknessCm}" min="0.01" max="999.99" step="0.01"
+                                    required inputmode="decimal"
+                                    data-validate="dimension" data-label="Thickness"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                                     placeholder="0.00">
+                                <p id="thicknessCm-error" class="mt-1 text-xs text-red-600"
+                                    th:text="${validationErrors != null ? validationErrors['thicknessCm'] : ''}"></p>
                             </div>
 
                             <!-- Page Count -->
@@ -194,9 +229,12 @@
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Page count
                                 </label>
-                                <input type="number" th:field="*{pageCount}" min="1"
+                                <input type="number" th:field="*{pageCount}" min="1" step="1" required
+                                    inputmode="numeric" data-validate="page-count"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
                                     placeholder="0">
+                                <p id="pageCount-error" class="mt-1 text-xs text-red-600"
+                                    th:text="${validationErrors != null ? validationErrors['pageCount'] : ''}"></p>
                             </div>
 
                             <!-- Upload image -->
@@ -218,8 +256,8 @@
                                 </label>
                                 <input type="file" name="imageFile" accept="image/*"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition bg-white">
-                                <p class="text-xs text-gray-500 mt-2">If both URL and file are provided, the uploaded
-                                    file will be used. Supported formats: JPG, JPEG, PNG, GIF, WEBP.</p>
+                                <p class="text-xs text-gray-500 mt-2">If both URL and file are provided, URL will be
+                                    used. Supported formats: JPG, JPEG, PNG, GIF, WEBP.</p>
                                 <div th:if="${book.imageUrl != null and !book.imageUrl.isEmpty()}" class="mt-4">
                                     <p class="text-sm font-medium text-gray-700 mb-2">Current image:</p>
                                     <img th:src="${book.imageUrl}" alt="Book Image" class="h-40 rounded-lg border"
@@ -259,6 +297,143 @@
         (function () {
             const categorySelect = document.getElementById('categorySelect');
             if (!categorySelect) return;
+
+            const currentYear = new Date().getFullYear();
+            const publishedYearInput = document.getElementById('publishedYear');
+            if (publishedYearInput) {
+                publishedYearInput.max = String(currentYear);
+            }
+
+            const setError = (input, message) => {
+                const errorEl = document.getElementById(`${input.id}-error`);
+                if (errorEl) {
+                    errorEl.textContent = message || '';
+                }
+                input.classList.toggle('border-red-500', !!message);
+            };
+
+            const validatePublishedYear = (input) => {
+                const raw = input.value.trim();
+                if (!raw) {
+                    setError(input, 'Published year is required.');
+                    return false;
+                }
+                const year = Number(raw);
+                if (!Number.isInteger(year)) {
+                    setError(input, 'Published year must be a valid integer.');
+                    return false;
+                }
+                if (year < 1450 || year > currentYear) {
+                    setError(input, `Published year must be between 1450 and ${currentYear}.`);
+                    return false;
+                }
+                setError(input, '');
+                return true;
+            };
+
+            const validateDimension = (input) => {
+                const raw = input.value.trim();
+                if (!raw) {
+                    setError(input, `${input.dataset.label || 'Value'} (cm) is required.`);
+                    return false;
+                }
+
+                const label = input.dataset.label || 'Value';
+                const value = Number(raw);
+                if (Number.isNaN(value)) {
+                    setError(input, `${label} (cm) must be a valid number.`);
+                    return false;
+                }
+                if (value <= 0) {
+                    setError(input, `${label} (cm) must be greater than 0.`);
+                    return false;
+                }
+                if (value > 999.99) {
+                    setError(input, `${label} (cm) cannot exceed 999.99.`);
+                    return false;
+                }
+
+                const decimals = raw.includes('.') ? raw.split('.')[1].length : 0;
+                if (decimals > 2) {
+                    setError(input, `${label} (cm) supports up to 2 decimal places.`);
+                    return false;
+                }
+
+                setError(input, '');
+                return true;
+            };
+
+            const validatePageCount = (input) => {
+                const raw = input.value.trim();
+                if (!raw) {
+                    setError(input, 'Page count is required.');
+                    return false;
+                }
+                const value = Number(raw);
+                if (!Number.isInteger(value) || value <= 0) {
+                    setError(input, 'Page count must be greater than 0.');
+                    return false;
+                }
+                setError(input, '');
+                return true;
+            };
+
+            const validatePublisher = (input) => {
+                const raw = input.value.trim();
+                if (!raw) {
+                    setError(input, 'Publisher is required.');
+                    return false;
+                }
+                if (raw.length > 150) {
+                    setError(input, 'Publisher cannot exceed 150 characters.');
+                    return false;
+                }
+                setError(input, '');
+                return true;
+            };
+
+            const validatorMap = {
+                'published-year': validatePublishedYear,
+                'dimension': validateDimension,
+                'page-count': validatePageCount,
+                'publisher': validatePublisher
+            };
+
+            document.querySelectorAll('[data-validate]').forEach((input) => {
+                const validator = validatorMap[input.dataset.validate];
+                if (!validator) {
+                    return;
+                }
+                input.addEventListener('input', () => validator(input));
+                input.addEventListener('blur', () => validator(input));
+            });
+
+            const form = document.querySelector('form[th\\:object], form');
+            if (form) {
+                form.addEventListener('keydown', (event) => {
+                    if (event.key !== 'Enter') {
+                        return;
+                    }
+                    if (event.target && event.target.tagName === 'TEXTAREA') {
+                        return;
+                    }
+                    event.preventDefault();
+                });
+
+                form.addEventListener('submit', (event) => {
+                    let isValid = true;
+                    document.querySelectorAll('[data-validate]').forEach((input) => {
+                        const validator = validatorMap[input.dataset.validate];
+                        if (validator && !validator(input)) {
+                            isValid = false;
+                        }
+                    });
+                    if (!isValid) {
+                        event.preventDefault();
+                    }
+                });
+            }
+
         })();
     </script>
 </body>

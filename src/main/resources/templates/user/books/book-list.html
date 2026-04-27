@@ -278,6 +278,25 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
         }
 
+        .book-card.discontinued {
+            cursor: not-allowed;
+            opacity: 0.75;
+            border-color: #fecaca;
+            background: #fff7f7;
+        }
+
+        .book-card.discontinued:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .book-status-warning {
+            margin-top: 6px;
+            font-size: 11px;
+            color: #b91c1c;
+            font-weight: 700;
+        }
+
         .book-cover {
             width: 120px;
             height: 175px;
@@ -443,7 +462,8 @@
                     Try changing the search filter.</div>
 
                 <div th:if="${!#lists.isEmpty(books)}" class="books-grid">
-                    <a th:each="book : ${books}" th:href="@{/books/{id}(id=${book.id})}" class="book-card">
+                    <a th:each="book : ${books}" th:if="${!book.discontinued}" th:href="@{/books/{id}(id=${book.id})}"
+                        class="book-card">
                         <img class="book-cover" th:if="${book.imageUrl != null and !book.imageUrl.isEmpty()}"
                             th:src="${book.imageUrl}" th:alt="${book.title}">
                         <img class="book-cover" th:if="${book.imageUrl == null or book.imageUrl.isEmpty()}"
@@ -460,6 +480,23 @@
                             Available: 0
                         </p>
                     </a>
+
+                    <div th:each="book : ${books}" th:if="${book.discontinued}" class="book-card discontinued">
+                        <img class="book-cover" th:if="${book.imageUrl != null and !book.imageUrl.isEmpty()}"
+                            th:src="${book.imageUrl}" th:alt="${book.title}">
+                        <img class="book-cover" th:if="${book.imageUrl == null or book.imageUrl.isEmpty()}"
+                            src="https://via.placeholder.com/120x175?text=No+Image" alt="No image">
+                        <h3 class="book-title" th:text="${book.title}">Book Title</h3>
+                        <p class="book-author"
+                            th:text="${book.author != null and !book.author.isBlank() ? book.author : 'Updating'}">
+                            Author</p>
+                        <p class="book-price"
+                            th:text="${book.price != null ? #numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT') + ' VND' : '0 VND'}">
+                            0 VND</p>
+                        <p class="book-status-warning"
+                            th:text="${'Cease business - will be removed from cart in about ' + book.cartCleanupRemainingMinutes + ' minute(s)'}">
+                            Cease business</p>
+                    </div>
                 </div>
 
                 <div class="pager" th:if="${totalPages > 1}">
