@@ -32,11 +32,13 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y">
-                    <tr th:each="imp : ${imports}" class="hover:bg-gray-50 transition">
+                    <tr th:each="imp : ${imports}" class="hover:bg-gray-50 transition"
+                        th:with="actualTotal=${#aggregates.sum(imp.details.![unitPrice * (receivedQuantity != null ? receivedQuantity : orderedQuantity)])}">
                         <td class="px-6 py-4 font-mono text-blue-600 import-id" th:data-id="${imp.id}" th:text="'IMP-' + ${imp.id}"></td>
                         <td class="px-6 py-4 text-gray-800" th:text="${imp.user.fullName}"></td>
                         <td class="px-6 py-4 text-gray-800" th:text="${imp.supplier.supplierName}"></td>
-                        <td class="px-6 py-4 font-bold text-orange-600 text-right" th:text="${#numbers.formatDecimal(imp.totalAmount, 0, 'COMMA', 0, 'POINT') + ' VND'}"></td>
+                        <td class="px-6 py-4 font-bold text-orange-600 text-right" 
+                            th:text="${#numbers.formatDecimal(actualTotal, 0, 'COMMA', 0, 'POINT') + ' VND'}"></td>
                         <td class="px-6 py-4 text-center">
                             <span th:class="${'px-2 py-1 rounded text-xs font-bold ' + 
                                 (imp.status == 'Requested' ? 'bg-yellow-100 text-yellow-700' : 
@@ -46,18 +48,25 @@
                                  imp.status == 'Completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')}"
                                   th:text="${imp.status}"></span>
                         </td>
-                        <td class="px-6 py-4 text-right space-x-2">
-                            <a th:href="@{'/admin/imports/view/' + ${imp.id}}" class="text-blue-600 hover:underline text-sm font-medium">View</a>
+                        <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                            <!-- Nút View luôn hiển thị -->
+                            <a th:href="@{'/admin/imports/view/' + ${imp.id}}" 
+                               class="inline-block bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs font-bold transition">View</a>
                             
                             <!-- Bước 2: Duyệt đơn Requested -->
                             <form th:if="${imp.status == 'Requested'}" th:action="@{'/admin/imports/approve/' + ${imp.id}}" method="post" class="inline">
-                                <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm">Approve</button>
+                                <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-xs font-bold transition">Approve</button>
                             </form>
 
                             <!-- Bước 4: Đối soát đơn Received -->
                             <a th:if="${imp.status == 'Received'}" th:href="@{'/admin/imports/finalize/' + ${imp.id}}" 
-                               class="bg-blue-50 text-blue-600 border border-blue-200 px-3 py-1 rounded hover:bg-blue-100 text-sm font-bold">Finalize</a>
+                               class="inline-block bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 text-xs font-bold transition">Finalize</a>
                             
+                            <!-- Nút Cancel cho các đơn chưa hoàn tất -->
+                            <a th:if="${imp.status != 'Completed' && imp.status != 'Cancelled'}" 
+                               th:href="@{'/admin/imports/cancel/' + ${imp.id}}" 
+                               class="inline-block bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs font-bold transition">Cancel</a>
+
                             <span th:if="${imp.status == 'Completed'}" class="text-gray-400 italic text-xs">Archived</span>
                             <span th:if="${imp.status == 'Cancelled'}" class="text-red-400 italic text-xs">Cancelled</span>
                         </td>

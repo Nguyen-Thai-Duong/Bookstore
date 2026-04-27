@@ -140,9 +140,16 @@ public class AdminImportController {
         return "redirect:/admin/imports/confirm";
     }
 
+    @GetMapping("/cancel/{id}")
+    public String showCancelForm(@PathVariable Integer id, Model model) {
+        importService.getImportById(id).ifPresent(importOrder -> model.addAttribute("importOrder", importOrder));
+        model.addAttribute("activePage", "confirm-imports");
+        return "admin/import/cancel-form";
+    }
+
     @PostMapping("/cancel/{id}")
-    public String cancel(@PathVariable Integer id) {
-        importService.cancelImport(id);
+    public String cancel(@PathVariable Integer id, @RequestParam(required = false) String note) {
+        importService.cancelImport(id, note);
         return "redirect:/admin/imports/confirm";
     }
 }

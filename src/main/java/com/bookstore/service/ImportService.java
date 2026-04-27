@@ -97,9 +97,10 @@ public class ImportService {
     }
 
     @Transactional
-    public void cancelImport(Integer id) {
+    public void cancelImport(Integer id, String note) {
         Import importOrder = importRepository.findById(id).orElseThrow();
         importOrder.setStatus("Cancelled");
+        importOrder.setNote(note);
         importRepository.save(importOrder);
     }
 }
