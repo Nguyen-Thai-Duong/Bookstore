@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -32,8 +33,35 @@ public class ImportService {
         return importRepository.findById(id);
     }
 
+    public boolean hasOpenImportForProduct(Long productId) {
+        if (productId == null) {
+            return false;
+        }
+
+        return importRepository.findAll().stream()
+                .filter(importOrder -> importOrder != null && !isClosedImportStatus(importOrder.getStatus()))
+                .anyMatch(importOrder -> importOrder.getDetails() != null
+                        && importOrder.getDetails().stream().anyMatch(detail -> detail != null
+                                && detail.getProduct() != null
+                                && productId.equals(detail.getProduct().getId())));
+    }
+
     @Transactional
     public Import saveImport(Import importOrder) {
+        if (importOrder != null && importOrder.getDetails() != null) {
+            for (ImportDetail detail : importOrder.getDetails()) {
+                if (detail == null || detail.getProduct() == null || detail.getProduct().getId() == null) {
+                    continue;
+                }
+                Book latestProduct = bookRepository.findById(detail.getProduct().getId())
+                        .orElseThrow(() -> new RuntimeException("Product not found for import detail"));
+                if (latestProduct.isDiscontinued()) {
+                    throw new RuntimeException(
+                            "Import blocked because product is Discontinued: " + latestProduct.getTitle()
+                                    + ". Please cancel this import.");
+                }
+            }
+        }
         return importRepository.save(importOrder);
     }
 
@@ -85,6 +113,11 @@ public class ImportService {
 
         for (ImportDetail detail : importOrder.getDetails()) {
             Book product = detail.getProduct();
+            if (product != null && product.isDiscontinued()) {
+                throw new RuntimeException(
+                        "Cannot stock in discontinued product: " + product.getTitle()
+                                + ". Please cancel this import.");
+            }
             int receivedQty = (detail.getReceivedQuantity() != null) ? detail.getReceivedQuantity() : 0;
             
             int currentStock = (product.getStock() != null ? product.getStock() : 0);
@@ -102,5 +135,13 @@ public class ImportService {
         importOrder.setStatus("Cancelled");
         importOrder.setNote(note);
         importRepository.save(importOrder);
+    }
+
+    private boolean isClosedImportStatus(String status) {
+        if (status == null) {
+            return false;
+        }
+        String normalized = status.trim().toLowerCase(Locale.ROOT);
+        return "completed".equals(normalized) || "cancelled".equals(normalized);
     }
 }

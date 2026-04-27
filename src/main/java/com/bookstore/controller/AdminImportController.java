@@ -42,7 +42,8 @@ public class AdminImportController {
                             @RequestParam List<Long> productIds,
                             @RequestParam List<Integer> quantities,
                             @RequestParam List<BigDecimal> prices,
-                            HttpSession session) {
+                            HttpSession session,
+                            RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("loggedInUser");
         Supplier supplier = supplierService.getSupplierById(supplierId).orElseThrow();
 
@@ -56,6 +57,12 @@ public class AdminImportController {
 
         for (int i = 0; i < productIds.size(); i++) {
             Book book = bookService.getBookById(productIds.get(i)).orElseThrow();
+            if (book.isDiscontinued()) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Cannot import discontinued product: " + book.getTitle()
+                                + ". Please cancel this import request or select another product.");
+                return "redirect:/admin/imports/new";
+            }
             ImportDetail detail = new ImportDetail();
             detail.setImportOrder(importOrder);
             detail.setProduct(book);
