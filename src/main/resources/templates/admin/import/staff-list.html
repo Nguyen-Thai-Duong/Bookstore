@@ -34,9 +34,9 @@
                         <th class="px-6 py-4 font-semibold text-gray-700">ID</th>
                         <th class="px-6 py-4 font-semibold text-gray-700">Supplier</th>
                         <th class="px-6 py-4 font-semibold text-gray-700">Date</th>
-                        <th class="px-6 py-4 font-semibold text-gray-700 text-right">Total Amount</th>
+                        <th class="px-6 py-4 font-semibold text-gray-700 text-right whitespace-nowrap">Total Amount</th>
                         <th class="px-6 py-4 font-semibold text-gray-700 text-center">Status</th>
-                        <th class="px-6 py-4 font-semibold text-gray-700 text-right">Actions</th>
+                        <th class="px-6 py-4 font-semibold text-gray-700 text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
@@ -45,7 +45,7 @@
                         <td class="px-6 py-4 text-gray-600 font-mono import-id" th:data-id="${imp.id}" th:text="'IMP-' + ${imp.id}"></td>
                         <td class="px-6 py-4 font-medium text-gray-800" th:text="${imp.supplier.supplierName}"></td>
                         <td class="px-6 py-4 text-gray-600 text-sm" th:text="${#temporals.format(imp.orderDate, 'dd/MM/yyyy HH:mm')}"></td>
-                        <td class="px-6 py-4 font-bold text-orange-600 text-right" 
+                        <td class="px-6 py-4 font-bold text-orange-600 text-right whitespace-nowrap" 
                             th:text="${#numbers.formatDecimal(actualTotal, 0, 'COMMA', 0, 'POINT') + ' VND'}"></td>
                         <td class="px-6 py-4 text-center">
                             <span th:class="${'px-3 py-1 rounded-full text-xs font-bold ' + 
@@ -56,20 +56,29 @@
                                  imp.status == 'Completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')}"
                                   th:text="${imp.status}"></span>
                         </td>
-                        <td class="px-6 py-4 text-right space-x-2">
-                            <a th:href="@{'/admin/imports/view/' + ${imp.id}}" class="text-blue-600 hover:underline text-sm font-medium">View</a>
-                            <a th:if="${imp.status == 'Pending'}" 
-                               th:href="@{'/admin/imports/receive/' + ${imp.id}}" 
-                               class="text-sm bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600">
-                                Report Goods
-                            </a>
-                            <form th:if="${imp.status == 'Finalized'}" 
-                                  th:action="@{'/admin/imports/stock-in/' + ${imp.id}}" method="post" class="inline">
-                                <button type="submit" class="text-sm bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                                        onclick="return confirm('Confirm updating stock in database?')">
-                                    Stock-in
-                                </button>
-                            </form>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex justify-center items-center gap-3">
+                                <!-- Slot 1: View (Luôn hiển thị) -->
+                                <div class="w-16">
+                                    <a th:href="@{'/admin/imports/view/' + ${imp.id}}" 
+                                       class="inline-block w-full text-blue-600 hover:underline text-sm font-medium text-center">View</a>
+                                </div>
+                                
+                                <!-- Slot 2: Main Action (Report Goods hoặc Stock-in) -->
+                                <div class="w-24">
+                                    <a th:if="${imp.status == 'Pending'}" 
+                                       th:href="@{'/admin/imports/receive/' + ${imp.id}}" 
+                                       class="inline-block w-full bg-purple-500 text-white px-2 py-1 rounded hover:bg-purple-600 text-[11px] font-bold transition text-center">Report Goods</a>
+                                    
+                                    <form th:if="${imp.status == 'Finalized'}" 
+                                          th:action="@{'/admin/imports/stock-in/' + ${imp.id}}" method="post" class="block w-full">
+                                        <button type="submit" class="w-full bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 text-[11px] font-bold transition text-center"
+                                                onclick="return confirm('Confirm updating stock in database?')">
+                                            Stock-in
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

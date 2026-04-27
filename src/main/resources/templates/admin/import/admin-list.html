@@ -28,7 +28,7 @@
                         <th class="px-6 py-4 font-semibold text-gray-700">Supplier</th>
                         <th class="px-6 py-4 font-semibold text-gray-700 text-right">Total Amount</th>
                         <th class="px-6 py-4 font-semibold text-gray-700 text-center">Status</th>
-                        <th class="px-6 py-4 font-semibold text-gray-700 text-right">Actions</th>
+                        <th class="px-6 py-4 font-semibold text-gray-700 text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
@@ -37,7 +37,7 @@
                         <td class="px-6 py-4 font-mono text-blue-600 import-id" th:data-id="${imp.id}" th:text="'IMP-' + ${imp.id}"></td>
                         <td class="px-6 py-4 text-gray-800" th:text="${imp.user.fullName}"></td>
                         <td class="px-6 py-4 text-gray-800" th:text="${imp.supplier.supplierName}"></td>
-                        <td class="px-6 py-4 font-bold text-orange-600 text-right" 
+                        <td class="px-6 py-4 font-bold text-orange-600 text-right whitespace-nowrap" 
                             th:text="${#numbers.formatDecimal(actualTotal, 0, 'COMMA', 0, 'POINT') + ' VND'}"></td>
                         <td class="px-6 py-4 text-center">
                             <span th:class="${'px-2 py-1 rounded text-xs font-bold ' + 
@@ -48,27 +48,31 @@
                                  imp.status == 'Completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')}"
                                   th:text="${imp.status}"></span>
                         </td>
-                        <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
-                            <!-- Nút View luôn hiển thị -->
-                            <a th:href="@{'/admin/imports/view/' + ${imp.id}}" 
-                               class="inline-block bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs font-bold transition">View</a>
-                            
-                            <!-- Bước 2: Duyệt đơn Requested -->
-                            <form th:if="${imp.status == 'Requested'}" th:action="@{'/admin/imports/approve/' + ${imp.id}}" method="post" class="inline">
-                                <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-xs font-bold transition">Approve</button>
-                            </form>
-
-                            <!-- Bước 4: Đối soát đơn Received -->
-                            <a th:if="${imp.status == 'Received'}" th:href="@{'/admin/imports/finalize/' + ${imp.id}}" 
-                               class="inline-block bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 text-xs font-bold transition">Finalize</a>
-                            
-                            <!-- Nút Cancel cho các đơn chưa hoàn tất -->
-                            <a th:if="${imp.status != 'Completed' && imp.status != 'Cancelled'}" 
-                               th:href="@{'/admin/imports/cancel/' + ${imp.id}}" 
-                               class="inline-block bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs font-bold transition">Cancel</a>
-
-                            <span th:if="${imp.status == 'Completed'}" class="text-gray-400 italic text-xs">Archived</span>
-                            <span th:if="${imp.status == 'Cancelled'}" class="text-red-400 italic text-xs">Cancelled</span>
+                        <td class="px-6 py-4">
+                            <!-- Sử dụng Flexbox justify-center để căn giữa nhóm nút so với tiêu đề Actions -->
+                            <div class="flex justify-center items-center gap-3">
+                                <!-- Slot 1: View -->
+                                <div class="w-16">
+                                    <a th:href="@{'/admin/imports/view/' + ${imp.id}}" 
+                                       class="inline-block w-full bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-[11px] font-bold transition text-center">View</a>
+                                </div>
+                                
+                                <!-- Slot 2: Main Action -->
+                                <div class="w-20">
+                                    <form th:if="${imp.status == 'Requested'}" th:action="@{'/admin/imports/approve/' + ${imp.id}}" method="post" class="block w-full">
+                                        <button type="submit" class="w-full bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 text-[11px] font-bold transition text-center">Approve</button>
+                                    </form>
+                                    <a th:if="${imp.status == 'Received'}" th:href="@{'/admin/imports/finalize/' + ${imp.id}}" 
+                                       class="inline-block w-full bg-indigo-500 text-white px-2 py-1 rounded hover:bg-indigo-600 text-[11px] font-bold transition text-center">Finalize</a>
+                                </div>
+                                
+                                <!-- Slot 3: Cancel Action -->
+                                <div class="w-16">
+                                    <a th:if="${imp.status == 'Requested' || imp.status == 'Received'}" 
+                                       th:href="@{'/admin/imports/cancel/' + ${imp.id}}" 
+                                       class="inline-block w-full bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-[11px] font-bold transition text-center">Cancel</a>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
