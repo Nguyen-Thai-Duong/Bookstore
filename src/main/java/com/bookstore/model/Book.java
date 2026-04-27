@@ -75,7 +75,7 @@ public class Book {
 
     @Transient
     public boolean isDiscontinued() {
-        return description != null && description.contains(DISCONTINUED_MARKER);
+        return status != null && "Discontinued".equalsIgnoreCase(status.trim());
     }
 
     @Transient
@@ -135,6 +135,7 @@ public class Book {
     }
 
     public void markDiscontinued() {
+        status = "Discontinued";
         if (isDiscontinued()) {
             stock = 0;
             if (getDiscontinuedAt() == null) {
