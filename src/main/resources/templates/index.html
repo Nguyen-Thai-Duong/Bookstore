@@ -361,7 +361,6 @@
                             BOOK
                         </span>
 
-                        <!-- ĐƯỜNG DẪN ĐÃ SỬA: Bỏ /detail/ -->
                         <a th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery/' + p.id : '/books/' + p.id}">
                             <img th:src="${p.imageUrl != null && !p.imageUrl.isEmpty() ? p.imageUrl : 'https://via.placeholder.com/110x160'}">
                         </a>
@@ -385,7 +384,6 @@
 
         </section>
 
-        <!-- RIGHT -->
         <aside>
             <div class="sidebar-box">
                 <h3>Best-selling Products</h3>
@@ -393,7 +391,6 @@
                 <div class="rank-item" th:each="p,iter : ${featuredProducts}" th:if="${iter.index < 3}">
                     <span class="rank-badge" th:text="${iter.index + 1}">1</span>
                     <div style="min-width:0;">
-                        <!-- ĐƯỜNG DẪN ĐÃ SỬA: Bỏ /detail/ -->
                         <a class="rank-title"
                             th:href="${p.productTypeId != null && p.productTypeId == 2 ? '/stationery/' + p.id : '/books/' + p.id}"
                             th:text="${p.title}">Title</a>

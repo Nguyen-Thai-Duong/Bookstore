@@ -10,6 +10,7 @@ import com.bookstore.dto.VoucherDTO;
 import com.bookstore.model.Book;
 import com.bookstore.model.Category;
 import com.bookstore.model.Order;
+import com.bookstore.model.Role;
 import com.bookstore.model.User;
 import com.bookstore.model.Voucher;
 import com.bookstore.repository.BookRepository;
@@ -100,7 +101,6 @@ public class AdminController {
 
     @GetMapping
     public String dashboard(Model model) {
-        // Get statistics
         var allBooks = bookService.getProductsByProductType(BOOK_PRODUCT_TYPE_ID).stream()
                 .filter(book -> book != null && !book.isDiscontinued() && "Active".equalsIgnoreCase(book.getStatus()))
                 .toList();
@@ -129,12 +129,11 @@ public class AdminController {
                 .toList();
         var allUsers = userService.getAllUsers();
 
-        // Calculate total stock
+
         int totalStock = allActiveProducts.stream()
                 .mapToInt(product -> product.getStock() != null ? product.getStock() : 0)
                 .sum();
 
-        // Get recent books (last 5)
         var recentBooks = allBooks.stream()
                 .limit(5)
                 .map(BookDTO::fromEntity)
@@ -149,7 +148,6 @@ public class AdminController {
                 .map(ReviewDTO::fromEntity)
                 .toList();
 
-        // Add attributes to model
         model.addAttribute("totalProducts", allBooks.size() + allStationery.size());
         model.addAttribute("totalProductTypes", allProductTypes.size());
         model.addAttribute("totalStock", totalStock);
@@ -281,9 +279,6 @@ public class AdminController {
             boolean submittedUrlChanged = !submittedImageUrl.equals(existingUrl);
 
             if (hasUploadedFile && hasSubmittedUrl) {
-                // If both are submitted in one request:
-                // - New URL + upload => URL wins
-                // - URL is just unchanged prefilled value during edit => upload wins (newest input)
                 if (isEditing && !submittedUrlChanged) {
                     try {
                         String uploadedImageUrl = storeBookImage(imageFile, existingImageUrl[0]);
@@ -459,7 +454,6 @@ public class AdminController {
         try {
             Files.deleteIfExists(oldPath);
         } catch (IOException ignored) {
-            // Keep update flow stable even if old image cleanup fails.
         }
     }
 
@@ -680,7 +674,7 @@ public class AdminController {
     }
 
     @PostMapping("/users/save")
-    public String saveUser(@ModelAttribute("user") UserFormDTO userForm) {
+    public String saveUser(@ModelAttribute("user") UserFormDTO userForm, RedirectAttributes redirectAttributes) {
         String rawPassword = userForm.getPassword();
         String encodedPassword = rawPassword;
 
@@ -702,9 +696,21 @@ public class AdminController {
         }
 
         User user = userForm.toEntity(encodedPassword);
+        Optional<Role> selectedRoleOpt = Optional.empty();
         if (userForm.getRole() != null && userForm.getRole().getId() != null) {
-            roleService.getRoleById(userForm.getRole().getId()).ifPresent(user::setRole);
+            selectedRoleOpt = roleService.getRoleById(userForm.getRole().getId());
+            selectedRoleOpt.ifPresent(user::setRole);
         }
+
+        boolean isAdminAccount = selectedRoleOpt
+                .map(role -> role.getRoleName() != null && "admin".equalsIgnoreCase(role.getRoleName()))
+                .orElse(false);
+        if (isAdminAccount && !"Active".equalsIgnoreCase(user.getStatus())) {
+            user.setStatus("Active");
+            redirectAttributes.addFlashAttribute("userError",
+                    "Admin accounts cannot be locked. Status was kept as Active.");
+        }
+
         userService.saveUser(user);
         return "redirect:/admin/users";
     }
@@ -821,9 +827,6 @@ public class AdminController {
                 return "redirect:/admin/orders";
             }
 
-            // Build an update request object to avoid mutating the managed entity in the
-            // current request context. This keeps old/new status comparison reliable in
-            // service.
             Order updateRequest = new Order();
             updateRequest.setId(orderDto.getId());
             updateRequest.setStatus(orderDto.getStatus());
@@ -865,7 +868,6 @@ public class AdminController {
                         .filter(order -> order.getId().equals(id))
                         .toList();
             } catch (NumberFormatException e) {
-                // Ignore invalid order ID
             }
         }
 
@@ -1050,7 +1052,6 @@ public class AdminController {
         return "admin/vouchers";
     }
 
-    // API endpoint for revenue statistics
     @GetMapping("/api/revenue-statistics")
     @ResponseBody
     public Map<String, Object> getRevenueStatistics(
@@ -1061,17 +1062,16 @@ public class AdminController {
         LocalDateTime end = LocalDateTime.now();
         LocalDateTime start;
 
-        // Default date ranges based on period
         if (startDate == null || startDate.isEmpty()) {
             switch (period.toLowerCase()) {
                 case "day":
-                    start = end.minusDays(30); // Last 30 days
+                    start = end.minusDays(30);  
                     break;
                 case "month":
-                    start = end.minusMonths(12); // Last 12 months
+                    start = end.minusMonths(12); 
                     break;
                 case "year":
-                    start = end.minusYears(5); // Last 5 years
+                    start = end.minusYears(5); 
                     break;
                 default:
                     start = end.minusDays(30);

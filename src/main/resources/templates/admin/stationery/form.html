@@ -40,14 +40,11 @@
 <body class="bg-gray-50 h-full overflow-auto" style="background-color: var(--color-bg);">
 <div class="flex h-screen overflow-hidden">
 
-    <!-- Sidebar -->
     <div th:replace="~{admin/fragments/sidebar :: adminSidebar('stationery')}"></div>
 
-    <!-- Main -->
     <main class="flex-1 overflow-y-auto ml-64">
         <div class="p-8">
 
-            <!-- Header -->
             <div class="mb-8">
                 <h1 class="text-3xl font-bold text-gray-900"
                     th:text="${item.id != null ? 'Edit Stationery' : 'Add New Stationery'}">
@@ -55,7 +52,6 @@
                 <p class="text-gray-600 mt-1">Manage your office and school supplies</p>
             </div>
 
-            <!-- Form -->
             <div class="bg-white rounded-xl shadow-sm p-8">
                 <form th:action="@{/admin/stationery/save}" method="post"
                       enctype="multipart/form-data" th:object="${item}">
@@ -105,7 +101,6 @@
                             <p th:if="${#fields.hasErrors('price')}" th:errors="*{price}" class="text-red-500 text-xs mt-1"></p>
                         </div>
 
-                        <!-- Image from URL -->
                         <div class="md:col-span-2">
                             <label class="block text-sm font-semibold mb-2">Image from URL</label>
                             <input type="url" th:field="*{imageUrl}"
@@ -114,7 +109,6 @@
                             <p class="text-xs text-gray-500 mt-2">Paste an image URL here or upload a file from your device below.</p>
                         </div>
 
-                        <!-- Image from File -->
                         <div class="md:col-span-2">
                             <label class="block text-sm font-semibold mb-2">Upload Image</label>
                             <input type="file" name="imageFile" accept="image/*"
@@ -136,7 +130,6 @@
 
                     </div>
 
-                    <!-- Buttons -->
                     <div class="flex justify-end space-x-4 mt-8 pt-6 border-t">
                         <a href="/admin/stationery" class="px-6 py-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition font-medium">Cancel</a>
 

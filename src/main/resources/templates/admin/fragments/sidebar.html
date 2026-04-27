@@ -53,7 +53,6 @@
                 <span>Dashboard</span>
             </a>
 
-            <!-- Chỉ Admin mới thấy các mục quản lý khác -->
             <a th:if="${session.loggedInUser.role.roleName.equalsIgnoreCase('Admin')}" 
                href="/admin/books"
                 th:class="${activePage == 'books'} ? 'sidebar-item active block px-4 py-3 rounded-lg font-medium flex items-center gap-3' : 'sidebar-item block px-4 py-3 rounded-lg font-medium flex items-center gap-3'">

@@ -47,7 +47,6 @@
             box-shadow: 0 8px 16px rgba(243, 112, 33, 0.32);
         }
 
-        /* fpt-theme-overrides */
         a {
             transition: color 0.2s ease;
         }
@@ -89,12 +88,9 @@
 
 <body class="h-full overflow-hidden" style="background-color: var(--color-bg);">
     <div class="flex h-full w-full overflow-hidden">
-        <!-- Sidebar -->
         <div th:replace="~{admin/fragments/sidebar :: adminSidebar('users')}"></div>
 
-        <!-- Main Content -->
         <main class="flex-1 ml-64 overflow-y-auto h-full">
-            <!-- Header -->
             <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
                 <div class="px-8 py-4">
                     <div class="flex items-center justify-between">
@@ -120,12 +116,9 @@
                 </div>
             </header>
 
-            <!-- Content -->
             <div class="p-8">
-                <!-- User Info Card -->
                 <div class="bg-white rounded-lg shadow-sm mb-6">
                     <div class="p-8">
-                        <!-- User Header -->
                         <div class="flex items-start gap-6 mb-8 pb-8 border-b border-gray-200">
                             <div class="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold text-white"
                                 style="background: linear-gradient(135deg, var(--color-primary) 0%, #D95F14 100%);"
@@ -155,7 +148,6 @@
                             </div>
                         </div>
 
-                        <!-- User Details Grid -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <h4 class="text-lg font-semibold mb-4" style="color: var(--color-text);">Basic
@@ -219,7 +211,6 @@
                     </div>
                 </div>
 
-                <!-- Order History -->
                 <div class="bg-white rounded-lg shadow-sm">
                     <div class="p-6 border-b border-gray-200">
                         <h4 class="text-lg font-semibold" style="color: var(--color-text);">Order History</h4>

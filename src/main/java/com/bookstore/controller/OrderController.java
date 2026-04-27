@@ -61,7 +61,6 @@ public class OrderController {
         }
 
         Order order = orderOpt.get();
-        // Only allow viewing your own orders or admin access
         if (!authService.isAdmin(user) && !order.getUser().getId().equals(user.getId())) {
             return "redirect:/orders";
         }

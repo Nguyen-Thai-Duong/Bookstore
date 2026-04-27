@@ -27,7 +27,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     long countByCategory_Id(Long categoryId);
 
-    // Lọc theo ProductTypeID (1: Book, 2: Stationery)
     @Query("SELECT b FROM Book b WHERE b.category.productType.id = :typeId")
     List<Book> findByProductType(@Param("typeId") Long typeId);
 

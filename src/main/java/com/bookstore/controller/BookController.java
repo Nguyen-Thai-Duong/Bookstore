@@ -80,7 +80,6 @@ public class BookController {
                 ? ratingFilter
                 : null;
 
-        // Filter by rating if provided
         List<ReviewDTO> filteredReviews;
         if (normalizedRatingFilter == null) {
             filteredReviews = allReviews;
@@ -94,7 +93,6 @@ public class BookController {
         model.addAttribute("book", BookDTO.fromEntity(book));
         model.addAttribute("selectedRatingFilter", normalizedRatingFilter);
 
-        // Calculate average rating from all reviews
         if (!allReviews.isEmpty()) {
             double avgRating = allReviews.stream()
                     .mapToInt(r -> r.getRating() != null ? r.getRating() : 0)
@@ -103,7 +101,6 @@ public class BookController {
             model.addAttribute("avgRating", avgRating);
         }
 
-        // Pagination: 4 reviews per page
         final int REVIEWS_PER_PAGE = 4;
         int filteredReviewCount = filteredReviews.size();
         int totalReviewPages = Math.max(1, (int) Math.ceil((double) filteredReviewCount / REVIEWS_PER_PAGE));

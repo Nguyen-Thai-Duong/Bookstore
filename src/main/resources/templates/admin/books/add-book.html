@@ -33,7 +33,6 @@
             background-color: rgba(255, 255, 255, 0.15);
         }
 
-        /* fpt-theme-overrides */
         a {
             transition: color 0.2s ease;
         }
@@ -75,20 +74,16 @@
 
 <body class="bg-gray-50">
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
         <div th:replace="~{admin/fragments/sidebar :: adminSidebar('books')}"></div>
 
-        <!-- Main Content -->
         <main class="flex-1 ml-64 overflow-y-auto">
             <div class="p-8">
-                <!-- Header -->
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold text-gray-900"
                         th:text="${book.id != null ? 'Edit Book' : 'Add New Book'}">Add New Book</h1>
                     <p class="text-gray-600 mt-1">Enter detailed information about the book</p>
                 </div>
 
-                <!-- Form Card -->
                 <div class="bg-white rounded-xl shadow-sm p-8">
                     <form th:action="@{/admin/books/save}" method="post" enctype="multipart/form-data"
                         th:object="${book}">
@@ -99,7 +94,6 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Title -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Book title <span class="text-red-500">*</span>
@@ -112,7 +106,6 @@
                                     th:text="${validationErrors['title']}"></p>
                             </div>
 
-                            <!-- Author -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Author <span class="text-red-500">*</span>
@@ -125,7 +118,6 @@
                                     th:text="${validationErrors['author']}"></p>
                             </div>
 
-                            <!-- Price -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Price (VND) <span class="text-red-500">*</span>
@@ -138,7 +130,6 @@
                                     th:text="${validationErrors['price']}"></p>
                             </div>
 
-                            <!-- Category -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Category <span class="text-red-500">*</span>
@@ -155,7 +146,6 @@
                                     th:text="${validationErrors['category.id']}"></p>
                             </div>
 
-                            <!-- Published Year -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Published year
@@ -169,7 +159,6 @@
                                     th:text="${validationErrors != null ? validationErrors['publishedYear'] : ''}"></p>
                             </div>
 
-                            <!-- Publisher -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Publisher
@@ -182,7 +171,6 @@
                                     th:text="${validationErrors != null ? validationErrors['publisher'] : ''}"></p>
                             </div>
 
-                            <!-- Width -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Width (cm)
@@ -196,7 +184,6 @@
                                     th:text="${validationErrors != null ? validationErrors['widthCm'] : ''}"></p>
                             </div>
 
-                            <!-- Height -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Height (cm)
@@ -210,7 +197,6 @@
                                     th:text="${validationErrors != null ? validationErrors['heightCm'] : ''}"></p>
                             </div>
 
-                            <!-- Thickness -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Thickness (cm)
@@ -224,7 +210,6 @@
                                     th:text="${validationErrors != null ? validationErrors['thicknessCm'] : ''}"></p>
                             </div>
 
-                            <!-- Page Count -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Page count
@@ -237,7 +222,6 @@
                                     th:text="${validationErrors != null ? validationErrors['pageCount'] : ''}"></p>
                             </div>
 
-                            <!-- Upload image -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Image from URL
@@ -249,7 +233,6 @@
                                     from your device below.</p>
                             </div>
 
-                            <!-- Upload image -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Book image
@@ -265,7 +248,6 @@
                                 </div>
                             </div>
 
-                            <!-- Description -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                                     Description
@@ -276,7 +258,6 @@
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
                         <div class="flex justify-end space-x-4 mt-8 pt-6 border-t">
                             <a href="/admin/books"
                                 class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-medium">

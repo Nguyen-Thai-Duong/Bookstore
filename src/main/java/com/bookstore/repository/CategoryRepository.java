@@ -13,7 +13,6 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByName(String name);
 
-    // Lọc danh mục theo loại sản phẩm
     @Query("SELECT c FROM Category c WHERE c.productType.id = :typeId")
     List<Category> findByProductType(@Param("typeId") Long typeId);
 }

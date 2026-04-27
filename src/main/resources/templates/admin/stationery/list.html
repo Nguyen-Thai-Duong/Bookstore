@@ -102,13 +102,9 @@
 
 <body class="h-full overflow-hidden" style="background-color: var(--color-bg);">
     <div class="flex h-full w-full overflow-hidden">
-        <!-- Sidebar -->
         <div th:replace="~{admin/fragments/sidebar :: adminSidebar('stationery')}"></div>
 
-
-        <!-- Main Content -->
         <main class="flex-1 ml-64 overflow-y-auto h-full">
-            <!-- Header -->
             <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
                 <div class="px-8 py-4 flex items-center justify-between">
                     <div>
@@ -128,24 +124,19 @@
                 </div>
             </header>
 
-            <!-- Content -->
             <div class="p-8">
 
-                <!-- Alert Messages -->
-                <!-- Updated to match AdminStationeryController flash attributes -->
                 <div th:if="${itemSuccess}" class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-700"
                     th:text="${itemSuccess}"></div>
                 <div th:if="${itemError}" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700"
                     th:text="${itemError}"></div>
                 
-                <!-- Supporting generic messages if any -->
                 <div th:if="${successMessage}" class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-700"
                     th:text="${successMessage}"></div>
                 <div th:if="${errorMessage}" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700"
                     th:text="${errorMessage}"></div>
 
                 <div class="bg-white rounded-lg shadow-sm">
-                    <!-- Search Bar -->
                     <div class="p-6 border-b border-gray-200">
                         <form action="/admin/stationery" method="get" class="flex gap-4">
                             <input type="text" name="name" th:value="${param.name}" placeholder="Search by name..."
@@ -159,7 +150,6 @@
                         </form>
                     </div>
 
-                    <!-- Table -->
                     <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead class="bg-gray-50 border-b border-gray-200">
@@ -224,7 +214,6 @@
                         </table>
                     </div>
 
-                    <!-- Empty State -->
                     <div th:if="${#lists.isEmpty(stationeryList)}" class="p-12 text-center">
                         <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">

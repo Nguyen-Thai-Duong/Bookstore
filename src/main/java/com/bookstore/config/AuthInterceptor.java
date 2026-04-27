@@ -27,8 +27,6 @@ public class AuthInterceptor implements HandlerInterceptor {
         User user = session == null ? null : (User) session.getAttribute("loggedInUser");
         boolean isAdminPath = path.startsWith("/admin");
 
-        // Keep admin/staff and user areas separated: if they leave /admin area,
-        // force logout to guest before allowing access.
         if (user != null && authService.canAccessAdminPanel(user) && !isAdminPath) {
             session.removeAttribute("loggedInUser");
             session.removeAttribute("cart");

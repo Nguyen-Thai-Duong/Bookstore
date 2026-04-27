@@ -90,12 +90,9 @@
 
 <body style="background-color: var(--color-bg);">
     <div class="flex min-h-screen w-full">
-        <!-- Sidebar -->
         <div th:replace="~{admin/fragments/sidebar :: adminSidebar('users')}"></div>
 
-        <!-- Main Content -->
         <main class="flex-1 ml-64 overflow-y-auto">
-            <!-- Header -->
             <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
                 <div class="px-8 py-4">
                     <h2 class="text-2xl font-bold" style="color: var(--color-text);"
@@ -109,17 +106,14 @@
                 </div>
             </header>
 
-            <!-- Content -->
             <div class="p-8">
                 <div class="max-w-4xl mx-auto">
                     <form th:action="@{/admin/users/save}" method="post" th:object="${user}"
                         class="bg-white rounded-lg shadow-sm p-8">
 
-                        <!-- Hidden ID field for edit mode -->
                         <input type="hidden" th:field="*{id}" />
                         <input type="hidden" th:field="*{createdAt}" />
 
-                        <!-- Alert for Edit Mode -->
                         <div th:if="${user.id != null}" class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
                             <div class="flex">
                                 <svg class="w-5 h-5 text-blue-400 mr-3" fill="none" stroke="currentColor"
@@ -134,9 +128,7 @@
                             </div>
                         </div>
 
-                        <!-- Form Fields -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Full Name -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Full Name <span class="text-red-500">*</span>
@@ -146,7 +138,6 @@
                                     style="focus:ring-color: var(--color-primary);" placeholder="Enter full name">
                             </div>
 
-                            <!-- Email -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Email <span class="text-red-500">*</span>
@@ -156,7 +147,6 @@
                                     style="focus:ring-color: var(--color-primary);" placeholder="example@email.com">
                             </div>
 
-                            <!-- Password (only for new user or visible for edit) -->
                             <div th:if="${user.id == null}">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Password <span class="text-red-500">*</span>
@@ -166,7 +156,6 @@
                                     style="focus:ring-color: var(--color-primary);" placeholder="Enter password">
                             </div>
 
-                            <!-- Password placeholder for edit mode -->
                             <div th:if="${user.id != null}">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Password
@@ -178,7 +167,6 @@
                                 <p class="text-xs text-gray-500 mt-1">Leave blank if no change is needed</p>
                             </div>
 
-                            <!-- Phone -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Phone Number
@@ -188,7 +176,6 @@
                                     style="focus:ring-color: var(--color-primary);" placeholder="0123456789">
                             </div>
 
-                            <!-- Role -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Role <span class="text-red-500">*</span>
@@ -204,22 +191,28 @@
                                 <p class="text-xs text-gray-500 mt-1">Select access role for the user</p>
                             </div>
 
-                            <!-- Status -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Status <span class="text-red-500">*</span>
                                 </label>
-                                <select th:field="*{status}" required
-                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-0"
-                                    style="focus:ring-color: var(--color-primary);">
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Locked</option>
-                                </select>
-                                <p class="text-xs text-gray-500 mt-1">User account status</p>
+                                <div th:if="${user.id != null and user.role != null and user.role.roleName != null and #strings.equalsIgnoreCase(user.role.roleName, 'Admin')}">
+                                    <input type="hidden" th:field="*{status}" value="Active">
+                                    <input type="text" value="Active" readonly
+                                        class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed">
+                                    <p class="text-xs text-gray-500 mt-1">Admin account status is fixed and cannot be locked.</p>
+                                </div>
+                                <div th:unless="${user.id != null and user.role != null and user.role.roleName != null and #strings.equalsIgnoreCase(user.role.roleName, 'Admin')}">
+                                    <select th:field="*{status}" required
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-offset-0"
+                                        style="focus:ring-color: var(--color-primary);">
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Locked</option>
+                                    </select>
+                                    <p class="text-xs text-gray-500 mt-1">User account status</p>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Address (Full Width) -->
                         <div class="mt-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Address
@@ -230,7 +223,6 @@
                                 placeholder="Enter full address"></textarea>
                         </div>
 
-                        <!-- Info Note -->
                         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-6">
                             <div class="flex">
                                 <svg class="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
@@ -251,7 +243,6 @@
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
                         <div class="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-200">
                             <a href="/admin/users" class="px-6 py-3 border-2 rounded-lg hover:bg-gray-50 transition"
                                 style="border-color: var(--color-primary); color: var(--color-primary);">

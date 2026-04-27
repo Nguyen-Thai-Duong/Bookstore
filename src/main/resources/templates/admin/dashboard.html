@@ -103,7 +103,6 @@
             color: var(--color-error);
         }
 
-        /* fpt-theme-overrides */
         a {
             transition: color 0.2s ease;
         }
@@ -146,12 +145,9 @@
 <body class="h-full overflow-hidden" style="background-color: var(--color-bg);">
     <div class="flex h-full w-full overflow-hidden">
 
-        <!-- Shared Admin Sidebar -->
         <div th:replace="~{admin/fragments/sidebar :: adminSidebar('dashboard')}"></div>
 
-        <!-- Main Content -->
         <main class="flex-1 ml-64 overflow-y-auto h-full">
-            <!-- Header -->
             <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
                 <div class="px-8 py-4 flex items-center justify-between">
                     <div>
@@ -168,9 +164,7 @@
                 </div>
             </header>
 
-            <!-- Dashboard Content -->
             <div class="p-8 space-y-8">
-                <!-- Stats -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="stat-card bg-white p-6 rounded-lg">
                         <div class="flex items-center justify-between mb-4">
@@ -238,7 +232,6 @@
                     </div>
                 </div>
 
-                <!-- Revenue Chart Section -->
                 <div class="bg-white p-6 rounded-lg">
                     <div class="flex items-center justify-between mb-6">
                         <div>
@@ -269,9 +262,7 @@
                     </div>
                 </div>
 
-                <!-- Tables Section -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Recent Books -->
                     <div class="bg-white p-6 rounded-lg">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-bold" style="color: var(--color-text);">Latest Books</h3>
@@ -306,7 +297,6 @@
                         </div>
                     </div>
 
-                    <!-- Product Types -->
                     <div class="bg-white p-6 rounded-lg">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-bold" style="color: var(--color-text);">Product Type</h3>
@@ -329,7 +319,6 @@
                         </div>
                     </div>
 
-                    <!-- Recent Stationery -->
                     <div class="bg-white p-6 rounded-lg">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-lg font-bold" style="color: var(--color-text);">Latest Stationery</h3>
@@ -364,7 +353,6 @@
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
                 <div class="bg-white p-6 rounded-lg">
                     <h3 class="text-lg font-bold mb-4" style="color: var(--color-text);">Quick Actions</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -473,11 +461,9 @@
                 });
         }
 
-        // Render chart
         function renderChart(data) {
             const ctx = document.getElementById('revenueChart').getContext('2d');
 
-            // Destroy existing chart
             if (revenueChart) {
                 revenueChart.destroy();
             }

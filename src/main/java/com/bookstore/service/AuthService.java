@@ -48,7 +48,6 @@ public class AuthService {
             try {
                 user.setDateOfBirth(LocalDate.parse(dateOfBirth));
             } catch (Exception e) {
-                // Ignore invalid date format
             }
         }
         user.setStatus("Active");
@@ -106,7 +105,6 @@ public class AuthService {
             try {
                 user.setDateOfBirth(LocalDate.parse(dateOfBirth));
             } catch (Exception e) {
-                // Ignore invalid date format
             }
         }
         return userRepository.save(user);

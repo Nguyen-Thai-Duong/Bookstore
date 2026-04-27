@@ -79,7 +79,6 @@ public class BookServiceImpl implements BookService {
             return List.of();
         }
 
-        // Sum sold quantity per book, ignoring canceled orders.
         Map<Long, Integer> soldQuantityByBookId = new HashMap<>();
         for (OrderDetail detail : orderDetailRepository.findAll()) {
             if (detail == null || detail.getBook() == null || detail.getBook().getId() == null) {

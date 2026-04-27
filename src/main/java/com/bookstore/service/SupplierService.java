@@ -15,7 +15,6 @@ public class SupplierService {
 
     private final SupplierRepository supplierRepository;
 
-    // Chỉ lấy những nhà cung cấp đang Active để hiển thị
     public List<Supplier> getAllActiveSuppliers() {
         return supplierRepository.findAll().stream()
                 .filter(s -> "Active".equalsIgnoreCase(s.getStatus()))
@@ -37,7 +36,6 @@ public class SupplierService {
         return supplierRepository.save(supplier);
     }
 
-    // Xóa mềm: Chuyển sang Inactive
     public void deleteSoft(Integer id) {
         supplierRepository.findById(id).ifPresent(supplier -> {
             supplier.setStatus("Inactive");

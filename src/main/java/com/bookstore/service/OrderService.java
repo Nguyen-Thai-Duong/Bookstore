@@ -21,6 +21,5 @@ public interface OrderService {
 
     void deleteOrder(Long id);
 
-    // Statistics methods
     Map<String, Object> getRevenueStatistics(String period, LocalDateTime startDate, LocalDateTime endDate);
 }

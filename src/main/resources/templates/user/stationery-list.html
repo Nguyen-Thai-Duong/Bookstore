@@ -96,7 +96,6 @@
                 <div th:if="${#lists.isEmpty(items)}" style="padding: 20px 6px; color: #666;">No items found.</div>
 
                 <div th:if="${!#lists.isEmpty(items)}" class="books-grid">
-                    <!-- LINK ĐÃ SỬA: Sắp xếp theo chuẩn /stationery/{id} -->
                     <a th:each="item : ${items}" th:href="@{/stationery/{id}(id=${item.id})}" class="book-card">
                         <img class="book-cover" th:src="${item.imageUrl != null and !item.imageUrl.isEmpty() ? item.imageUrl : 'https://via.placeholder.com/120x175?text=No+Image'}" th:alt="${item.title}">
                         <h3 class="book-title" th:text="${item.title}">Item Name</h3>

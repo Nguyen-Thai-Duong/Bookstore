@@ -66,13 +66,11 @@
                         </td>
                         <td class="px-6 py-4 text-center">
                             <div class="flex justify-center items-center gap-3">
-                                <!-- Slot 1: View (Luôn hiển thị) -->
                                 <div class="w-16">
                                     <a th:href="@{'/admin/imports/view/' + ${imp.id}}" 
                                        class="inline-block w-full text-blue-600 hover:underline text-sm font-medium text-center">View</a>
                                 </div>
                                 
-                                <!-- Slot 2: Main Action (Report Goods hoặc Stock-in) -->
                                 <div class="w-24">
                                     <a th:if="${imp.status == 'Pending'}" 
                                        th:href="@{'/admin/imports/receive/' + ${imp.id}}" 

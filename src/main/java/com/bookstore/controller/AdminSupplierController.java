@@ -17,7 +17,6 @@ public class AdminSupplierController {
 
     @GetMapping
     public String listSuppliers(Model model) {
-        // Chỉ hiện những Supplier đang Active
         model.addAttribute("suppliers", supplierService.getAllActiveSuppliers());
         model.addAttribute("activePage", "suppliers");
         return "admin/supplier/list";
@@ -46,7 +45,6 @@ public class AdminSupplierController {
 
     @GetMapping("/delete/{id}")
     public String deleteSupplier(@PathVariable Integer id, RedirectAttributes ra) {
-        // Thực hiện xóa mềm (chuyển sang Inactive)
         supplierService.deleteSoft(id);
         ra.addFlashAttribute("successMessage", "Supplier status changed to Inactive.");
         return "redirect:/admin/suppliers";

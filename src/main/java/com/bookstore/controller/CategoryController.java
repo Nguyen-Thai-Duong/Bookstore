@@ -17,13 +17,11 @@ public class CategoryController {
 
     @GetMapping
     public String listCategories(Model model) {
-        // Redirect to home page with categories section anchor
         return "redirect:/?section=categories";
     }
 
     @GetMapping("/{id}")
     public String viewCategory(@PathVariable Long id, Model model) {
-        // Redirect to home page with categories section anchor
         return "redirect:/?section=categories";
     }
 

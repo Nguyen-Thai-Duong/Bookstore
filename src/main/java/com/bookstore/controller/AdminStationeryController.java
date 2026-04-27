@@ -61,7 +61,6 @@ public class AdminStationeryController {
     public String listStationery(@RequestParam(required = false) String name,
                                 @RequestParam(required = false) String brand,
                                 Model model) {
-        // Cập nhật lọc: Chỉ lấy các item không bị Discontinued và status không phải là Deleted
         List<Book> stationeryItems = bookRepository.findByProductType(2L).stream()
                 .filter(item -> !"Deleted".equals(item.getStatus()) && !item.isDiscontinued())
                 .collect(Collectors.toList());
