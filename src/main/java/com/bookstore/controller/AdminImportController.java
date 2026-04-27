@@ -32,7 +32,7 @@ public class AdminImportController {
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("suppliers", supplierService.getAllActiveSuppliers());
-        model.addAttribute("products", bookService.getAllBooks());
+        model.addAttribute("products", bookService.getAllActiveBooks());
         model.addAttribute("activePage", "imports");
         return "admin/import/form";
     }

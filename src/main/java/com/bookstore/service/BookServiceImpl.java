@@ -186,4 +186,11 @@ public class BookServiceImpl implements BookService {
     public void deleteBook(Long id) {
         bookRepository.deleteById(id);
     }
+
+    @Override
+    public List<Book> getAllActiveBooks() {
+        return bookRepository.findByStatus("Active").stream()
+                .filter(book -> !book.isDiscontinued())
+                .toList();
+    }
 }

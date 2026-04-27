@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookNest - Stationery </title>
+    <title>BookNest - Stationery Management</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
             --color-surface: #ffffff;
             --color-text: #333333;
             --color-border: #e5e0d8;
-            --color-success: #10b981;
+            --color-success: #00A859;
             --color-warning: #f59e0b;
             --color-error: #ef4444;
         }
@@ -67,6 +67,36 @@
         .table-row:hover {
             background-color: rgba(243, 112, 33, 0.08);
         }
+
+        a {
+            transition: color 0.2s ease;
+        }
+
+        main a,
+        .sidebar-list a,
+        .footer-col a,
+        .info,
+        .text-info {
+            color: #0072BC;
+        }
+
+        button,
+        input[type="submit"],
+        .btn,
+        .btn-primary,
+        .checkout-btn {
+            border-radius: 8px;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+        }
+
+        button:hover,
+        input[type="submit"]:hover,
+        .btn:hover,
+        .btn-primary:hover,
+        .checkout-btn:hover {
+            filter: brightness(0.95);
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 
@@ -100,6 +130,13 @@
 
             <!-- Content -->
             <div class="p-8">
+
+                <!-- Alert Messages -->
+                <div th:if="${successMessage}" class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-green-700"
+                    th:text="${successMessage}"></div>
+                <div th:if="${errorMessage}" class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700"
+                    th:text="${errorMessage}"></div>
+
                 <div class="bg-white rounded-lg shadow-sm">
                     <!-- Search Bar -->
                     <div class="p-6 border-b border-gray-200">
@@ -147,8 +184,7 @@
                                 <tr th:each="item : ${stationeryList}" class="table-row">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" th:text="${item.id}">1
                                     </td>
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900" th:text="${item.title}">Item
-                                        title</td>
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-900" th:text="${item.title}">Item title</td>
                                     <td class="px-6 py-4 text-sm text-gray-600" th:text="${item.author}">Brand</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold"
                                         style="color: var(--color-primary);"

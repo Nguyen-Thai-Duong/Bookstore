@@ -5,6 +5,9 @@ import com.bookstore.dto.CategoryDTO;
 import com.bookstore.model.Book;
 import com.bookstore.model.Category;
 import com.bookstore.repository.BookRepository;
+import com.bookstore.repository.CartItemRepository;
+import com.bookstore.repository.ImportDetailRepository;
+import com.bookstore.repository.OrderDetailRepository;
 import com.bookstore.service.BookService;
 import com.bookstore.service.CategoryService;
 import jakarta.validation.Valid;
@@ -40,12 +43,22 @@ public class AdminStationeryController {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
+    @Autowired
+    private ImportDetailRepository importDetailRepository;
+
     @GetMapping
     public String listStationery(@RequestParam(required = false) String name,
                                 @RequestParam(required = false) String brand,
                                 Model model) {
-        List<Book> stationeryItems = bookService.getProductsByProductType(2L).stream()
-                .filter(item -> "Active".equalsIgnoreCase(item.getStatus()))
+        // Chỉ lấy những item chưa bị xóa (status khác 'Deleted')
+        List<Book> stationeryItems = bookRepository.findByProductType(2L).stream()
+                .filter(item -> !"Deleted".equals(item.getStatus()))
                 .collect(Collectors.toList());
 
         if (name != null && !name.isEmpty()) {
@@ -74,7 +87,6 @@ public class AdminStationeryController {
         BookDTO dto = new BookDTO();
         List<Category> stationeryCategories = categoryService.getCategoriesByProductType(2L);
         
-        // Mặc định chọn category đầu tiên nếu chỉ có 1 category thuộc loại Stationery (ID 2)
         if (!stationeryCategories.isEmpty()) {
             dto.setCategory(CategoryDTO.fromEntity(stationeryCategories.get(0)));
         }
@@ -147,11 +159,55 @@ public class AdminStationeryController {
 
     @GetMapping("/delete/{id}")
     public String deleteStationery(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        bookService.getBookById(id).ifPresent(item -> {
-            item.setStatus("Discontinued"); 
+        var itemOptional = bookService.getBookById(id);
+        if (itemOptional.isEmpty()) {
+            redirectAttributes.addFlashAttribute("itemError", "Item not found");
+            return "redirect:/admin/stationery";
+        }
+
+        Book item = itemOptional.get();
+
+        // Kiểm tra lịch sử đơn hàng (OrderDetail)
+        if (orderDetailRepository.existsByBook_Id(id)) {
+            redirectAttributes.addFlashAttribute("itemError",
+                    "Cannot delete this item because it exists in order history.");
+            return "redirect:/admin/stationery";
+        }
+
+        // Kiểm tra lịch sử nhập hàng (ImportDetail)
+        if (importDetailRepository.existsByProduct_Id(id)) {
+            redirectAttributes.addFlashAttribute("itemError",
+                    "Cannot delete this item because it exists in import history.");
+            return "redirect:/admin/stationery";
+        }
+
+        // Bước 1: Nếu chưa Discontinued, thực hiện đánh dấu Discontinued (ẩn đi với khách hàng)
+        if (!item.isDiscontinued()) {
+            item.markDiscontinued();
             bookService.saveBook(item);
-            redirectAttributes.addFlashAttribute("successMessage", "Item has been discontinued.");
-        });
+            redirectAttributes.addFlashAttribute("itemSuccess",
+                    "Item hidden from store successfully. This item will be removed from all carts after 2 minutes.");
+            return "redirect:/admin/stationery";
+        }
+
+        // Bước 2: Kiểm tra cửa sổ 2 phút để dọn dẹp giỏ hàng
+        if (item.isCartCleanupWindowActive()) {
+            redirectAttributes.addFlashAttribute("itemError",
+                    "This item is still in the 2-minute cart cleanup window. Please try again after the timer ends.");
+            return "redirect:/admin/stationery";
+        }
+
+        // Bước 3: Kiểm tra giỏ hàng (Cart Items)
+        if (cartItemRepository.existsByBook_Id(id)) {
+            redirectAttributes.addFlashAttribute("itemError",
+                    "Item is still present in some carts. Please wait for cleanup to finish and try again.");
+            return "redirect:/admin/stationery";
+        }
+
+        // Bước 4: Xóa mềm (Đổi trạng thái thành 'Deleted' thay vì xóa khỏi database)
+        item.setStatus("Deleted");
+        bookService.saveBook(item);
+        redirectAttributes.addFlashAttribute("itemSuccess", "Item has been hidden from admin list successfully (Soft Deleted).");
         return "redirect:/admin/stationery";
     }
 
