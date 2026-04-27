@@ -10,6 +10,7 @@ import com.bookstore.repository.ImportDetailRepository;
 import com.bookstore.repository.OrderDetailRepository;
 import com.bookstore.service.BookService;
 import com.bookstore.service.CategoryService;
+import com.bookstore.service.ImportService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -52,13 +54,16 @@ public class AdminStationeryController {
     @Autowired
     private ImportDetailRepository importDetailRepository;
 
+    @Autowired
+    private ImportService importService;
+
     @GetMapping
     public String listStationery(@RequestParam(required = false) String name,
                                 @RequestParam(required = false) String brand,
                                 Model model) {
-        // Chỉ lấy những item chưa bị xóa (status khác 'Deleted')
+        // Cập nhật lọc: Chỉ lấy các item không bị Discontinued và status không phải là Deleted
         List<Book> stationeryItems = bookRepository.findByProductType(2L).stream()
-                .filter(item -> !"Deleted".equals(item.getStatus()))
+                .filter(item -> !"Deleted".equals(item.getStatus()) && !item.isDiscontinued())
                 .collect(Collectors.toList());
 
         if (name != null && !name.isEmpty()) {
@@ -167,48 +172,70 @@ public class AdminStationeryController {
 
         Book item = itemOptional.get();
 
-        // Kiểm tra lịch sử đơn hàng (OrderDetail)
-        if (orderDetailRepository.existsByBook_Id(id)) {
+        if (importService.hasOpenImportForProduct(id)) {
             redirectAttributes.addFlashAttribute("itemError",
-                    "Cannot delete this item because it exists in order history.");
+                    "Cannot delete this product because it exists in an import that is not completed yet. Please complete or cancel that import first.");
             return "redirect:/admin/stationery";
         }
 
-        // Kiểm tra lịch sử nhập hàng (ImportDetail)
-        if (importDetailRepository.existsByProduct_Id(id)) {
+        boolean hasBlockingOrder = orderDetailRepository.findByBookId(id).stream()
+                .anyMatch(detail -> detail.getOrder() != null && isBlockingDeleteOrderStatus(detail.getOrder().getStatus()));
+        if (hasBlockingOrder) {
             redirectAttributes.addFlashAttribute("itemError",
-                    "Cannot delete this item because it exists in import history.");
+                    "Cannot delete this product because it exists in active orders (Pending/Confirmed/Shipping).");
             return "redirect:/admin/stationery";
         }
 
-        // Bước 1: Nếu chưa Discontinued, thực hiện đánh dấu Discontinued (ẩn đi với khách hàng)
+        boolean inAnyCart = cartItemRepository.existsByBook_Id(id);
+
         if (!item.isDiscontinued()) {
             item.markDiscontinued();
             bookService.saveBook(item);
-            redirectAttributes.addFlashAttribute("itemSuccess",
-                    "Item hidden from store successfully. This item will be removed from all carts after 2 minutes.");
+            
+            if (inAnyCart) {
+                redirectAttributes.addFlashAttribute("itemSuccess",
+                        "Product status changed to Discontinued. It is hidden from users now. After 2 minutes, click Delete again to remove only this product from all carts.");
+            } else {
+                redirectAttributes.addFlashAttribute("itemSuccess",
+                        "Product status changed to Discontinued. It is hidden from users and can only be restored by setting Status=Active in database.");
+            }
             return "redirect:/admin/stationery";
         }
 
-        // Bước 2: Kiểm tra cửa sổ 2 phút để dọn dẹp giỏ hàng
         if (item.isCartCleanupWindowActive()) {
             redirectAttributes.addFlashAttribute("itemError",
-                    "This item is still in the 2-minute cart cleanup window. Please try again after the timer ends.");
+                    "Product is in carts. Wait until the 2-minute window ends, then click Delete again to remove only this product from carts.");
             return "redirect:/admin/stationery";
         }
 
-        // Bước 3: Kiểm tra giỏ hàng (Cart Items)
-        if (cartItemRepository.existsByBook_Id(id)) {
-            redirectAttributes.addFlashAttribute("itemError",
-                    "Item is still present in some carts. Please wait for cleanup to finish and try again.");
+        if (inAnyCart) {
+            long removedRows = cartItemRepository.deleteByBook_Id(id);
+            redirectAttributes.addFlashAttribute("itemSuccess",
+                    "Product remains Discontinued. Removed from " + removedRows + " cart line(s).");
             return "redirect:/admin/stationery";
         }
 
-        // Bước 4: Xóa mềm (Đổi trạng thái thành 'Deleted' thay vì xóa khỏi database)
         item.setStatus("Deleted");
         bookService.saveBook(item);
-        redirectAttributes.addFlashAttribute("itemSuccess", "Item has been hidden from admin list successfully (Soft Deleted).");
+        redirectAttributes.addFlashAttribute("itemSuccess", "Item has been hidden from admin list successfully.");
         return "redirect:/admin/stationery";
+    }
+
+    private boolean isBlockingDeleteOrderStatus(String status) {
+        String normalized = normalizeOrderStatus(status);
+        return "pending".equals(normalized) || "confirmed".equals(normalized) || "shipping".equals(normalized);
+    }
+
+    private String normalizeOrderStatus(String status) {
+        if (status == null) return "";
+        String normalized = Normalizer.normalize(status, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase(Locale.ROOT)
+                .trim();
+        if (normalized.contains("pending") || normalized.contains("cho xu ly")) return "pending";
+        if (normalized.contains("confirmed") || normalized.contains("xac nhan")) return "confirmed";
+        if (normalized.contains("shipping") || normalized.contains("dang giao")) return "shipping";
+        return normalized;
     }
 
     @GetMapping("/{id}")
